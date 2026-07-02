@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 60px;
+}
+
+.developer-footer {
+    position: fixed;
+    bottom: 0; left: 0; width: 100%;
+    background: #ffffff;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+    padding: 12px 0;
+    text-align: center;
+    z-index: 900;
+    font-size: 0.95rem;
+    color: #475569;
+    border-top: 2px solid #e2e8f0;
+}
+
+.developer-footer a {
+    color: #2563eb;
+    font-weight: 800;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+.developer-footer a:hover { color: #1e40af; }
+
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; transition: opacity 0.3s;
+}
+.modal-overlay.active { display: flex; opacity: 1; }
+
+.modal-content {
+    background: #fff; padding: 30px; border-radius: 16px;
+    width: 90%; max-width: 500px; text-align: right;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: translateY(20px); transition: transform 0.3s;
+    display: flex; flex-direction: column; gap: 15px;
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
+
+.modal-content h3 { border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-top: 0; color: #0f172a;}
+
+/* Signature Pad Styles */
+.signature-pad-container {
+    width: 100%; height: 200px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    position: relative;
+    overflow: hidden;
+    touch-action: none; /* لمنع التمرير أثناء الرسم على الجوال */
+}
+canvas#signature-pad-canvas {
+    width: 100%; height: 100%;
+    cursor: crosshair;
+}
+.signature-actions {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;
+}
+.signature-actions button {
+    flex: 1; padding: 10px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; color: white; transition: 0.2s;
+}
+.btn-clear-sig { background: #ef4444; }
+.btn-save-sig { background: #10b981; }
+.btn-insert-sig { background: #3b82f6; }
+.signature-actions button:hover { filter: brightness(1.1); }
+
+
+/* ========================================== */
+/* التنسيقات الجديدة لشاشة تسجيل الدخول */
+/* ========================================== */
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 1));
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    direction: rtl;
+}
+
+.auth-glass-panel {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    padding: 40px 30px;
+    width: 90%;
+    max-width: 380px;
+    text-align: center;
+    animation: authSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.auth-input-group input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px 20px;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.auth-input-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.auth-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.5);
+}
+
+.auth-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@keyframes authSlideUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}

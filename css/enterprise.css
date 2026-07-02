@@ -1,0 +1,37 @@
+/* css/enterprise.css */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+
+.admin-shell {
+    font-family: 'Tajawal', sans-serif; background: #f8fafc; color: #0f172a;
+    margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; direction: rtl;
+}
+.admin-shell * { box-sizing: border-box; }
+.admin-shell .sidebar {
+    width: 280px; background: #1e293b; color: white; display: flex; flex-direction: column;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 10;
+}
+.admin-shell .sidebar-header { padding: 20px; border-bottom: 1px solid #334155; text-align: center; }
+.admin-shell .sidebar-header h2 { margin: 0; font-size: 1.2rem; color: #38bdf8; }
+.admin-shell .nav-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
+.admin-shell .nav-item {
+    padding: 15px 25px; display: flex; align-items: center; gap: 15px; color: #cbd5e1;
+    text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;
+}
+.admin-shell .nav-item:hover, .admin-shell .nav-item.active { background: #334155; color: #fff; border-right: 4px solid #38bdf8; }
+.admin-shell .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.admin-shell .topbar {
+    height: 70px; background: white; border-bottom: 1px solid #e2e8f0; display: flex;
+    justify-content: space-between; align-items: center; padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.admin-shell .content-area { flex: 1; padding: 30px; overflow-y: auto; background: #f1f5f9; }
+.admin-shell .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
+.admin-shell .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+.admin-shell .data-table th, .admin-shell .data-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; }
+.admin-shell .data-table th { background: #f8fafc; font-weight: 700; color: #475569; }
+.admin-shell .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; transition: 0.2s; }
+.admin-shell .btn-primary { background: #2563eb; color: white; }
+.admin-shell .btn-danger { background: #ef4444; color: white; }
+.admin-shell .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px; font-family: inherit; }
+.admin-shell .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.enterprise-toast { position: fixed; bottom: 30px; left: 30px; background: #1e293b; color: white; padding: 15px 25px; border-radius: 8px; z-index: 9999; animation: slideIn 0.3s; }
+@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }

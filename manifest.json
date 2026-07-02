@@ -1,0 +1,27 @@
+{
+  "name": "مؤسسة درة العالم للنقليات",
+  "short_name": "درة العالم",
+  "description": "نظام إدارة بوليصة الشحن",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e40af",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "./icons/196.png",
+      "sizes": "196x196",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
