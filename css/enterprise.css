@@ -1,37 +1,269 @@
-/* css/enterprise.css */
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap');
+/* ========================================= */
+/* ملف التنسيقات الرئيسي للإدارة المؤسسية    */
+/* ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
 
-.admin-shell {
-    font-family: 'Tajawal', sans-serif; background: #f8fafc; color: #0f172a;
-    margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; direction: rtl;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Tajawal', sans-serif;
 }
-.admin-shell * { box-sizing: border-box; }
-.admin-shell .sidebar {
-    width: 280px; background: #1e293b; color: white; display: flex; flex-direction: column;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1); z-index: 10;
+
+body {
+    background-color: #f8fafc;
+    color: #0f172a;
+    direction: rtl;
+    display: flex;
+    min-height: 100vh;
 }
-.admin-shell .sidebar-header { padding: 20px; border-bottom: 1px solid #334155; text-align: center; }
-.admin-shell .sidebar-header h2 { margin: 0; font-size: 1.2rem; color: #38bdf8; }
-.admin-shell .nav-menu { flex: 1; padding: 20px 0; overflow-y: auto; }
-.admin-shell .nav-item {
-    padding: 15px 25px; display: flex; align-items: center; gap: 15px; color: #cbd5e1;
-    text-decoration: none; font-weight: 600; cursor: pointer; transition: 0.3s;
+
+/* --- القائمة الجانبية (Sidebar) --- */
+.sidebar {
+    width: 260px;
+    background-color: #0f172a;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    transition: 0.3s;
+    box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    z-index: 100;
 }
-.admin-shell .nav-item:hover, .admin-shell .nav-item.active { background: #334155; color: #fff; border-right: 4px solid #38bdf8; }
-.admin-shell .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.admin-shell .topbar {
-    height: 70px; background: white; border-bottom: 1px solid #e2e8f0; display: flex;
-    justify-content: space-between; align-items: center; padding: 0 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+.sidebar-header {
+    padding: 25px 20px;
+    text-align: center;
+    border-bottom: 1px solid #1e293b;
 }
-.admin-shell .content-area { flex: 1; padding: 30px; overflow-y: auto; background: #f1f5f9; }
-.admin-shell .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px; }
-.admin-shell .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-.admin-shell .data-table th, .admin-shell .data-table td { padding: 12px 15px; text-align: right; border-bottom: 1px solid #e2e8f0; }
-.admin-shell .data-table th { background: #f8fafc; font-weight: 700; color: #475569; }
-.admin-shell .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-family: inherit; transition: 0.2s; }
-.admin-shell .btn-primary { background: #2563eb; color: white; }
-.admin-shell .btn-danger { background: #ef4444; color: white; }
-.admin-shell .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 15px; font-family: inherit; }
-.admin-shell .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.enterprise-toast { position: fixed; bottom: 30px; left: 30px; background: #1e293b; color: white; padding: 15px 25px; border-radius: 8px; z-index: 9999; animation: slideIn 0.3s; }
-@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+.sidebar-header h2 {
+    color: #38bdf8;
+    font-weight: 800;
+    font-size: 1.5rem;
+    margin: 0;
+}
+.nav-menu {
+    list-style: none;
+    padding: 20px 0;
+}
+.nav-item {
+    padding: 15px 25px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+}
+.nav-item:hover, .nav-item.active {
+    background-color: #1e293b;
+    color: #38bdf8;
+    border-right: 4px solid #38bdf8;
+}
+
+/* --- منطقة المحتوى الرئيسية --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* --- الشريط العلوي --- */
+.top-bar {
+    background: #fff;
+    padding: 15px 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 90;
+}
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 700;
+    color: #475569;
+}
+
+/* --- منطقة عرض البيانات --- */
+#content-area {
+    padding: 30px;
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+.card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    border: 1px solid #f1f5f9;
+}
+.card h3 {
+    margin-bottom: 15px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.card p {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+/* --- الجداول --- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+.data-table th, .data-table td {
+    padding: 14px 15px;
+    text-align: right;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+}
+.data-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 700;
+    border-top: 1px solid #e2e8f0;
+}
+.data-table tr:hover {
+    background-color: #f1f5f9;
+}
+
+/* --- الأزرار والحقول --- */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+}
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+.btn-primary:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 10px rgba(37,99,235,0.2);
+}
+.btn-danger {
+    background: #ef4444;
+    color: #fff;
+}
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-family: inherit;
+    outline: none;
+    transition: 0.2s;
+    background: #f8fafc;
+    color: #0f172a;
+}
+.form-control:focus {
+    border-color: #38bdf8;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.2);
+}
+
+/* --- الإشعارات (Toasts) --- */
+.enterprise-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #fff;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15);
+    z-index: 999999;
+    font-weight: 700;
+    color: #0f172a;
+    animation: slideUp 0.3s ease-out;
+}
+@keyframes slideUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* ========================================= */
+/* تنسيقات النوافذ المنبثقة (Modals) للإدارة */
+/* ========================================= */
+.ent-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.6); 
+    backdrop-filter: blur(4px);
+    z-index: 100000; 
+    display: none; 
+    align-items: center; 
+    justify-content: center;
+}
+.ent-modal-box {
+    background: #fff; 
+    width: 90%; 
+    max-width: 450px;
+    border-radius: 12px; 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    overflow: hidden; 
+    animation: modalPop 0.3s ease-out; 
+    direction: rtl;
+}
+.ent-modal-header {
+    padding: 20px; 
+    border-bottom: 1px solid #e2e8f0; 
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    background: #f8fafc;
+}
+.ent-modal-header h3 { 
+    margin: 0; 
+    color: #0f172a; 
+    font-size: 1.2rem; 
+    font-weight: 800; 
+}
+.ent-modal-body { 
+    padding: 20px; 
+    max-height: 60vh; 
+    overflow-y: auto; 
+}
+.ent-modal-footer {
+    padding: 15px 20px; 
+    border-top: 1px solid #e2e8f0; 
+    background: #f8fafc;
+    display: flex; 
+    justify-content: flex-start; 
+    gap: 10px;
+}
+.form-group { 
+    margin-bottom: 15px; 
+    text-align: right; 
+}
+.form-group label { 
+    display: block; 
+    margin-bottom: 6px; 
+    font-weight: 700; 
+    color: #475569; 
+    font-size: 0.95rem; 
+}
+@keyframes modalPop { 
+    from { transform: scale(0.95); opacity: 0; } 
+    to { transform: scale(1); opacity: 1; } 
+}
