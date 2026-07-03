@@ -1,12 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
 
+/* ========================================== */
+/* التنسيقات الأساسية والحركة السينمائية للدخول */
+/* ========================================== */
 body {
     font-family: 'Tajawal', sans-serif;
     margin: 0;
     padding: 0;
     padding-bottom: 60px;
+    /* حركة الدخول الناعمة */
+    animation: cinematicLoad 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
+@keyframes cinematicLoad {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================== */
+/* تذييل المطور (الفوتر) */
+/* ========================================== */
 .developer-footer {
     position: fixed;
     bottom: 0; left: 0; width: 100%;
@@ -28,6 +41,9 @@ body {
 }
 .developer-footer a:hover { color: #1e40af; }
 
+/* ========================================== */
+/* النوافذ المنبثقة (Modals) */
+/* ========================================== */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(15, 23, 42, 0.85);
@@ -51,7 +67,9 @@ body {
 
 .modal-content h3 { border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-top: 0; color: #0f172a;}
 
-/* Signature Pad Styles */
+/* ========================================== */
+/* لوحة التوقيع (Signature Pad) */
+/* ========================================== */
 .signature-pad-container {
     width: 100%; height: 200px;
     border: 2px dashed #cbd5e1;
@@ -76,9 +94,8 @@ canvas#signature-pad-canvas {
 .btn-insert-sig { background: #3b82f6; }
 .signature-actions button:hover { filter: brightness(1.1); }
 
-
 /* ========================================== */
-/* التنسيقات الجديدة لشاشة تسجيل الدخول */
+/* شاشة تسجيل الدخول الزجاجية (Auth) */
 /* ========================================== */
 .auth-overlay {
     position: fixed;
@@ -162,4 +179,69 @@ canvas#signature-pad-canvas {
 @keyframes authSlideUp {
     0% { opacity: 0; transform: translateY(30px); }
     100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================== */
+/* اللمسات السينمائية التفاعلية للحقول والأزرار في واجهة البوليصة  */
+/* ============================================================== */
+
+/* تفاعل احترافي للحقول عند التركيز أو الكتابة */
+input, select, textarea {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+input:focus, select:focus, textarea:focus {
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3) !important;
+    border-color: #38bdf8 !important;
+    transform: translateY(-2px);
+    background-color: #ffffff !important;
+}
+
+/* نبض حيوي للأزرار الملونة والقائمة الجانبية */
+.btn, .action-btn, [class*="btn-"] {
+    transition: all 0.3s ease !important;
+    position: relative;
+}
+.btn:hover, .action-btn:hover, [class*="btn-"]:not(.auth-btn):hover {
+    transform: translateY(-3px) scale(1.02);
+    filter: brightness(1.15);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important;
+}
+.btn:active, .action-btn:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+/* ترتيب الأيقونات داخل الأزرار */
+.btn i, .action-btn i, button i {
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* ============================================================== */
+/* حماية هندسية صارمة جداً للطباعة (لحماية البوليصة الورقية)     */
+/* ============================================================== */
+@media print {
+    body {
+        animation: none !important;
+        background: white !important;
+        padding-bottom: 0 !important;
+    }
+    input, select, textarea {
+        box-shadow: none !important;
+        transform: none !important;
+        border: none !important;
+        background: transparent !important;
+        color: black !important;
+    }
+    /* إخفاء كل الأزرار، القوائم الجانبية، الفوتر، واللوحات المنبثقة عند الطباعة */
+    button, .btn, .sidebar, .top-bar, .action-bar, [class*="action"], .developer-footer, .modal-overlay, .auth-overlay {
+        display: none !important;
+    }
+    /* توسيع البوليصة لتأخذ كامل عرض الورقة A4 */
+    .waybill-container, .paper, .container {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        border: none !important;
+    }
 }
