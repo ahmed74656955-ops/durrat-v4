@@ -24,7 +24,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
-    <link href="./style.css?v=9" rel="stylesheet">
+    <!-- تحديث الكاش -->
+    <link href="./style.css?v=10" rel="stylesheet">
 
     <style>
         :root {
@@ -117,7 +118,6 @@
 
         .no-image-overlay { position: absolute; inset: 0; background: rgba(248,250,252,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; gap: 20px; text-align: center; border: 2px dashed var(--border); border-radius: var(--radius); display: none; }
         
-        /* ضبط إشعارات الخطأ (الـ Toast) لتظهر دائماً فوق كل شيء بكفاءة */
         .toast-container { position: fixed; bottom: 80px; left: 30px; display: flex; flex-direction: column; gap: 12px; z-index: 9999999999 !important; pointer-events: none; }
         .toast { background: var(--secondary); color: white; padding: 14px 24px; border-radius: var(--radius); box-shadow: var(--shadow-lg); font-weight: 700; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.3s forwards; font-size: 0.95rem; min-width: 250px; }
         .toast.error { background: var(--danger); } .toast.success { background: var(--accent); } .toast.warning { background: var(--warning); }
@@ -134,6 +134,7 @@
 </head>
 <body class="dark-mode">
 
+    <!-- شاشة تسجيل الدخول -->
     <div id="auth-screen" class="auth-overlay">
         <div class="auth-glass-panel">
             <div class="auth-header">
@@ -144,11 +145,13 @@
             <form id="loginForm" onsubmit="AuthManager.handleLogin(event)" novalidate>
                 <div class="auth-input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="username" placeholder="اسم المستخدم" autocomplete="off">
+                    <!-- تم إلغاء الإكمال التلقائي لضمان الكتابة اليدوية -->
+                    <input type="text" id="username" placeholder="اسم المستخدم" autocomplete="off" autocorrect="off" spellcheck="false">
                 </div>
                 <div class="auth-input-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" id="password" placeholder="كلمة المرور">
+                    <!-- تغيير نوع الحقل إلى text لإلغاء النقاط الدائرية -->
+                    <input type="text" id="password" placeholder="كلمة المرور" autocomplete="off" autocorrect="off" spellcheck="false">
                 </div>
                 <button type="submit" class="auth-btn" id="loginBtn" style="width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;">
                     تسجيل الدخول <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
@@ -336,13 +339,11 @@
             async handleLogin(e) {
                 e.preventDefault();
                 
-                // جلب القيم وتنظيفها
                 let inputUser = document.getElementById('username').value.trim();
                 let inputPass = document.getElementById('password').value.trim();
                 
-                // الفحص الذكي عبر جافا سكريبت لمنع تعليق المتصفح أوتوماتيكياً
                 if (!inputUser || !inputPass) {
-                    UI.toast("يرجى كتابة اسم المستخدم وكلمة المرور بالكامل!", "error");
+                    UI.toast("يرجى كتابة اسم المستخدم وكلمة المرور!", "error");
                     return;
                 }
                 
@@ -363,7 +364,7 @@
                         btn.innerHTML = originalText; btn.disabled = false; 
                     }
                 } catch (err) { 
-                    UI.toast("خطأ في الاتصال بقاعدة البيانات السحابية", "error"); 
+                    UI.toast("خطأ في الاتصال بقاعدة البيانات", "error"); 
                     btn.innerHTML = originalText; btn.disabled = false; 
                 }
             },
@@ -429,7 +430,7 @@
             { id: "intl_phone", name: "رقم هاتف دولي", group: "المركبة والمبالغ", type: "text", x: "43.5%", y: "72.8%", w: "27.5%", h: "2.8%", size: 12, align: "left", color: "#000000" },
             { id: "notes", name: "الملاحظات", group: "المركبة والمبالغ", type: "textarea", x: "43.5%", y: "76.0%", w: "35.3%", h: "9.5%", size: 12, align: "right", color: "#000000" },
             { id: "amount", name: "القيمة", group: "المركبة والمبالغ", type: "text", x: "85.4%", y: "81.0%", w: "13.6%", h: "2.5%", size: 16, align: "center", color: "#ef4444" },
-            { id: "barcode_zone", name: "الباركود", group: "الأكواد", type: "readonly", x: "30.0%", y: "2.0%", w: "40.0%", h: "5.0%", size: 14, align: "center", color: "#000" },
+            { id: "barcode_zone", name: "الباركود", group: "الأكواد", type: "readonly", x: "30.0%", y: "2.0%", w: "40.0%", h: "5.0%", size: 14, align: "center", color: "#00" },
             { id: "qrcode_zone", name: "QR Code", group: "الأكواد", type: "readonly", x: "86.0%", y: "2.0%", w: "12.0%", h: "12.0%", size: 14, align: "center", color: "#000" }
         ];
 
