@@ -9,6 +9,8 @@ const AdminApp = {
             if(loader) loader.style.display = 'none';
 
             this.createModalContainer(); 
+            
+            // فتح قسم الرئيسية مباشرة عند الدخول بدون أي تعارض
             this.showSection('dashboard');
         } catch (error) {
             console.log("جارٍ التحقق من الصلاحيات...");
@@ -49,11 +51,15 @@ const AdminApp = {
     closeModal() { document.getElementById('ent-modal').style.display = 'none'; },
 
     async showSection(section) {
+        // تفعيل الزر الجانبي الصحيح برمجياً بدون أخطاء
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        if(window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
+        const activeLink = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick')?.includes(section));
+        if(activeLink) activeLink.classList.add('active');
         
         const area = document.getElementById('content-area');
-        document.getElementById('page-title').innerText = section.toUpperCase();
+        if(!area) return;
+
+        document.getElementById('page-title').innerText = section === 'dashboard' ? 'الرئيسية' : section.toUpperCase();
         area.innerHTML = '<h3 style="text-align:center; color:#94a3b8; margin-top:50px;"><i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...</h3>';
 
         switch(section) {
@@ -150,7 +156,6 @@ const AdminApp = {
         this.closeModal(); this.showSection('users');
     },
 
-    // استعادة جدول القوالب الاحترافي بالكامل
     async renderTemplates(area) {
         const { data } = await supabase.from('waybill_field_templates').select('*');
         let html = `<div class="card"><h3>تخصيص أسماء واتجاهات الحقول</h3>
@@ -187,7 +192,6 @@ const AdminApp = {
         this.toast("تم تحديث الحقل مركزياً", "success");
     },
 
-    // استعادة سجل المراقبة الاحترافي المجدول
     async renderAudit(area) {
         const { data } = await supabase.from('audit_logs').select('*, branches(name)').order('created_at', { ascending: false }).limit(30);
         let html = `<div class="card"><h3>سجل المراقبة والتدقيق الأمني</h3>
@@ -216,4 +220,10 @@ const AdminApp = {
 };
 
 window.AdminApp = AdminApp;
-document.addEventListener('DOMContentLoaded', () => AdminApp.init());
+
+// تأمين تشغيل الكود في الوقت الصحيح
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => AdminApp.init());
+} else {
+    AdminApp.init();
+}
