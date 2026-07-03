@@ -1,14 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
 
 /* ========================================== */
-/* التنسيقات الأساسية والحركة السينمائية للدخول */
+/* التنسيقات الأساسية والحركة السينمائية */
 /* ========================================== */
 body {
     font-family: 'Tajawal', sans-serif;
-    margin: 0;
-    padding: 0;
-    padding-bottom: 60px;
-    /* حركة الدخول الناعمة */
+    margin: 0; padding: 0; padding-bottom: 60px;
     animation: cinematicLoad 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
 
@@ -18,230 +15,110 @@ body {
 }
 
 /* ========================================== */
+/* حماية الأيقونات ومنع تداخل الخطوط */
+/* ========================================== */
+i[class^="fa-"], i[class*=" fa-"], .fas, .fab {
+    font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands" !important;
+}
+.fas { font-weight: 900 !important; }
+
+/* ========================================== */
 /* تذييل المطور (الفوتر) */
 /* ========================================== */
 .developer-footer {
-    position: fixed;
-    bottom: 0; left: 0; width: 100%;
-    background: #ffffff;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-    padding: 12px 0;
-    text-align: center;
-    z-index: 900;
-    font-size: 0.95rem;
-    color: #475569;
+    position: fixed; bottom: 0; left: 0; width: 100%;
+    background: #ffffff; box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+    padding: 12px 0; text-align: center; z-index: 900; font-size: 0.95rem; color: #475569;
     border-top: 2px solid #e2e8f0;
 }
-
-.developer-footer a {
-    color: #2563eb;
-    font-weight: 800;
-    text-decoration: none;
-    transition: color 0.3s;
-}
+.developer-footer a { color: #2563eb; font-weight: 800; text-decoration: none; transition: color 0.3s; }
 .developer-footer a:hover { color: #1e40af; }
 
 /* ========================================== */
-/* النوافذ المنبثقة (Modals) */
+/* النوافذ المنبثقة ولائحة التوقيع */
 /* ========================================== */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.85);
-    backdrop-filter: blur(4px);
-    z-index: 10000;
-    display: none;
-    align-items: center;
-    justify-content: center;
+    background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+    z-index: 10000; display: none; align-items: center; justify-content: center;
     opacity: 0; transition: opacity 0.3s;
 }
 .modal-overlay.active { display: flex; opacity: 1; }
-
 .modal-content {
-    background: #fff; padding: 30px; border-radius: 16px;
-    width: 90%; max-width: 500px; text-align: right;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-    transform: translateY(20px); transition: transform 0.3s;
-    display: flex; flex-direction: column; gap: 15px;
+    background: #fff; padding: 30px; border-radius: 16px; width: 90%; max-width: 500px;
+    text-align: right; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: translateY(20px); transition: transform 0.3s; display: flex; flex-direction: column; gap: 15px;
 }
 .modal-overlay.active .modal-content { transform: translateY(0); }
-
 .modal-content h3 { border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-top: 0; color: #0f172a;}
+.signature-pad-container { width: 100%; height: 200px; border: 2px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; position: relative; overflow: hidden; touch-action: none; }
+canvas#signature-pad-canvas { width: 100%; height: 100%; cursor: crosshair; }
+.signature-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+.signature-actions button { flex: 1; padding: 10px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; color: white; transition: 0.2s; }
+.btn-clear-sig { background: #ef4444; } .btn-save-sig { background: #10b981; } .btn-insert-sig { background: #3b82f6; }
 
 /* ========================================== */
-/* لوحة التوقيع (Signature Pad) */
-/* ========================================== */
-.signature-pad-container {
-    width: 100%; height: 200px;
-    border: 2px dashed #cbd5e1;
-    border-radius: 8px;
-    background: #f8fafc;
-    position: relative;
-    overflow: hidden;
-    touch-action: none; /* لمنع التمرير أثناء الرسم على الجوال */
-}
-canvas#signature-pad-canvas {
-    width: 100%; height: 100%;
-    cursor: crosshair;
-}
-.signature-actions {
-    display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;
-}
-.signature-actions button {
-    flex: 1; padding: 10px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; color: white; transition: 0.2s;
-}
-.btn-clear-sig { background: #ef4444; }
-.btn-save-sig { background: #10b981; }
-.btn-insert-sig { background: #3b82f6; }
-.signature-actions button:hover { filter: brightness(1.1); }
-
-/* ========================================== */
-/* شاشة تسجيل الدخول الزجاجية (Auth) */
+/* شاشة تسجيل الدخول الزجاجية (النسخة المطورة) */
 /* ========================================== */
 .auth-overlay {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at top right, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 1));
-    z-index: 9999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-    direction: rtl;
+    position: fixed; inset: 0; z-index: 9999999; display: flex; align-items: center; justify-content: center;
+    background: rgba(15, 23, 42, 0.6) !important; backdrop-filter: blur(15px) !important;
+    transition: opacity 0.5s ease, visibility 0.5s ease; direction: rtl;
 }
-
 .auth-glass-panel {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    border-radius: 20px;
-    padding: 40px 30px;
-    width: 90%;
-    max-width: 380px;
-    text-align: center;
+    background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border-radius: 20px;
+    padding: 40px 30px; width: 90%; max-width: 380px; text-align: center;
     animation: authSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-
-.auth-input-group {
-    margin-bottom: 20px;
-    position: relative;
-}
-
+.auth-input-group { position: relative; margin-bottom: 20px; }
+.auth-input-group i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; z-index: 2; transition: 0.3s; }
 .auth-input-group input {
-    width: 100%;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 14px 20px;
-    border-radius: 12px;
-    color: #fff;
-    font-size: 1rem;
-    font-family: inherit;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
+    width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px 45px 14px 20px; border-radius: 12px; color: #fff; font-size: 1.05rem; font-weight: 600;
+    transition: all 0.3s ease; box-sizing: border-box;
 }
-
+/* حل مشكلة النص المخفي في شاشة الدخول */
 .auth-input-group input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    background: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #0f172a !important; /* تحويل النص للون داكن ليظهر بوضوح */
+    border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
+.auth-input-group input:focus + i, .auth-input-group input:focus ~ i { color: #2563eb !important; }
 
-.auth-btn {
-    width: 100%;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #fff;
-    border: none;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: inherit;
-}
-
-.auth-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.5);
-}
-
-.auth-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-@keyframes authSlideUp {
-    0% { opacity: 0; transform: translateY(30px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-/* ============================================================== */
-/* اللمسات السينمائية التفاعلية للحقول والأزرار في واجهة البوليصة  */
-/* ============================================================== */
-
-/* تفاعل احترافي للحقول عند التركيز أو الكتابة */
-input, select, textarea {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-input:focus, select:focus, textarea:focus {
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3) !important;
-    border-color: #38bdf8 !important;
-    transform: translateY(-2px);
+/* ========================================== */
+/* لمسات وتفاعلات حقول البوليصة والأزرار */
+/* ========================================== */
+input, select, textarea { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; }
+/* حماية لون النص في الحقول العادية */
+.input-group input:focus, .input-group textarea:focus {
     background-color: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3) !important; border-color: #38bdf8 !important; transform: translateY(-2px);
+}
+.btn, .action-btn, [class*="btn-"], button { transition: all 0.3s ease !important; position: relative; overflow: hidden; }
+.btn:hover, button:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+.btn:active, button:active { transform: translateY(1px); }
+button i, .btn i { margin-left: 6px; vertical-align: middle; }
+
+/* تأثير النبض السحابي (Live Indicator) */
+.live-pulse {
+    display: inline-block; width: 10px; height: 10px; background-color: #10b981;
+    border-radius: 50%; margin-right: 8px; box-shadow: 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulseSync 2s infinite; vertical-align: middle;
+}
+@keyframes pulseSync {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-/* نبض حيوي للأزرار الملونة والقائمة الجانبية */
-.btn, .action-btn, [class*="btn-"] {
-    transition: all 0.3s ease !important;
-    position: relative;
-}
-.btn:hover, .action-btn:hover, [class*="btn-"]:not(.auth-btn):hover {
-    transform: translateY(-3px) scale(1.02);
-    filter: brightness(1.15);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15) !important;
-}
-.btn:active, .action-btn:active {
-    transform: translateY(1px) scale(0.98);
-}
-
-/* ترتيب الأيقونات داخل الأزرار */
-.btn i, .action-btn i, button i {
-    margin-left: 6px;
-    vertical-align: middle;
-}
-
-/* ============================================================== */
-/* حماية هندسية صارمة جداً للطباعة (لحماية البوليصة الورقية)     */
-/* ============================================================== */
+/* ========================================== */
+/* حماية هندسية للطباعة (للبوليصة الورقية) */
+/* ========================================== */
 @media print {
-    body {
-        animation: none !important;
-        background: white !important;
-        padding-bottom: 0 !important;
-    }
-    input, select, textarea {
-        box-shadow: none !important;
-        transform: none !important;
-        border: none !important;
-        background: transparent !important;
-        color: black !important;
-    }
-    /* إخفاء كل الأزرار، القوائم الجانبية، الفوتر، واللوحات المنبثقة عند الطباعة */
-    button, .btn, .sidebar, .top-bar, .action-bar, [class*="action"], .developer-footer, .modal-overlay, .auth-overlay {
-        display: none !important;
-    }
-    /* توسيع البوليصة لتأخذ كامل عرض الورقة A4 */
-    .waybill-container, .paper, .container {
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        border: none !important;
-    }
+    body { animation: none !important; background: white !important; padding-bottom: 0 !important; }
+    input, select, textarea { box-shadow: none !important; transform: none !important; border: none !important; background: transparent !important; color: black !important; }
+    button, .btn, .sidebar, .top-bar, .toolbar, .developer-footer, .modal-overlay, .auth-overlay, .live-pulse { display: none !important; }
+    .waybill-container, .paper, .container { box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; border: none !important; }
 }
