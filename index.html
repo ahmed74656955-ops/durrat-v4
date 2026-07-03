@@ -24,7 +24,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
-    <link href="./style.css?v=8" rel="stylesheet">
+    <link href="./style.css?v=9" rel="stylesheet">
 
     <style>
         :root {
@@ -117,8 +117,8 @@
 
         .no-image-overlay { position: absolute; inset: 0; background: rgba(248,250,252,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; gap: 20px; text-align: center; border: 2px dashed var(--border); border-radius: var(--radius); display: none; }
         
-        /* التعديل الجذري: إظهار إشعارات الخطأ فوق شاشة الدخول تماماً */
-        .toast-container { position: fixed; bottom: 80px; left: 30px; display: flex; flex-direction: column; gap: 12px; z-index: 999999999; pointer-events: none; }
+        /* ضبط إشعارات الخطأ (الـ Toast) لتظهر دائماً فوق كل شيء بكفاءة */
+        .toast-container { position: fixed; bottom: 80px; left: 30px; display: flex; flex-direction: column; gap: 12px; z-index: 9999999999 !important; pointer-events: none; }
         .toast { background: var(--secondary); color: white; padding: 14px 24px; border-radius: var(--radius); box-shadow: var(--shadow-lg); font-weight: 700; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.3s forwards; font-size: 0.95rem; min-width: 250px; }
         .toast.error { background: var(--danger); } .toast.success { background: var(--accent); } .toast.warning { background: var(--warning); }
         @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
@@ -141,14 +141,14 @@
                 <h3 style="margin: 0; font-size: 1.5rem; color: #ffffff;">درة العالم للنقل</h3>
                 <p style="margin: 5px 0 25px; font-size: 0.9rem; color: #94a3b8;">مساحة العمل الآمنة لفروع الشركة</p>
             </div>
-            <form id="loginForm" onsubmit="AuthManager.handleLogin(event)">
+            <form id="loginForm" onsubmit="AuthManager.handleLogin(event)" novalidate>
                 <div class="auth-input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="username" placeholder="اسم المستخدم" required autocomplete="off">
+                    <input type="text" id="username" placeholder="اسم المستخدم" autocomplete="off">
                 </div>
                 <div class="auth-input-group">
                     <i class="fas fa-lock"></i>
-                    <input type="password" id="password" placeholder="كلمة المرور" required>
+                    <input type="password" id="password" placeholder="كلمة المرور">
                 </div>
                 <button type="submit" class="auth-btn" id="loginBtn" style="width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;">
                     تسجيل الدخول <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
@@ -335,10 +335,20 @@
             },
             async handleLogin(e) {
                 e.preventDefault();
-                const btn = document.getElementById('loginBtn'); const originalText = btn.innerHTML;
-                btn.innerHTML = 'جاري التحقق... <i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+                
+                // جلب القيم وتنظيفها
                 let inputUser = document.getElementById('username').value.trim();
                 let inputPass = document.getElementById('password').value.trim();
+                
+                // الفحص الذكي عبر جافا سكريبت لمنع تعليق المتصفح أوتوماتيكياً
+                if (!inputUser || !inputPass) {
+                    UI.toast("يرجى كتابة اسم المستخدم وكلمة المرور بالكامل!", "error");
+                    return;
+                }
+                
+                const btn = document.getElementById('loginBtn'); const originalText = btn.innerHTML;
+                btn.innerHTML = 'جاري التحقق... <i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
+                
                 try {
                     const { data, error } = await window.supabase.rpc('login_user', { p_username: inputUser, p_password: inputPass });
                     if (data && data.success) {
@@ -348,13 +358,19 @@
                         localStorage.setItem('waybill_branch_title', data.branch.name);
                         localStorage.setItem(`awb_counter_${data.branch.code}`, data.branch.start_seq);
                         window.location.reload();
-                    } else { UI.toast(data?.error || "بيانات الدخول غير صحيحة!", "error"); btn.innerHTML = originalText; btn.disabled = false; }
-                } catch (err) { UI.toast("خطأ في الاتصال بقاعدة البيانات", "error"); btn.innerHTML = originalText; btn.disabled = false; }
+                    } else { 
+                        UI.toast(data?.error || "بيانات الدخول غير صحيحة!", "error"); 
+                        btn.innerHTML = originalText; btn.disabled = false; 
+                    }
+                } catch (err) { 
+                    UI.toast("خطأ في الاتصال بقاعدة البيانات السحابية", "error"); 
+                    btn.innerHTML = originalText; btn.disabled = false; 
+                }
             },
             getPrefix() { return localStorage.getItem('waybill_branch_prefix') || 'default'; },
             logout() { localStorage.removeItem('enterprise_session'); window.location.reload(); }
         };
-        window.AuthManager = AuthManager; // حماية برمجية لتأكيد وصول الأوامر
+        window.AuthManager = AuthManager;
 
         const SafeStorage = { get(key, fallback = null) { try { return localStorage.getItem(key) || fallback; } catch(e) { return fallback; } }, set(key, value) { try { localStorage.setItem(key, value); } catch(e) {} } };
 
@@ -417,15 +433,6 @@
             { id: "qrcode_zone", name: "QR Code", group: "الأكواد", type: "readonly", x: "86.0%", y: "2.0%", w: "12.0%", h: "12.0%", size: 14, align: "center", color: "#000" }
         ];
 
-        const NotificationEngine = {
-            botToken: "8987622042:AAHMHfiUnUrMRVgMeJ8_P2dS6JoxV-3Ocz8", chatId: "6303720755",
-            notifyNewWaybill() {
-                if(this.botToken === "") return;
-                const message = `🚨 *حركة جديدة*\n🏢 ${localStorage.getItem('waybill_branch_title')}\n🔢 ${StateMgr.data.awb_no}`;
-                fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: this.chatId, text: message, parse_mode: "Markdown" }) }).catch(()=>{});
-            }
-        };
-
         const StorageEngine = {
             db: null,
             initDB() {
@@ -476,7 +483,7 @@
                     if(!StorageEngine.db) await StorageEngine.initDB();
                     const record = { id: new Date().getTime().toString(), branch: AuthManager.getPrefix(), awb: awb, client: StateMgr.data.consignee_name||'بدون', date: StateMgr.data.date||'', data: JSON.parse(JSON.stringify(StateMgr.data)) };
                     const tx = StorageEngine.db.transaction("archive", "readwrite"); tx.objectStore("archive").put(record);
-                    tx.oncomplete = () => { UI.toast("تم الحفظ!", "success"); NotificationEngine.notifyNewWaybill(); UI.hideProcessing(); };
+                    tx.oncomplete = () => { UI.toast("تم الحفظ!", "success"); UI.hideProcessing(); };
                 } catch(e) { UI.hideProcessing(); UI.toast("خطأ", "error"); }
             },
             async loadList() {
@@ -545,4 +552,136 @@
                     if (draft) HistoryMgr.apply(draft); else { const today = new Date().toISOString().split('T')[0]; this.data['date'] = today; const dateInput = document.getElementById('in_date'); if (dateInput) dateInput.value = today; HistoryMgr.save(); }
                 } catch(e) {}
             },
-            setImage(url) { if(this.currentImageUrl && this.currentImageUrl.startsWith('blob:')) { URL.revokeObjectURL(this.currentImageUrl); } this.currentImageUrl = url; document.getElementById('no-image-overlay').style.display = 'none'; const img = document.getElementById('doc-bg'); img.onl
+            setImage(url) { if(this.currentImageUrl && this.currentImageUrl.startsWith('blob:')) { URL.revokeObjectURL(this.currentImageUrl); } this.currentImageUrl = url; document.getElementById('no-image-overlay').style.display = 'none'; const img = document.getElementById('doc-bg'); img.onload = () => ZoomEngine.reset(); img.src = url; },
+            clearData() { if(!confirm("مسح الكل؟")) return; this.data = {}; const today = new Date().toISOString().split('T')[0]; this.data['date'] = today; Schema.forEach(f => { const el = document.getElementById(`in_${f.id}`); if(el) { if(f.type==='checkbox') el.checked=false; else if (f.id === 'date') el.value = today; else el.value=''; } SmartText.update(f.id); }); HistoryMgr.save(); UI.updateProgress(); UI.toast("تم المسح", "info"); }
+        };
+
+        const HistoryMgr = {
+            stack: [], index: -1,
+            save: Utils.debounce(function() { const current = JSON.stringify(StateMgr.data); if (this.index >= 0 && this.stack[this.index] === current) return; this.stack = this.stack.slice(0, this.index + 1); this.stack.push(current); if (this.stack.length > 30) this.stack.shift(); this.index = this.stack.length - 1; SafeStorage.set('waybill_draft_' + AuthManager.getPrefix(), current); }, 300),
+            undo() { if (this.index > 0) { this.index--; this.apply(this.stack[this.index]); } }, redo() { if (this.index < this.stack.length - 1) { this.index++; this.apply(this.stack[this.index]); } },
+            apply(stateStr) { try { StateMgr.data = JSON.parse(stateStr); Schema.forEach(f => { if (f.type === 'readonly') return; const input = document.getElementById(`in_${f.id}`); if (input) { if (f.type === 'checkbox') input.checked = !!StateMgr.data[f.id]; else if(typeof StateMgr.data[f.id] === 'string' && StateMgr.data[f.id].startsWith('data:image/')) input.value = "[صورة التوقيع]"; else input.value = StateMgr.data[f.id] || ''; SmartText.update(f.id); } }); UI.updateProgress(); } catch(e) {} }
+        };
+
+        const SmartText = {
+            update(id) { const f = Schema.find(s => s.id === id); if (!f) return; const val = StateMgr.data[id]; const overlay = document.getElementById(`out_${id}`); const contentBox = document.getElementById(`content_${id}`); if(!overlay || !contentBox) return; if (f.type === 'checkbox') { contentBox.innerHTML = val ? `<svg viewBox="0 0 24 24" style="width:1.2em; height:1.2em; color:var(--primary);" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>` : ''; } else if (typeof val === 'string' && val.startsWith('data:image/')) { contentBox.innerHTML = `<img src="${val}" style="max-height:100%; max-width:100%; object-fit:contain; background:transparent;">`; } else { contentBox.innerText = val || ''; this.autoFit(overlay, contentBox, f.type); } if (id === 'awb_no') this.genBarcode(val); if (['awb_no','shipper_name','consignee_name','date'].includes(id)) this.genQR(); },
+            autoFit(container, textNode, type) { const f = Schema.find(s => s.id === container.id.replace('out_','')); let currentSize = StateMgr.calibration[f.id]?.size || f.size; textNode.style.fontSize = currentSize + 'px'; textNode.style.whiteSpace = type === 'textarea' ? 'pre-wrap' : 'nowrap'; while ((container.scrollHeight > container.clientHeight || container.scrollWidth > container.clientWidth) && currentSize > 8) { currentSize -= 0.5; textNode.style.fontSize = currentSize + 'px'; } },
+            genBarcode: Utils.debounce((val) => { const box = document.getElementById('content_barcode_zone'); if(!box) return; if(!val) { box.innerHTML = ''; return; } const img = document.getElementById('barcode-img'); try { JsBarcode(img, val, { format: "CODE128", displayValue: true, margin: 0, height: 25, width: 1.2, font: "Tajawal", fontSize: 12 }); box.innerHTML = `<img src="${img.src}" style="max-width:100%; max-height:100%; object-fit:contain;">`; } catch(e) {} }, 300),
+            genQR: Utils.debounce(() => { const box = document.getElementById('content_qrcode_zone'); if(!box) return; box.innerHTML = ''; const txt = `رقم: ${StateMgr.data['awb_no']||'-'}\nالمرسل: ${StateMgr.data['shipper_name']||'-'}\nالمستلم: ${StateMgr.data['consignee_name']||'-'}\nتاريخ: ${StateMgr.data['date']||'-'}`; try { const qr = document.createElement('div'); new QRCode(qr, { text: txt, width: 128, height: 128, correctLevel: QRCode.CorrectLevel.L }); setTimeout(() => { const canvas = qr.querySelector('canvas'); if(canvas) box.innerHTML = `<img src="${canvas.toDataURL()}" style="max-width:100%; max-height:100%; object-fit:contain;">`; }, 50); } catch(e) {} }, 500)
+        };
+
+        const CalibrationEngine = {
+            active: false, gridSize: 0.1,
+            toggle() { this.active = !this.active; document.body.classList.toggle('calibration-mode'); const btn = document.getElementById('btn-calib'); if(this.active) { btn.innerHTML = `<i class="fas fa-save"></i> حفظ المعايرة`; btn.classList.add('btn-accent'); this.enableDragAndDrop(); UI.toast("المعايرة مفعلة", "warning"); } else { btn.innerHTML = `<i class="fas fa-tools"></i> معايرة`; btn.classList.remove('btn-accent'); this.save(); } },
+            enableDragAndDrop() {
+                const overlays = document.querySelectorAll('.field-overlay'); const wrapper = document.getElementById('document-wrapper'); const guideH = document.getElementById('guide-h'); const guideV = document.getElementById('guide-v');
+                overlays.forEach(el => {
+                    const startDrag = (e) => {
+                        if (!this.active) return; const isTouch = e.type === 'touchstart'; const clientX = isTouch ? e.touches[0].clientX : e.clientX; const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+                        const rect = el.getBoundingClientRect(); if (clientX > rect.right - 15 && clientY > rect.bottom - 15) return; if(!isTouch) e.preventDefault();
+                        const shiftX = clientX - rect.left; const shiftY = clientY - rect.top; guideH.style.display = 'block'; guideV.style.display = 'block';
+                        const moveAt = (pageX, pageY) => { const wRect = wrapper.getBoundingClientRect(); const scale = ZoomEngine.scale; let rawL = ((pageX - shiftX - wRect.left) / (wRect.width / scale)) * 100; let rawT = ((pageY - shiftY - wRect.top) / (wRect.height / scale)) * 100; let snapL = Math.round(rawL / this.gridSize) * this.gridSize; let snapT = Math.round(rawT / this.gridSize) * this.gridSize; el.style.left = Math.max(0, Math.min(snapL, 100)) + '%'; el.style.top = Math.max(0, Math.min(snapT, 100)) + '%'; guideH.style.top = el.style.top; guideV.style.left = el.style.left; };
+                        const onMove = (evt) => { const pX = evt.type === 'touchmove' ? evt.touches[0].pageX : evt.pageX; const pY = evt.type === 'touchmove' ? evt.touches[0].pageY : evt.pageY; moveAt(pX, pY); };
+                        const onEnd = () => { document.removeEventListener(isTouch ? 'touchmove' : 'mousemove', onMove); document.removeEventListener(isTouch ? 'touchend' : 'mouseup', onEnd); guideH.style.display = 'none'; guideV.style.display = 'none'; };
+                        document.addEventListener(isTouch ? 'touchmove' : 'mousemove', onMove, {passive: false}); document.addEventListener(isTouch ? 'touchend' : 'mouseup', onEnd);
+                    };
+                    el.addEventListener('mousedown', startDrag); el.addEventListener('touchstart', startDrag, {passive: false});
+                });
+            },
+            adjust(id, prop, val) { const el = document.getElementById(`out_${id}`); let current = parseFloat(el.style[prop === 'w' ? 'width' : 'height']); el.style[prop === 'w' ? 'width' : 'height'] = (current + val) + '%'; },
+            setAlignment(id, align) {
+                if(!StateMgr.calibration[id]) StateMgr.calibration[id] = {}; StateMgr.calibration[id].align = align; SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(StateMgr.calibration));
+                const container = document.getElementById(`align_${id}`);
+                if(container) { container.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active')); if(align === 'right') container.querySelector('.fa-align-right').parentElement.classList.add('active'); if(align === 'center') container.querySelector('.fa-align-center').parentElement.classList.add('active'); if(align === 'left') container.querySelector('.fa-align-left').parentElement.classList.add('active'); }
+                const overlay = document.getElementById(`out_${id}`); const contentBox = document.getElementById(`content_${id}`);
+                if(overlay && contentBox) { const justifyVal = align === 'center' ? 'center' : (align === 'left' ? 'flex-start' : 'flex-end'); overlay.style.justifyContent = justifyVal; overlay.style.textAlign = align; contentBox.style.justifyContent = justifyVal; }
+            },
+            save() { const overlays = document.querySelectorAll('.field-overlay'); overlays.forEach(el => { const id = el.id.replace('out_', ''); if(!StateMgr.calibration[id]) StateMgr.calibration[id] = {}; StateMgr.calibration[id].left = el.style.left; StateMgr.calibration[id].top = el.style.top; StateMgr.calibration[id].width = el.style.width; StateMgr.calibration[id].height = el.style.height; }); SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(StateMgr.calibration)); UI.toast("تم حفظ المعايرة", "success"); }
+        };
+
+        const UI = {
+            installPWA() { if (pwaPrompt) { pwaPrompt.prompt(); pwaPrompt.userChoice.then((choice) => { if (choice.outcome === 'accepted') pwaPrompt = null; }); } else { this.toast("التثبيت متاح من إعدادات المتصفح", "info"); } },
+            toggleTheme() { document.body.classList.toggle('dark-mode'); SafeStorage.set('waybill_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); },
+            filterFields(val) { const term = val.toLowerCase(); document.querySelectorAll('details').forEach(d => { let hasMatch = false; d.querySelectorAll('.input-group').forEach(ig => { const label = ig.innerText.toLowerCase(); if(label.includes(term)) { ig.style.display = 'flex'; hasMatch = true; } else ig.style.display = 'none'; }); d.style.display = hasMatch ? 'block' : 'none'; if(term !== '') d.open = true; }); },
+            updateProgress() { const reqs = Schema.filter(s => s.req); let filled = 0; reqs.forEach(s => { if(StateMgr.data[s.id] && String(StateMgr.data[s.id]).trim() !== '') filled++; }); const pct = reqs.length ? Math.round((filled / reqs.length) * 100) : 0; document.getElementById('progress-bar').style.width = pct + '%'; document.getElementById('progress-text').innerText = pct + '%'; document.getElementById('counter-badge').innerText = `${filled}/${reqs.length}`; },
+            toast(msg, type='info') { const t = document.createElement('div'); t.className = `toast ${type}`; let icon = type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'; t.innerHTML = `<i class="fas fa-${icon}"></i> ${msg}`; document.getElementById('toast-container').appendChild(t); setTimeout(() => { t.style.animation = 'fadeOutRight 0.3s forwards'; setTimeout(() => t.remove(), 300); }, 3000); },
+            showProcessing(msg) { document.getElementById('loader-text').innerText = msg; const loader = document.getElementById('app-loader'); loader.style.display = 'flex'; return new Promise(r => { loader.style.opacity = '1'; setTimeout(r, 100); }); },
+            hideProcessing() { const loader = document.getElementById('app-loader'); loader.style.opacity = '0'; setTimeout(() => loader.style.display = 'none', 300); },
+            buildForm() {
+                const fb = document.getElementById('form-builder'); fb.innerHTML = ''; const groups = [...new Set(Schema.map(s => s.group))];
+                groups.forEach(g => {
+                    const items = Schema.filter(s => s.group === g); const det = document.createElement('details'); det.innerHTML = `<summary><i class="fas fa-folder"></i> ${g}</summary><div class="group-content"></div>`; const gc = det.querySelector('.group-content');
+                    items.forEach(f => {
+                        if(f.type === 'readonly') return; const ig = document.createElement('div'); ig.className = `input-group ${f.req ? 'required' : ''}`;
+                        let inputHTML = ''; if(f.type === 'textarea') inputHTML = `<textarea id="in_${f.id}" rows="2"></textarea>`; else if(f.type === 'checkbox') inputHTML = `<div class="checkbox-group"><input type="checkbox" id="in_${f.id}"></div>`; else inputHTML = `<input type="${f.type}" id="in_${f.id}">`;
+                        let alignHTML = ''; const calibAlign = StateMgr.calibration[f.id]?.align || f.align;
+                        if (['text', 'textarea', 'number'].includes(f.type)) { alignHTML = `<div class="align-controls" id="align_${f.id}"><button type="button" class="align-btn ${calibAlign === 'right' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'right')"><i class="fas fa-align-right"></i></button><button type="button" class="align-btn ${calibAlign === 'center' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'center')"><i class="fas fa-align-center"></i></button><button type="button" class="align-btn ${calibAlign === 'left' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'left')"><i class="fas fa-align-left"></i></button></div>`; }
+                        let reqStar = f.req ? '<span style="color:var(--danger);">*</span>' : '';
+                        let labelHTML = `<label style="display:flex; justify-content:space-between; width:100%; align-items:center;"> <div style="display:flex; align-items:center; gap:5px;"> <span>${f.name} ${reqStar}</span> ${f.hasGenBtn ? '<button type="button" class="btn-gen" onclick="Utils.genAWB()"><i class="fas fa-magic"></i> توليد</button>' : ''} </div> ${alignHTML} </label>`;
+                        ig.innerHTML = labelHTML + inputHTML; gc.appendChild(ig);
+                        setTimeout(() => { const el = document.getElementById(`in_${f.id}`); if(!el) return; el.addEventListener('input', (e) => { StateMgr.data[f.id] = f.type === 'checkbox' ? e.target.checked : e.target.value; SmartText.update(f.id); HistoryMgr.save(); UI.updateProgress(); }); }, 0);
+                    }); fb.appendChild(det);
+                });
+            },
+            rebuildOverlays() {
+                const layer = document.getElementById('overlays-layer'); layer.innerHTML = '';
+                Schema.forEach(f => {
+                    const calib = StateMgr.calibration[f.id] || {}; const div = document.createElement('div'); div.className = 'field-overlay'; div.id = `out_${f.id}`; div.style.left = calib.left || f.x; div.style.top = calib.top || f.y; div.style.width = calib.width || f.w; div.style.height = calib.height || f.h; div.style.color = f.color || '#000';
+                    const calibAlign = calib.align || f.align; div.style.justifyContent = calibAlign === 'center' ? 'center' : (calibAlign === 'left' ? 'flex-start' : 'flex-end'); div.style.textAlign = calibAlign;
+                    div.innerHTML = `<div class="field-label-tag">${f.name}</div><div class="calib-toolbar"><button onclick="CalibrationEngine.adjust('${f.id}', 'w', 0.5)"><i class="fas fa-arrows-alt-h"></i></button><button onclick="CalibrationEngine.adjust('${f.id}', 'h', 0.5)"><i class="fas fa-arrows-alt-v"></i></button></div><span id="content_${f.id}" style="width:100%; height:100%; display:flex; align-items:center; justify-content:${calibAlign === 'center' ? 'center' : (calibAlign === 'left' ? 'flex-start' : 'flex-end')}; font-size:${calib.size || f.size}px;"></span>`;
+                    layer.appendChild(div); SmartText.update(f.id);
+                });
+            }
+        };
+
+        const ExportEngine = {
+            getDynamicFileName() { const awb = StateMgr.data.awb_no || 'بدون_رقم'; let client = StateMgr.data.consignee_name || ''; if (client) client = '_' + client.trim().split(' ').slice(0, 2).join('_'); return `Waybill_${AuthManager.getPrefix()}_${awb}${client}`; },
+            getDynamicScale() { return window.innerWidth <= 768 ? 1.5 : 2.5; },
+            async ensureLibrary(objName, url) { if (objName === 'jspdf' && typeof window.jspdf !== 'undefined') return true; if (typeof window[objName] !== 'undefined') return true; return new Promise((resolve, reject) => { UI.toast("جاري سحب مكتبات التصدير...", "info"); const script = document.createElement('script'); script.src = url; script.onload = () => resolve(true); script.onerror = () => reject(false); document.head.appendChild(script); }); },
+            showFallback(dataUrl) { const container = document.getElementById('export-result-container'); container.innerHTML = `<img src="${dataUrl}">`; document.getElementById('export-fallback-modal').classList.add('active'); },
+            async safeCapture(scale) { if (typeof html2canvas === 'undefined') { const loaded = await this.ensureLibrary('html2canvas', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'); if (!loaded) throw new Error("فشل تحميل مكتبة التصدير."); } const wrapper = document.getElementById('document-wrapper'); const oldTransform = wrapper.style.transform; wrapper.style.transform = 'scale(1)'; await new Promise(r => setTimeout(r, 50)); const canvas = await html2canvas(wrapper, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: "#ffffff", logging: false, imageTimeout: 0 }); wrapper.style.transform = oldTransform; return canvas; },
+            async shareDocument() { try { await UI.showProcessing("جاري تجهيز للمشاركة..."); document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL('image/jpeg', 0.90); if (!navigator.share) { this.showFallback(dataUrl); UI.hideProcessing(); return; } canvas.toBlob(async (blob) => { const file = new File([blob], `${this.getDynamicFileName()}.jpg`, { type: 'image/jpeg' }); try { await navigator.share({ title: 'بوليصة درة العالم', text: `بوليصة شحن رقم: ${StateMgr.data.awb_no || '---'}`, files: [file] }); } catch(err) { this.showFallback(dataUrl); } UI.hideProcessing(); }, 'image/jpeg', 0.90); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ أثناء التجهيز", "error"); } },
+            async generatePDF() { try { await UI.showProcessing("جاري التصدير..."); if (typeof window.jspdf === 'undefined') { const loaded = await this.ensureLibrary('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); if (!loaded) throw new Error("مكتبة PDF غير متوفرة."); } document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const copies = document.getElementById('copies-selector').value; const watermarks = ["Original", "Shipper Copy", "Consignee Copy", "Company Copy"]; const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4'); const pdfWidth = doc.internal.pageSize.getWidth(); let firstPageDataUrl = null; for(let i=0; i<copies; i++) { if(copies > 1) { const wm = document.getElementById('watermark'); if(wm) { wm.innerText = watermarks[i]; wm.style.visibility = 'visible'; } } const canvas = await this.safeCapture(this.getDynamicScale()); const imgData = canvas.toDataURL('image/jpeg', 0.95); if (i === 0) firstPageDataUrl = imgData; const imgProps = doc.getImageProperties(imgData); const h = pdfWidth / (imgProps.width / imgProps.height); if(i > 0) doc.addPage(); doc.addImage(imgData, 'JPEG', 0, 10, pdfWidth, h); const wm = document.getElementById('watermark'); if(wm) wm.style.visibility = 'hidden'; } try { doc.save(`${this.getDynamicFileName()}.pdf`); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(firstPageDataUrl), 1000); UI.toast("تم التصدير", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ", "error"); } },
+            async generateImage(format='png') { try { await UI.showProcessing(`جاري التصدير بصيغة ${format.toUpperCase()}...`); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast("تم التصدير", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ", "error"); } }
+        };
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            window.supabase = window.supabase.createClient(
+                'https://nysjhyfidbtptnfmgcnd.supabase.co',
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2poeWZpZGJ0cHRuZm1nY25kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjQzMjAsImV4cCI6MjA5ODE0MDMyMH0.KNfsZNGhTdQUv_bctNFJ0hLN0d0rycxm91KosyDfWp0'
+            );
+
+            AuthManager.init();
+            try {
+                if(SafeStorage.get('waybill_theme') === 'light') document.body.classList.remove('dark-mode');
+                
+                if(localStorage.getItem('enterprise_session')) { 
+                    try {
+                        const { data: templates } = await window.supabase.from('waybill_field_templates').select('*');
+                        if (templates && templates.length > 0) {
+                            templates.forEach(t => {
+                                const fieldIndex = Schema.findIndex(s => s.id === t.field_id);
+                                if(fieldIndex > -1) {
+                                    if(t.label) Schema[fieldIndex].name = t.label;
+                                    Schema[fieldIndex].req = t.is_required;
+                                    if(!t.is_visible) Schema[fieldIndex].type = 'readonly';
+                                }
+                            });
+                        }
+                    } catch(e) {}
+
+                    UI.buildForm(); UI.rebuildOverlays(); await StateMgr.init(); 
+                }
+            } catch(e) {} finally { UI.hideProcessing(); window.addEventListener('resize', () => ZoomEngine.reset()); }
+        });
+    </script>
+    
+    <script type="module">
+        try {
+            import('./js/services/sync.engine.js').then(module => {
+                window.SyncEngine = module.SyncEngine; window.SyncEngine.init();
+            }).catch(err => {});
+        } catch (error) {}
+    </script>
+</body>
+</html>
