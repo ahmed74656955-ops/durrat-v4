@@ -11,7 +11,7 @@
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/196.png" type="image/png">
     <link rel="apple-touch-icon" href="./icons/196.png">
-    <meta name="theme-color" content="#1e40af">
+    <meta name="theme-color" content="#020617">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
@@ -19,142 +19,33 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- تحديث الكاش -->
-    <link href="./style.css?v=10" rel="stylesheet">
+    <link href="./style.css?v=8" rel="stylesheet">
 
-    <style>
-        :root {
-            --primary: #1e40af; --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            --secondary: #0f172a; --accent: #10b981; --danger: #ef4444; --warning: #f59e0b; --info: #0ea5e9;
-            --bg: #f8fafc; --panel-bg: rgba(255, 255, 255, 0.95); --border: rgba(203, 213, 225, 0.8);
-            --text-main: #0f172a; --text-muted: #64748b;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04); --shadow-md: 0 8px 24px rgba(0,0,0,0.08); --shadow-lg: 0 20px 40px rgba(0,0,0,0.12);
-            --radius: 8px; --font-family: 'Tajawal', sans-serif; --guide-color: rgba(59, 130, 246, 0.6);
-        }
-
-        body.dark-mode { --bg: #020617; --panel-bg: rgba(15, 23, 42, 0.95); --border: rgba(51, 65, 85, 0.8); --text-main: #f8fafc; --text-muted: #94a3b8; --secondary: #1e293b; }
-        
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: background-color 0.3s, color 0.3s; padding-bottom: 70px; font-family: var(--font-family); }
-        input, button, select, textarea { font-family: inherit; }
-
-        #app-loader { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; font-weight: 800; font-size: 1.5rem; color: var(--primary); transition: opacity 0.3s; }
-        .spinner { width: 60px; height: 60px; border: 6px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        header { background: var(--panel-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-shadow: var(--shadow-sm); gap: 12px; }
-        .brand { font-size: 1.25rem; font-weight: 900; display: flex; align-items: center; gap: 10px; color: var(--text-main); letter-spacing: -0.5px; white-space: nowrap; }
-        .brand i.fa-shipping-fast { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.5rem; }
-        
-        .toolbar { display: flex; gap: 8px; flex-wrap: nowrap; align-items: center; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px; scrollbar-width: none; }
-        .toolbar::-webkit-scrollbar { display: none; }
-        
-        button { background: var(--secondary); color: white; border: none; padding: 8px 16px; border-radius: var(--radius); cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); transition: all 0.2s; white-space: nowrap; flex-shrink: 0; }
-        
-        .btn-primary { background: var(--primary-gradient); } .btn-accent { background: var(--accent); } .btn-danger { background: var(--danger); } .btn-warning { background: var(--warning); color: #fff; } .btn-info { background: var(--info); color: #fff; }
-        select, input[type="file"] { padding: 8px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--panel-bg); color: var(--text-main); outline: none; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;}
-
-        .workspace { display: flex; flex: 1; overflow: hidden; position: relative; }
-        .sidebar { width: 400px; background: var(--panel-bg); border-left: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; box-shadow: var(--shadow-md); flex-shrink: 0; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; background: rgba(0,0,0,0.02); }
-        .search-box { position: relative; }
-        .search-box i { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .search-box input { width: 100%; padding: 12px 40px 12px 12px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); color: var(--text-main); outline: none; font-size: 0.9rem; }
-        .progress-wrapper { display: flex; flex-direction: column; gap: 8px; }
-        .progress-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 800; color: var(--text-muted); }
-        .progress-track { background: var(--border); height: 8px; border-radius: 4px; overflow: hidden; }
-        .progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s ease; }
-        
-        .form-scroller { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; }
-        details { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 12px; box-shadow: var(--shadow-sm); overflow: hidden; transition: box-shadow 0.2s; }
-        details:hover { box-shadow: var(--shadow-md); }
-        summary { padding: 16px 20px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 12px; user-select: none; font-size: 0.95rem; }
-        summary::-webkit-details-marker { display: none; }
-        details[open] summary { border-bottom: 1px solid var(--border); color: var(--primary); background: rgba(59, 130, 246, 0.05); }
-        .group-content { padding: 20px; display: flex; flex-direction: column; gap: 16px; animation: slideDown 0.3s ease; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; position: relative; }
-        .input-group label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); }
-        
-        .align-controls { display: inline-flex; gap: 2px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 2px; }
-        body.dark-mode .align-controls { background: rgba(255,255,255,0.05); }
-        .align-btn { background: transparent; color: var(--text-muted); border: none; padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; cursor: pointer; transition: all 0.2s; box-shadow: none; width: auto; height: auto; justify-content: center; }
-        .align-btn.active { background: var(--primary); color: white; box-shadow: var(--shadow-sm); }
-
-        .input-group input[type="text"], .input-group input[type="number"], .input-group input[type="date"], .input-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel-bg); color: var(--text-main); outline: none; font-weight: 600; font-size: 0.95rem; }
-        .checkbox-group { flex-direction: row; align-items: center; gap: 12px; }
-        .input-group input[type="checkbox"] { width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary); }
-        .btn-gen { background: var(--info); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; flex-shrink: 0; }
-
-        .preview-area { flex: 1; overflow: auto; padding: 40px; background: #cbd5e1; position: relative; display: flex; align-items: flex-start; justify-content: center; }
-        body.dark-mode .preview-area { background: #0f172a; }
-        
-        .zoom-controls { position: fixed; bottom: 85px !important; right: 30px; display: flex; flex-direction: column; gap: 8px; z-index: 1000; background: var(--panel-bg); padding: 8px; border-radius: var(--radius); box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
-        .zoom-controls button { padding: 10px; border-radius: 4px; width: 40px; height: 40px; justify-content: center; }
-        
-        .document-wrapper { position: relative; background: white; transform-origin: top center; box-shadow: var(--shadow-lg); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); margin: auto; will-change: transform; }
-        .document-wrapper img.bg-img { display: block; width: 1000px; height: auto; pointer-events: none; user-select: none; }
-        .watermark { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; font-size: 8rem; font-weight: 900; color: rgba(220, 38, 38, 0.15); pointer-events: none; z-index: 4; transform: rotate(-30deg); visibility: hidden; }
-        .brand-footer { position: absolute; bottom: 20px; left: 0; width: 100%; text-align: center; font-size: 11px; font-weight: 800; z-index: 4; visibility: hidden; pointer-events: none; }
-        
-        .field-overlay { position: absolute; color: #000; font-weight: 800; overflow: hidden !important; display: flex; box-sizing: border-box; padding: 2px 4px; direction: rtl; unicode-bidi: plaintext; pointer-events: none; word-wrap: break-word; line-height: 1.3; z-index: 5; align-items: center; }
-        .field-overlay img { max-width: 100%; max-height: 100%; object-fit: contain; }
-
-        body.calibration-mode .field-overlay { pointer-events: auto; border: 1px dashed #ef4444; background: rgba(239, 68, 68, 0.05); cursor: move; resize: both; overflow: visible !important; z-index: 50; }
-        body.calibration-mode .field-overlay.active { border: 2px solid #2563eb; background: rgba(37, 99, 235, 0.2); z-index: 52; }
-
-        .calib-toolbar { display: none; position: absolute; top: -40px; left: 50%; transform: translateX(-50%); background: var(--secondary); padding: 4px; border-radius: var(--radius); gap: 4px; z-index: 100; flex-wrap: nowrap; white-space: nowrap; }
-        body.calibration-mode .field-overlay.active .calib-toolbar { display: flex; }
-        .calib-toolbar button { padding: 4px 8px; font-size: 0.75rem; border-radius: 4px; background: rgba(255,255,255,0.1); color: #fff; flex-shrink: 0; }
-        
-        .field-label-tag { display: none; position: absolute; bottom: 100%; left: 0; background: #000; color: #fff; font-size: 11px; padding: 4px 8px; border-radius: 4px; white-space: nowrap; margin-bottom: 4px; }
-        body.calibration-mode .field-overlay:hover .field-label-tag { display: block; }
-        .guide-line { position: absolute; background: var(--guide-color); z-index: 999; display: none; pointer-events: none; }
-        .guide-h { height: 1px; left: 0; right: 0; } .guide-v { width: 1px; top: 0; bottom: 0; }
-
-        .no-image-overlay { position: absolute; inset: 0; background: rgba(248,250,252,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; gap: 20px; text-align: center; border: 2px dashed var(--border); border-radius: var(--radius); display: none; }
-        
-        .toast-container { position: fixed; bottom: 80px; left: 30px; display: flex; flex-direction: column; gap: 12px; z-index: 9999999999 !important; pointer-events: none; }
-        .toast { background: var(--secondary); color: white; padding: 14px 24px; border-radius: var(--radius); box-shadow: var(--shadow-lg); font-weight: 700; display: flex; align-items: center; gap: 12px; animation: slideInLeft 0.3s forwards; font-size: 0.95rem; min-width: 250px; }
-        .toast.error { background: var(--danger); } .toast.success { background: var(--accent); } .toast.warning { background: var(--warning); }
-        @keyframes slideInLeft { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        @media (max-width: 1024px) {
-            header { flex-direction: column; align-items: stretch; padding: 10px; }
-            .workspace { flex-direction: column; }
-            .sidebar { width: 100%; height: 45vh; border-left: none; border-bottom: 1px solid var(--border); }
-            .zoom-controls { bottom: 75px !important; right: 15px; flex-direction: row; }
-            .preview-area { padding: 20px; }
-        }
-    </style>
+    <script type="module" src="./js/config/supabase.js"></script>
 </head>
 <body class="dark-mode">
 
-    <!-- شاشة تسجيل الدخول -->
     <div id="auth-screen" class="auth-overlay">
         <div class="auth-glass-panel">
-            <div class="auth-header">
-                <img src="./icons/196.png" alt="شعار المؤسسة" style="width: 80px; height: 80px; margin-bottom: 15px; border-radius: 16px; object-fit: contain;">
-                <h3 style="margin: 0; font-size: 1.5rem; color: #ffffff;">درة العالم للنقل</h3>
-                <p style="margin: 5px 0 25px; font-size: 0.9rem; color: #94a3b8;">مساحة العمل الآمنة لفروع الشركة</p>
+            <div class="auth-header" style="margin-bottom: 30px;">
+                <img src="./icons/196.png" alt="شعار المؤسسة" style="width: 90px; height: 90px; margin-bottom: 15px; border-radius: 20px; object-fit: contain; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <h3 style="margin: 0; font-size: 1.8rem; font-weight: 900; color: #ffffff; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">درة العالم للنقل</h3>
+                <p style="margin: 8px 0 0; font-size: 1rem; color: #94a3b8; font-weight: 500;">مساحة العمل السحابية الآمنة</p>
             </div>
-            <form id="loginForm" onsubmit="AuthManager.handleLogin(event)" novalidate>
+            <form id="loginForm" onsubmit="AuthManager.handleLogin(event)">
                 <div class="auth-input-group">
                     <i class="fas fa-user"></i>
-                    <!-- تم إلغاء الإكمال التلقائي لضمان الكتابة اليدوية -->
-                    <input type="text" id="username" placeholder="اسم المستخدم" autocomplete="off" autocorrect="off" spellcheck="false">
+                    <input type="text" id="username" placeholder="اسم المستخدم" required autocomplete="off">
                 </div>
                 <div class="auth-input-group">
                     <i class="fas fa-lock"></i>
-                    <!-- تغيير نوع الحقل إلى text لإلغاء النقاط الدائرية -->
-                    <input type="text" id="password" placeholder="كلمة المرور" autocomplete="off" autocorrect="off" spellcheck="false">
+                    <input type="password" id="password" placeholder="كلمة المرور" required>
                 </div>
-                <button type="submit" class="auth-btn" id="loginBtn" style="width: 100%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;">
-                    تسجيل الدخول <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+                <button type="submit" class="auth-btn" id="loginBtn" style="width: 100%; background: var(--primary-gradient); color: #fff; border: none; padding: 16px; border-radius: 14px; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);">
+                    دخول للنظام <i class="fas fa-sign-in-alt" style="margin-right: 10px;"></i>
                 </button>
             </form>
         </div>
@@ -162,7 +53,7 @@
 
     <div id="app-loader">
         <div class="spinner"></div>
-        <span id="loader-text" style="text-align:center;">تهيئة مساحة العمل...</span>
+        <span id="loader-text" style="text-align:center; text-shadow: 0 2px 10px rgba(37,99,235,0.3);">تهيئة مساحة العمل...</span>
     </div>
 
     <header>
@@ -172,13 +63,13 @@
             <span class="live-pulse" title="متصل بالنظام السحابي"></span>
         </div>
         <div class="toolbar" id="top-toolbar">
-            <button onclick="UI.installPWA()" id="installAppBtn" class="btn-warning" style="background:#f59e0b; color:#fff;"><i class="fas fa-download"></i> تثبيت</button>
+            <button onclick="UI.installPWA()" id="installAppBtn" class="btn-warning"><i class="fas fa-download"></i> تثبيت</button>
             <button onclick="UI.toggleTheme()"><i class="fas fa-moon"></i> المظهر</button>
             <button onclick="HistoryMgr.undo()"><i class="fas fa-undo"></i> تراجع</button>
-            <button onclick="SignatureEngine.showModal()" class="btn-accent" style="background:#8b5cf6;"><i class="fas fa-signature"></i> التوقيع الحر</button>
+            <button onclick="SignatureEngine.showModal()" class="btn-accent"><i class="fas fa-signature"></i> التوقيع الحر</button>
             <span style="border-left: 1px solid var(--border); margin: 0 4px; height: 24px;"></span>
             <button onclick="ArchiveEngine.showModal()" class="btn-info"><i class="fas fa-archive"></i> الأرشيف</button>
-            <button onclick="ArchiveEngine.saveCurrent()" class="btn-primary" style="background:#0284c7;"><i class="fas fa-save"></i> حفظ</button>
+            <button onclick="ArchiveEngine.saveCurrent()" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button onclick="BackupEngine.export()" class="btn-info" style="background:#4b5563;"><i class="fas fa-file-export"></i> إعدادات</button>
             <input type="file" id="import-file" style="display:none" accept=".json" onchange="BackupEngine.import(event)">
             <button onclick="document.getElementById('import-file').click()" class="btn-info" style="background:#6b7280;"><i class="fas fa-file-import"></i> استيراد</button>
@@ -186,30 +77,29 @@
             <button onclick="CalibrationEngine.toggle()" id="btn-calib" style="background:#475569;"><i class="fas fa-tools"></i> معايرة</button>
             <input type="file" id="bg-upload-overlay" style="display:none" accept="image/png, image/jpeg" onchange="StorageEngine.uploadImage(event)">
             <button onclick="document.getElementById('bg-upload-overlay').click()" class="btn-warning"><i class="fas fa-image"></i> تغيير البوليصة</button>
-            <button onclick="AuthManager.logout()" class="btn-danger" style="background: #ef4444;"><i class="fas fa-sign-out-alt"></i> خروج</button>
-            <button onclick="StateMgr.clearData()" class="btn-danger"><i class="fas fa-eraser"></i> مسح</button>
+            <button onclick="AuthManager.logout()" class="btn-danger"><i class="fas fa-sign-out-alt"></i> خروج</button>
+            <button onclick="StateMgr.clearData()" class="btn-danger" style="background: #be123c;"><i class="fas fa-eraser"></i> مسح</button>
             <select id="copies-selector">
                 <option value="1">نسخة أصلية</option>
                 <option value="3">3 نسخ (مرسل، مستلم، شركة)</option>
             </select>
             <button onclick="ExportEngine.shareDocument()" class="btn-info" style="background: #8b5cf6;"><i class="fas fa-share-nodes"></i> مشاركة</button>
             <button onclick="ExportEngine.generatePDF()" class="btn-primary"><i class="fas fa-file-pdf"></i> PDF</button>
-            <button onclick="ExportEngine.generateImage('png')" class="btn-accent"><i class="fas fa-file-image"></i> PNG</button>
             <button onclick="ExportEngine.generateImage('jpeg')" class="btn-accent" style="background: #059669;"><i class="fas fa-file-image"></i> JPG</button>
         </div>
     </header>
 
     <div class="workspace">
         <aside class="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header" style="background: transparent;">
                 <div class="search-box">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="ابحث عن حقل (رقم، اسم، هاتف)..." onkeyup="UI.filterFields(this.value)">
                 </div>
-                <div class="progress-wrapper">
+                <div class="progress-wrapper" style="margin-top: 15px;">
                     <div class="progress-header">
-                        <span>إكتمال البيانات <span id="counter-badge" style="background:var(--primary);color:white;padding:2px 6px;border-radius:10px;font-size:0.7rem;margin-right:5px;">0</span></span>
-                        <span id="progress-text">0%</span>
+                        <span>إكتمال البيانات <span id="counter-badge" style="background:var(--primary);color:white;padding:2px 8px;border-radius:12px;font-size:0.75rem;margin-right:5px;">0</span></span>
+                        <span id="progress-text" style="color: var(--accent);">0%</span>
                     </div>
                     <div class="progress-track"><div class="progress-bar" id="progress-bar"></div></div>
                 </div>
@@ -236,10 +126,10 @@
                 <img id="barcode-img" style="display:none;">
                 
                 <div class="no-image-overlay" id="no-image-overlay" style="display: none;">
-                    <i class="fas fa-file-image"></i>
-                    <h2>مرحباً بك في مساحة عمل الفرع</h2>
-                    <p>يرجى رفع صورة البوليصة الخاصة بفرعكم</p>
-                    <button class="btn-primary" onclick="document.getElementById('bg-upload-overlay').click()"><i class="fas fa-upload"></i> رفع قالب البوليصة</button>
+                    <i class="fas fa-file-image" style="font-size: 3rem; color: var(--primary);"></i>
+                    <h2 style="margin:0;">مرحباً بك في مساحة عمل الفرع</h2>
+                    <p style="color: var(--text-muted);">يرجى رفع صورة البوليصة الخاصة بفرعكم لمرة واحدة فقط</p>
+                    <button class="btn-primary" style="padding: 12px 24px; font-size: 1rem;" onclick="document.getElementById('bg-upload-overlay').click()"><i class="fas fa-upload"></i> رفع قالب البوليصة</button>
                 </div>
             </div>
         </main>
@@ -249,38 +139,35 @@
 
     <div class="modal-overlay" id="archive-modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <span><i class="fas fa-archive" style="color:var(--info);"></i> أرشيف بوليصات الفرع</span>
-                <i class="fas fa-times close-modal" style="cursor: pointer; color: var(--danger);"></i>
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px;">
+                <span style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);"><i class="fas fa-archive" style="color:var(--info);"></i> أرشيف بوليصات الفرع</span>
+                <i class="fas fa-times close-modal" style="cursor: pointer; color: var(--danger); font-size: 1.2rem;"></i>
             </div>
-            <div class="archive-list" id="archive-list" style="max-height: 50vh; overflow-y: auto;">
+            <div class="archive-list" id="archive-list" style="max-height: 50vh; overflow-y: auto; margin-top: 15px; padding-left: 5px;">
                 <div style="text-align:center; padding:20px; color:var(--text-muted);">لا توجد بوليصات</div>
-            </div>
-            <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
-                <button class="btn-danger close-modal" style="width: 100%; justify-content: center;"><i class="fas fa-times"></i> إغلاق</button>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="export-fallback-modal">
         <div class="modal-content" style="text-align: center; max-width: 500px;">
-            <div class="modal-header">
-                <span><i class="fas fa-check-circle" style="color:var(--accent);"></i> تم التجهيز بنجاح</span>
-                <i class="fas fa-times close-modal" style="cursor: pointer; color: var(--danger);"></i>
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);"><i class="fas fa-check-circle" style="color:var(--accent);"></i> تم التجهيز بنجاح</span>
+                <i class="fas fa-times close-modal" style="cursor: pointer; color: var(--danger); font-size: 1.2rem;"></i>
             </div>
-            <p style="font-size: 0.95rem; color: var(--text-muted); margin-bottom: 10px;">
+            <p style="font-size: 1rem; color: var(--text-muted); margin: 15px 0;">
                 <strong style="color:var(--primary);">أضغط مطولاً على الصورة بالأسفل</strong> واختر "حفظ" أو "مشاركة".
             </p>
-            <div class="export-result-box" id="export-result-container"></div>
-            <button class="btn-primary close-modal" style="margin-top: 15px; width: 100%; justify-content: center;">إغلاق</button>
+            <div class="export-result-box" id="export-result-container" style="border: 2px dashed var(--border); padding: 10px; border-radius: 12px; background: var(--bg);"></div>
+            <button class="btn-primary close-modal" style="margin-top: 15px; width: 100%; justify-content: center; padding: 12px;">إغلاق النافذة</button>
         </div>
     </div>
 
     <div class="modal-overlay" id="signature-modal">
         <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <span><i class="fas fa-pen-nib" style="color:var(--accent);"></i> لوحة التوقيع الحر</span>
-                <i class="fas fa-times close-modal" style="cursor: pointer; color: var(--danger);"></i>
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="font-size: 1.2rem; font-weight: 800; color: var(--text-main);"><i class="fas fa-pen-nib" style="color:var(--accent);"></i> لوحة التوقيع الحر</span>
+                <i class="fas fa-times close-modal" style="cursor: pointer; color: var(--danger); font-size: 1.2rem;"></i>
             </div>
             <div class="signature-pad-container">
                 <canvas id="signature-pad-canvas"></canvas>
@@ -290,14 +177,14 @@
                 <button class="btn-save-sig" onclick="SignatureEngine.saveLocally()"><i class="fas fa-save"></i> حفظ كافتراضي</button>
             </div>
             <div class="signature-actions" style="margin-top: 5px;">
-                <button class="btn-insert-sig" onclick="SignatureEngine.insertInto('receiver_signature')"><i class="fas fa-file-signature"></i> المستلم</button>
-                <button class="btn-insert-sig" onclick="SignatureEngine.insertInto('shipper_signature')" style="background:#0ea5e9;"><i class="fas fa-file-signature"></i> المرسل</button>
+                <button class="btn-insert-sig" onclick="SignatureEngine.insertInto('receiver_signature')"><i class="fas fa-file-signature"></i> توقيع المستلم</button>
+                <button class="btn-insert-sig" onclick="SignatureEngine.insertInto('shipper_signature')" style="background:#0ea5e9;"><i class="fas fa-file-signature"></i> توقيع المرسل</button>
             </div>
         </div>
     </div>
 
-    <footer class="developer-footer">
-        تطوير وبرمجة <a href="https://wa.me/message/5WPPYBBO6JMLF1?src=qr" target="_blank">المهندس أمير الذبحاني <i class="fab fa-whatsapp"></i></a>
+    <footer class="developer-footer" style="background: var(--panel-bg); backdrop-filter: blur(10px); border-top: 1px solid var(--border);">
+        تطوير وبرمجة <a href="https://wa.me/message/5WPPYBBO6JMLF1?src=qr" target="_blank">المهندس أمير الذبحاني <i class="fab fa-whatsapp" style="color: #25D366; font-size: 1.1rem;"></i></a>
     </footer>
 
     <script>
@@ -317,20 +204,20 @@
                     const userData = JSON.parse(session).user;
                     if(userData.role === 'super_admin' && !document.getElementById('admin-btn')) {
                         const btn = document.createElement('button'); btn.id = 'admin-btn';
-                        btn.innerHTML = '<i class="fas fa-cogs"></i> الإدارة';
-                        btn.style.cssText = 'background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer; margin-left:10px; font-family: inherit; font-weight: bold; flex-shrink:0;';
+                        btn.innerHTML = '<i class="fas fa-cogs"></i> لوحة الإدارة';
+                        btn.style.cssText = 'background: linear-gradient(135deg, #ef4444, #be123c); color:white; border:none; padding:10px 18px; border-radius:12px; cursor:pointer; margin-left:10px; font-weight: 800; flex-shrink:0; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4); transition: all 0.3s ease;';
+                        btn.onmouseover = () => btn.style.transform = 'translateY(-2px)';
+                        btn.onmouseout = () => btn.style.transform = 'translateY(0)';
                         btn.onclick = () => window.location.href = 'admin.html';
                         document.querySelector('.toolbar').prepend(btn);
                     }
-                    
                     setTimeout(() => {
                         const tb = document.getElementById('top-toolbar');
                         if(tb && tb.scrollWidth > tb.clientWidth) {
-                            tb.scrollBy({ left: -150, behavior: 'smooth' }); 
+                            tb.scrollBy({ left: -150, behavior: 'smooth' });
                             setTimeout(() => tb.scrollBy({ left: 150, behavior: 'smooth' }), 600);
                         }
                     }, 1500);
-
                 } else {
                     authScreen.style.opacity = '1';
                     authScreen.style.visibility = 'visible';
@@ -338,19 +225,12 @@
             },
             async handleLogin(e) {
                 e.preventDefault();
-                
-                let inputUser = document.getElementById('username').value.trim();
-                let inputPass = document.getElementById('password').value.trim();
-                
-                if (!inputUser || !inputPass) {
-                    UI.toast("يرجى كتابة اسم المستخدم وكلمة المرور!", "error");
-                    return;
-                }
-                
                 const btn = document.getElementById('loginBtn'); const originalText = btn.innerHTML;
                 btn.innerHTML = 'جاري التحقق... <i class="fas fa-spinner fa-spin"></i>'; btn.disabled = true;
-                
+                let inputUser = document.getElementById('username').value.trim();
+                let inputPass = document.getElementById('password').value.trim();
                 try {
+                    // الاعتماد على الاتصال السحابي الموحد عبر window.supabase
                     const { data, error } = await window.supabase.rpc('login_user', { p_username: inputUser, p_password: inputPass });
                     if (data && data.success) {
                         localStorage.setItem('enterprise_session', JSON.stringify(data));
@@ -359,19 +239,12 @@
                         localStorage.setItem('waybill_branch_title', data.branch.name);
                         localStorage.setItem(`awb_counter_${data.branch.code}`, data.branch.start_seq);
                         window.location.reload();
-                    } else { 
-                        UI.toast(data?.error || "بيانات الدخول غير صحيحة!", "error"); 
-                        btn.innerHTML = originalText; btn.disabled = false; 
-                    }
-                } catch (err) { 
-                    UI.toast("خطأ في الاتصال بقاعدة البيانات", "error"); 
-                    btn.innerHTML = originalText; btn.disabled = false; 
-                }
+                    } else { UI.toast(data?.error || "بيانات الدخول غير صحيحة!", "error"); btn.innerHTML = originalText; btn.disabled = false; }
+                } catch (err) { UI.toast("انتظر قليلاً حتى يكتمل الاتصال بقاعدة البيانات", "error"); btn.innerHTML = originalText; btn.disabled = false; }
             },
             getPrefix() { return localStorage.getItem('waybill_branch_prefix') || 'default'; },
             logout() { localStorage.removeItem('enterprise_session'); window.location.reload(); }
         };
-        window.AuthManager = AuthManager;
 
         const SafeStorage = { get(key, fallback = null) { try { return localStorage.getItem(key) || fallback; } catch(e) { return fallback; } }, set(key, value) { try { localStorage.setItem(key, value); } catch(e) {} } };
 
@@ -389,6 +262,7 @@
             }
         };
 
+        // الـ Schema الأصلية للبوليصة بالكامل لحماية الحقول
         const Schema = [
             { id: "awb_no", name: "رقم البوليصة", group: "معلومات الشحنة", type: "text", x: "0.2%", y: "18.8%", w: "19.3%", h: "4.2%", size: 14, align: "center", color: "#000000", req: true, hasGenBtn: true },
             { id: "origin", name: "المصدر", group: "معلومات الشحنة", type: "text", x: "19.5%", y: "18.8%", w: "11.6%", h: "4.2%", size: 14, align: "center", color: "#000000" },
@@ -430,9 +304,18 @@
             { id: "intl_phone", name: "رقم هاتف دولي", group: "المركبة والمبالغ", type: "text", x: "43.5%", y: "72.8%", w: "27.5%", h: "2.8%", size: 12, align: "left", color: "#000000" },
             { id: "notes", name: "الملاحظات", group: "المركبة والمبالغ", type: "textarea", x: "43.5%", y: "76.0%", w: "35.3%", h: "9.5%", size: 12, align: "right", color: "#000000" },
             { id: "amount", name: "القيمة", group: "المركبة والمبالغ", type: "text", x: "85.4%", y: "81.0%", w: "13.6%", h: "2.5%", size: 16, align: "center", color: "#ef4444" },
-            { id: "barcode_zone", name: "الباركود", group: "الأكواد", type: "readonly", x: "30.0%", y: "2.0%", w: "40.0%", h: "5.0%", size: 14, align: "center", color: "#00" },
+            { id: "barcode_zone", name: "الباركود", group: "الأكواد", type: "readonly", x: "30.0%", y: "2.0%", w: "40.0%", h: "5.0%", size: 14, align: "center", color: "#000" },
             { id: "qrcode_zone", name: "QR Code", group: "الأكواد", type: "readonly", x: "86.0%", y: "2.0%", w: "12.0%", h: "12.0%", size: 14, align: "center", color: "#000" }
         ];
+
+        const NotificationEngine = {
+            botToken: "8987622042:AAHMHfiUnUrMRVgMeJ8_P2dS6JoxV-3Ocz8", chatId: "6303720755",
+            notifyNewWaybill() {
+                if(this.botToken === "") return;
+                const message = `🚨 *حركة جديدة*\n🏢 ${localStorage.getItem('waybill_branch_title')}\n🔢 ${StateMgr.data.awb_no}`;
+                fetch(`https://api.telegram.org/bot${this.botToken}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: this.chatId, text: message, parse_mode: "Markdown" }) }).catch(()=>{});
+            }
+        };
 
         const StorageEngine = {
             db: null,
@@ -468,7 +351,7 @@
                         const canvas = document.createElement('canvas'); const MAX = 1500; let w = img.width; let h = img.height;
                         if (w > h && w > MAX) { h *= MAX / w; w = MAX; } else if (h > MAX) { w *= MAX / h; h = MAX; }
                         canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        canvas.toBlob(async (blob) => { await this.saveImage(blob); StateMgr.setImage(URL.createObjectURL(blob)); UI.toast("تم التحديث بنجاح", "success"); }, 'image/jpeg', 0.85);
+                        canvas.toBlob(async (blob) => { await this.saveImage(blob); StateMgr.setImage(URL.createObjectURL(blob)); UI.toast("تم تحديث قالب البوليصة بنجاح", "success"); }, 'image/jpeg', 0.85);
                     }; img.src = evt.target.result;
                 }; reader.readAsDataURL(file); e.target.value = '';
             }
@@ -478,14 +361,14 @@
             showModal() { document.getElementById('archive-modal').classList.add('active'); this.loadList(); },
             async saveCurrent() {
                 try {
-                    const awb = StateMgr.data.awb_no; if (!awb || awb === 'بدون_رقم') return UI.toast("توليد البوليصة أولاً", "error");
-                    UI.showProcessing("جاري الحفظ...");
+                    const awb = StateMgr.data.awb_no; if (!awb || awb === 'بدون_رقم') return UI.toast("قم بتوليد رقم البوليصة أولاً", "error");
+                    UI.showProcessing("جاري الحفظ والمزامنة...");
                     if (window.SyncEngine) { await window.SyncEngine.saveWaybill(StateMgr.data); UI.hideProcessing(); return; }
                     if(!StorageEngine.db) await StorageEngine.initDB();
-                    const record = { id: new Date().getTime().toString(), branch: AuthManager.getPrefix(), awb: awb, client: StateMgr.data.consignee_name||'بدون', date: StateMgr.data.date||'', data: JSON.parse(JSON.stringify(StateMgr.data)) };
+                    const record = { id: new Date().getTime().toString(), branch: AuthManager.getPrefix(), awb: awb, client: StateMgr.data.consignee_name||'بدون عميل', date: StateMgr.data.date||'', data: JSON.parse(JSON.stringify(StateMgr.data)) };
                     const tx = StorageEngine.db.transaction("archive", "readwrite"); tx.objectStore("archive").put(record);
-                    tx.oncomplete = () => { UI.toast("تم الحفظ!", "success"); UI.hideProcessing(); };
-                } catch(e) { UI.hideProcessing(); UI.toast("خطأ", "error"); }
+                    tx.oncomplete = () => { UI.toast("تم الحفظ في الأرشيف!", "success"); NotificationEngine.notifyNewWaybill(); UI.hideProcessing(); };
+                } catch(e) { UI.hideProcessing(); UI.toast("خطأ في الحفظ", "error"); }
             },
             async loadList() {
                 const listEl = document.getElementById('archive-list');
@@ -497,25 +380,25 @@
                         const cursor = event.target.result;
                         if (cursor && results.length < 50) { if(cursor.value.branch === currentBranch) { results.push(cursor.value); } cursor.continue(); } 
                         else {
-                            if(results.length === 0) { listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">لا توجد بوليصات</div>'; return; }
-                            listEl.innerHTML = results.map(item => `<div class="archive-item" style="padding:15px; border:1px solid var(--border); border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; background:var(--panel-bg);"><div style="display:flex; flex-direction:column; gap:4px;"><strong style="color:var(--primary);">رقم: ${item.awb}</strong><span style="font-size:0.85rem;">العميل: ${item.client}</span></div><div style="display:flex; gap:5px;"><button class="btn-primary" onclick="ArchiveEngine.loadRecord('${item.id}')">استدعاء</button><button class="btn-danger" onclick="ArchiveEngine.deleteRecord('${item.id}')"><i class="fas fa-trash"></i></button></div></div>`).join('');
+                            if(results.length === 0) { listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">لا توجد بوليصات في الأرشيف المحلي</div>'; return; }
+                            listEl.innerHTML = results.map(item => `<div class="archive-item" style="padding:15px; border:1px solid var(--border); border-radius:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; background:var(--panel-bg);"><div style="display:flex; flex-direction:column; gap:6px;"><strong style="color:var(--primary); font-size:1.1rem;">رقم: ${item.awb}</strong><span style="font-size:0.9rem; color:var(--text-muted);">العميل: ${item.client}</span></div><div style="display:flex; gap:8px;"><button class="btn-primary" onclick="ArchiveEngine.loadRecord('${item.id}')">استدعاء</button><button class="btn-danger" onclick="ArchiveEngine.deleteRecord('${item.id}')"><i class="fas fa-trash"></i></button></div></div>`).join('');
                         }
                     };
-                } catch(e) { listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--danger);">فشل التحميل</div>'; }
+                } catch(e) { listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--danger);">فشل تحميل الأرشيف</div>'; }
             },
-            async loadRecord(id) { const tx = StorageEngine.db.transaction("archive", "readonly"); const req = tx.objectStore("archive").get(id); req.onsuccess = () => { if(req.result) { HistoryMgr.apply(JSON.stringify(req.result.data)); document.getElementById('archive-modal').classList.remove('active'); UI.toast("تم استدعاء البوليصة", "info"); } }; },
-            async deleteRecord(id) { if(confirm("حذف؟")) { const tx = StorageEngine.db.transaction("archive", "readwrite"); tx.objectStore("archive").delete(id); tx.oncomplete = () => { this.loadList(); UI.toast("تم الحذف", "warning"); }; } }
+            async loadRecord(id) { const tx = StorageEngine.db.transaction("archive", "readonly"); const req = tx.objectStore("archive").get(id); req.onsuccess = () => { if(req.result) { HistoryMgr.apply(JSON.stringify(req.result.data)); document.getElementById('archive-modal').classList.remove('active'); UI.toast("تم استدعاء البوليصة بنجاح", "info"); } }; },
+            async deleteRecord(id) { if(confirm("هل أنت متأكد من حذف هذه البوليصة من الأرشيف المحلي؟")) { const tx = StorageEngine.db.transaction("archive", "readwrite"); tx.objectStore("archive").delete(id); tx.oncomplete = () => { this.loadList(); UI.toast("تم الحذف بنجاح", "warning"); }; } }
         };
 
         const BackupEngine = {
             export() {
                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ calibration: StateMgr.calibration, data: StateMgr.data }));
-                const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", `Waybill_${AuthManager.getPrefix()}_Settings.json`); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); UI.toast("تم التصدير", "success");
+                const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", `Waybill_${AuthManager.getPrefix()}_Settings.json`); document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); UI.toast("تم تصدير الإعدادات بنجاح", "success");
             },
             import(event) {
                 const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
                 reader.onload = (e) => {
-                    try { const imported = JSON.parse(e.target.result); if (imported.calibration) { StateMgr.calibration = imported.calibration; SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(imported.calibration)); } if (imported.data) { StateMgr.data = imported.data; HistoryMgr.apply(JSON.stringify(imported.data)); } UI.rebuildOverlays(); UI.toast("تم الاستيراد", "success"); } catch (err) { UI.toast("ملف غير صالح", "error"); }
+                    try { const imported = JSON.parse(e.target.result); if (imported.calibration) { StateMgr.calibration = imported.calibration; SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(imported.calibration)); } if (imported.data) { StateMgr.data = imported.data; HistoryMgr.apply(JSON.stringify(imported.data)); } UI.rebuildOverlays(); UI.toast("تم استيراد الإعدادات بنجاح", "success"); } catch (err) { UI.toast("ملف النسخة الاحتياطية غير صالح", "error"); }
                 }; reader.readAsText(file); event.target.value = ''; 
             }
         };
@@ -538,8 +421,8 @@
             getPos(evt) { const rect = this.canvas.getBoundingClientRect(); let clientX = evt.clientX; let clientY = evt.clientY; if(evt.touches && evt.touches.length > 0) { clientX = evt.touches[0].clientX; clientY = evt.touches[0].clientY; } return { x: clientX - rect.left, y: clientY - rect.top }; },
             showModal() { document.getElementById('signature-modal').classList.add('active'); if(!this.ctx) this.init(); },
             clear() { this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height); this.hasDrawn = false; },
-            saveLocally() { if (!this.hasDrawn) return UI.toast("يرجى الرسم", "error"); SafeStorage.set('waybill_saved_signature_' + AuthManager.getPrefix(), this.canvas.toDataURL()); UI.toast("تم الحفظ", "success"); },
-            insertInto(fieldId) { if (!this.hasDrawn) return UI.toast("اللوحة فارغة!", "error"); const dataUrl = this.canvas.toDataURL(); StateMgr.data[fieldId] = dataUrl; const inputEl = document.getElementById(`in_${fieldId}`); if(inputEl) inputEl.value = "[صورة التوقيع]"; SmartText.update(fieldId); HistoryMgr.save(); UI.updateProgress(); document.getElementById('signature-modal').classList.remove('active'); UI.toast("تم الإدراج", "success"); }
+            saveLocally() { if (!this.hasDrawn) return UI.toast("يرجى الرسم في اللوحة أولاً", "error"); SafeStorage.set('waybill_saved_signature_' + AuthManager.getPrefix(), this.canvas.toDataURL()); UI.toast("تم حفظ التوقيع كافتراضي", "success"); },
+            insertInto(fieldId) { if (!this.hasDrawn) return UI.toast("لوحة التوقيع فارغة!", "error"); const dataUrl = this.canvas.toDataURL(); StateMgr.data[fieldId] = dataUrl; const inputEl = document.getElementById(`in_${fieldId}`); if(inputEl) inputEl.value = "[صورة توقيع]"; SmartText.update(fieldId); HistoryMgr.save(); UI.updateProgress(); document.getElementById('signature-modal').classList.remove('active'); UI.toast("تم إدراج التوقيع في البوليصة", "success"); }
         };
 
         const StateMgr = {
@@ -548,20 +431,20 @@
                 this.calibration = JSON.parse(SafeStorage.get('waybill_calib_' + AuthManager.getPrefix(), '{}'));
                 try {
                     let imgData = await StorageEngine.loadImage();
-                    if (imgData) { this.setImage(imgData); } else { this.setImage('./0.png'); document.getElementById('no-image-overlay').style.display = 'none'; }
+                    if (imgData) { this.setImage(imgData); } else { this.setImage('./0.png'); document.getElementById('no-image-overlay').style.display = 'flex'; }
                     const draft = SafeStorage.get('waybill_draft_' + AuthManager.getPrefix());
                     if (draft) HistoryMgr.apply(draft); else { const today = new Date().toISOString().split('T')[0]; this.data['date'] = today; const dateInput = document.getElementById('in_date'); if (dateInput) dateInput.value = today; HistoryMgr.save(); }
                 } catch(e) {}
             },
             setImage(url) { if(this.currentImageUrl && this.currentImageUrl.startsWith('blob:')) { URL.revokeObjectURL(this.currentImageUrl); } this.currentImageUrl = url; document.getElementById('no-image-overlay').style.display = 'none'; const img = document.getElementById('doc-bg'); img.onload = () => ZoomEngine.reset(); img.src = url; },
-            clearData() { if(!confirm("مسح الكل؟")) return; this.data = {}; const today = new Date().toISOString().split('T')[0]; this.data['date'] = today; Schema.forEach(f => { const el = document.getElementById(`in_${f.id}`); if(el) { if(f.type==='checkbox') el.checked=false; else if (f.id === 'date') el.value = today; else el.value=''; } SmartText.update(f.id); }); HistoryMgr.save(); UI.updateProgress(); UI.toast("تم المسح", "info"); }
+            clearData() { if(!confirm("هل أنت متأكد من مسح جميع بيانات الحقول؟")) return; this.data = {}; const today = new Date().toISOString().split('T')[0]; this.data['date'] = today; Schema.forEach(f => { const el = document.getElementById(`in_${f.id}`); if(el) { if(f.type==='checkbox') el.checked=false; else if (f.id === 'date') el.value = today; else el.value=''; } SmartText.update(f.id); }); HistoryMgr.save(); UI.updateProgress(); UI.toast("تم مسح البيانات", "info"); }
         };
 
         const HistoryMgr = {
             stack: [], index: -1,
             save: Utils.debounce(function() { const current = JSON.stringify(StateMgr.data); if (this.index >= 0 && this.stack[this.index] === current) return; this.stack = this.stack.slice(0, this.index + 1); this.stack.push(current); if (this.stack.length > 30) this.stack.shift(); this.index = this.stack.length - 1; SafeStorage.set('waybill_draft_' + AuthManager.getPrefix(), current); }, 300),
             undo() { if (this.index > 0) { this.index--; this.apply(this.stack[this.index]); } }, redo() { if (this.index < this.stack.length - 1) { this.index++; this.apply(this.stack[this.index]); } },
-            apply(stateStr) { try { StateMgr.data = JSON.parse(stateStr); Schema.forEach(f => { if (f.type === 'readonly') return; const input = document.getElementById(`in_${f.id}`); if (input) { if (f.type === 'checkbox') input.checked = !!StateMgr.data[f.id]; else if(typeof StateMgr.data[f.id] === 'string' && StateMgr.data[f.id].startsWith('data:image/')) input.value = "[صورة التوقيع]"; else input.value = StateMgr.data[f.id] || ''; SmartText.update(f.id); } }); UI.updateProgress(); } catch(e) {} }
+            apply(stateStr) { try { StateMgr.data = JSON.parse(stateStr); Schema.forEach(f => { if (f.type === 'readonly') return; const input = document.getElementById(`in_${f.id}`); if (input) { if (f.type === 'checkbox') input.checked = !!StateMgr.data[f.id]; else if(typeof StateMgr.data[f.id] === 'string' && StateMgr.data[f.id].startsWith('data:image/')) input.value = "[صورة توقيع]"; else input.value = StateMgr.data[f.id] || ''; SmartText.update(f.id); } }); UI.updateProgress(); } catch(e) {} }
         };
 
         const SmartText = {
@@ -573,7 +456,7 @@
 
         const CalibrationEngine = {
             active: false, gridSize: 0.1,
-            toggle() { this.active = !this.active; document.body.classList.toggle('calibration-mode'); const btn = document.getElementById('btn-calib'); if(this.active) { btn.innerHTML = `<i class="fas fa-save"></i> حفظ المعايرة`; btn.classList.add('btn-accent'); this.enableDragAndDrop(); UI.toast("المعايرة مفعلة", "warning"); } else { btn.innerHTML = `<i class="fas fa-tools"></i> معايرة`; btn.classList.remove('btn-accent'); this.save(); } },
+            toggle() { this.active = !this.active; document.body.classList.toggle('calibration-mode'); const btn = document.getElementById('btn-calib'); if(this.active) { btn.innerHTML = `<i class="fas fa-save"></i> حفظ المعايرة`; btn.classList.add('btn-accent'); this.enableDragAndDrop(); UI.toast("وضع المعايرة مفعل", "warning"); } else { btn.innerHTML = `<i class="fas fa-tools"></i> معايرة`; btn.classList.remove('btn-accent'); this.save(); } },
             enableDragAndDrop() {
                 const overlays = document.querySelectorAll('.field-overlay'); const wrapper = document.getElementById('document-wrapper'); const guideH = document.getElementById('guide-h'); const guideV = document.getElementById('guide-v');
                 overlays.forEach(el => {
@@ -597,7 +480,7 @@
                 const overlay = document.getElementById(`out_${id}`); const contentBox = document.getElementById(`content_${id}`);
                 if(overlay && contentBox) { const justifyVal = align === 'center' ? 'center' : (align === 'left' ? 'flex-start' : 'flex-end'); overlay.style.justifyContent = justifyVal; overlay.style.textAlign = align; contentBox.style.justifyContent = justifyVal; }
             },
-            save() { const overlays = document.querySelectorAll('.field-overlay'); overlays.forEach(el => { const id = el.id.replace('out_', ''); if(!StateMgr.calibration[id]) StateMgr.calibration[id] = {}; StateMgr.calibration[id].left = el.style.left; StateMgr.calibration[id].top = el.style.top; StateMgr.calibration[id].width = el.style.width; StateMgr.calibration[id].height = el.style.height; }); SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(StateMgr.calibration)); UI.toast("تم حفظ المعايرة", "success"); }
+            save() { const overlays = document.querySelectorAll('.field-overlay'); overlays.forEach(el => { const id = el.id.replace('out_', ''); if(!StateMgr.calibration[id]) StateMgr.calibration[id] = {}; StateMgr.calibration[id].left = el.style.left; StateMgr.calibration[id].top = el.style.top; StateMgr.calibration[id].width = el.style.width; StateMgr.calibration[id].height = el.style.height; }); SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(StateMgr.calibration)); UI.toast("تم حفظ إعدادات المعايرة", "success"); }
         };
 
         const UI = {
@@ -611,14 +494,14 @@
             buildForm() {
                 const fb = document.getElementById('form-builder'); fb.innerHTML = ''; const groups = [...new Set(Schema.map(s => s.group))];
                 groups.forEach(g => {
-                    const items = Schema.filter(s => s.group === g); const det = document.createElement('details'); det.innerHTML = `<summary><i class="fas fa-folder"></i> ${g}</summary><div class="group-content"></div>`; const gc = det.querySelector('.group-content');
+                    const items = Schema.filter(s => s.group === g); const det = document.createElement('details'); det.innerHTML = `<summary><i class="fas fa-folder" style="color:var(--primary);"></i> ${g}</summary><div class="group-content"></div>`; const gc = det.querySelector('.group-content');
                     items.forEach(f => {
                         if(f.type === 'readonly') return; const ig = document.createElement('div'); ig.className = `input-group ${f.req ? 'required' : ''}`;
                         let inputHTML = ''; if(f.type === 'textarea') inputHTML = `<textarea id="in_${f.id}" rows="2"></textarea>`; else if(f.type === 'checkbox') inputHTML = `<div class="checkbox-group"><input type="checkbox" id="in_${f.id}"></div>`; else inputHTML = `<input type="${f.type}" id="in_${f.id}">`;
                         let alignHTML = ''; const calibAlign = StateMgr.calibration[f.id]?.align || f.align;
                         if (['text', 'textarea', 'number'].includes(f.type)) { alignHTML = `<div class="align-controls" id="align_${f.id}"><button type="button" class="align-btn ${calibAlign === 'right' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'right')"><i class="fas fa-align-right"></i></button><button type="button" class="align-btn ${calibAlign === 'center' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'center')"><i class="fas fa-align-center"></i></button><button type="button" class="align-btn ${calibAlign === 'left' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'left')"><i class="fas fa-align-left"></i></button></div>`; }
-                        let reqStar = f.req ? '<span style="color:var(--danger);">*</span>' : '';
-                        let labelHTML = `<label style="display:flex; justify-content:space-between; width:100%; align-items:center;"> <div style="display:flex; align-items:center; gap:5px;"> <span>${f.name} ${reqStar}</span> ${f.hasGenBtn ? '<button type="button" class="btn-gen" onclick="Utils.genAWB()"><i class="fas fa-magic"></i> توليد</button>' : ''} </div> ${alignHTML} </label>`;
+                        let reqStar = f.req ? '<span style="color:var(--danger); margin-right:4px;">*</span>' : '';
+                        let labelHTML = `<label style="display:flex; justify-content:space-between; width:100%; align-items:center;"> <div style="display:flex; align-items:center; gap:5px;"> <span style="font-size:0.9rem;">${f.name} ${reqStar}</span> ${f.hasGenBtn ? '<button type="button" class="btn-gen" style="margin-right:10px; padding:6px 12px; background:var(--primary-gradient);" onclick="Utils.genAWB()"><i class="fas fa-magic"></i> توليد رقم</button>' : ''} </div> ${alignHTML} </label>`;
                         ig.innerHTML = labelHTML + inputHTML; gc.appendChild(ig);
                         setTimeout(() => { const el = document.getElementById(`in_${f.id}`); if(!el) return; el.addEventListener('input', (e) => { StateMgr.data[f.id] = f.type === 'checkbox' ? e.target.checked : e.target.value; SmartText.update(f.id); HistoryMgr.save(); UI.updateProgress(); }); }, 0);
                     }); fb.appendChild(det);
@@ -639,26 +522,28 @@
             getDynamicFileName() { const awb = StateMgr.data.awb_no || 'بدون_رقم'; let client = StateMgr.data.consignee_name || ''; if (client) client = '_' + client.trim().split(' ').slice(0, 2).join('_'); return `Waybill_${AuthManager.getPrefix()}_${awb}${client}`; },
             getDynamicScale() { return window.innerWidth <= 768 ? 1.5 : 2.5; },
             async ensureLibrary(objName, url) { if (objName === 'jspdf' && typeof window.jspdf !== 'undefined') return true; if (typeof window[objName] !== 'undefined') return true; return new Promise((resolve, reject) => { UI.toast("جاري سحب مكتبات التصدير...", "info"); const script = document.createElement('script'); script.src = url; script.onload = () => resolve(true); script.onerror = () => reject(false); document.head.appendChild(script); }); },
-            showFallback(dataUrl) { const container = document.getElementById('export-result-container'); container.innerHTML = `<img src="${dataUrl}">`; document.getElementById('export-fallback-modal').classList.add('active'); },
+            showFallback(dataUrl) { const container = document.getElementById('export-result-container'); container.innerHTML = `<img src="${dataUrl}" style="max-width:100%; border-radius:8px;">`; document.getElementById('export-fallback-modal').classList.add('active'); },
             async safeCapture(scale) { if (typeof html2canvas === 'undefined') { const loaded = await this.ensureLibrary('html2canvas', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'); if (!loaded) throw new Error("فشل تحميل مكتبة التصدير."); } const wrapper = document.getElementById('document-wrapper'); const oldTransform = wrapper.style.transform; wrapper.style.transform = 'scale(1)'; await new Promise(r => setTimeout(r, 50)); const canvas = await html2canvas(wrapper, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: "#ffffff", logging: false, imageTimeout: 0 }); wrapper.style.transform = oldTransform; return canvas; },
-            async shareDocument() { try { await UI.showProcessing("جاري تجهيز للمشاركة..."); document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL('image/jpeg', 0.90); if (!navigator.share) { this.showFallback(dataUrl); UI.hideProcessing(); return; } canvas.toBlob(async (blob) => { const file = new File([blob], `${this.getDynamicFileName()}.jpg`, { type: 'image/jpeg' }); try { await navigator.share({ title: 'بوليصة درة العالم', text: `بوليصة شحن رقم: ${StateMgr.data.awb_no || '---'}`, files: [file] }); } catch(err) { this.showFallback(dataUrl); } UI.hideProcessing(); }, 'image/jpeg', 0.90); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ أثناء التجهيز", "error"); } },
-            async generatePDF() { try { await UI.showProcessing("جاري التصدير..."); if (typeof window.jspdf === 'undefined') { const loaded = await this.ensureLibrary('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); if (!loaded) throw new Error("مكتبة PDF غير متوفرة."); } document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const copies = document.getElementById('copies-selector').value; const watermarks = ["Original", "Shipper Copy", "Consignee Copy", "Company Copy"]; const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4'); const pdfWidth = doc.internal.pageSize.getWidth(); let firstPageDataUrl = null; for(let i=0; i<copies; i++) { if(copies > 1) { const wm = document.getElementById('watermark'); if(wm) { wm.innerText = watermarks[i]; wm.style.visibility = 'visible'; } } const canvas = await this.safeCapture(this.getDynamicScale()); const imgData = canvas.toDataURL('image/jpeg', 0.95); if (i === 0) firstPageDataUrl = imgData; const imgProps = doc.getImageProperties(imgData); const h = pdfWidth / (imgProps.width / imgProps.height); if(i > 0) doc.addPage(); doc.addImage(imgData, 'JPEG', 0, 10, pdfWidth, h); const wm = document.getElementById('watermark'); if(wm) wm.style.visibility = 'hidden'; } try { doc.save(`${this.getDynamicFileName()}.pdf`); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(firstPageDataUrl), 1000); UI.toast("تم التصدير", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ", "error"); } },
-            async generateImage(format='png') { try { await UI.showProcessing(`جاري التصدير بصيغة ${format.toUpperCase()}...`); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast("تم التصدير", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ", "error"); } }
+            async shareDocument() { try { await UI.showProcessing("جاري تجهيز البوليصة للمشاركة..."); document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL('image/jpeg', 0.90); if (!navigator.share) { this.showFallback(dataUrl); UI.hideProcessing(); return; } canvas.toBlob(async (blob) => { const file = new File([blob], `${this.getDynamicFileName()}.jpg`, { type: 'image/jpeg' }); try { await navigator.share({ title: 'بوليصة درة العالم', text: `بوليصة شحن رقم: ${StateMgr.data.awb_no || '---'}`, files: [file] }); } catch(err) { this.showFallback(dataUrl); } UI.hideProcessing(); }, 'image/jpeg', 0.90); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ أثناء التجهيز", "error"); } },
+            async generatePDF() { try { await UI.showProcessing("جاري تصدير PDF..."); if (typeof window.jspdf === 'undefined') { const loaded = await this.ensureLibrary('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); if (!loaded) throw new Error("مكتبة PDF غير متوفرة."); } document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const copies = document.getElementById('copies-selector').value; const watermarks = ["Original", "Shipper Copy", "Consignee Copy", "Company Copy"]; const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4'); const pdfWidth = doc.internal.pageSize.getWidth(); let firstPageDataUrl = null; for(let i=0; i<copies; i++) { if(copies > 1) { const wm = document.getElementById('watermark'); if(wm) { wm.innerText = watermarks[i]; wm.style.visibility = 'visible'; } } const canvas = await this.safeCapture(this.getDynamicScale()); const imgData = canvas.toDataURL('image/jpeg', 0.95); if (i === 0) firstPageDataUrl = imgData; const imgProps = doc.getImageProperties(imgData); const h = pdfWidth / (imgProps.width / imgProps.height); if(i > 0) doc.addPage(); doc.addImage(imgData, 'JPEG', 0, 10, pdfWidth, h); const wm = document.getElementById('watermark'); if(wm) wm.style.visibility = 'hidden'; } try { doc.save(`${this.getDynamicFileName()}.pdf`); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(firstPageDataUrl), 1000); UI.toast("تم تصدير ملف PDF بنجاح", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ في التصدير", "error"); } },
+            async generateImage(format='png') { try { await UI.showProcessing(`جاري التصدير بصيغة ${format.toUpperCase()}...`); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast("تم تصدير الصورة بنجاح", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ في التصدير", "error"); } }
         };
 
+    </script>
+    
+    <script type="module">
+        import { supabase } from './js/config/supabase.js';
+        
         window.addEventListener('DOMContentLoaded', async () => {
-            window.supabase = window.supabase.createClient(
-                'https://nysjhyfidbtptnfmgcnd.supabase.co',
-                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2poeWZpZGJ0cHRuZm1nY25kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjQzMjAsImV4cCI6MjA5ODE0MDMyMH0.KNfsZNGhTdQUv_bctNFJ0hLN0d0rycxm91KosyDfWp0'
-            );
-
+            // التهيئة الأولية للمظهر ومدير الدخول
             AuthManager.init();
+            
             try {
                 if(SafeStorage.get('waybill_theme') === 'light') document.body.classList.remove('dark-mode');
                 
                 if(localStorage.getItem('enterprise_session')) { 
                     try {
-                        const { data: templates } = await window.supabase.from('waybill_field_templates').select('*');
+                        const { data: templates } = await supabase.from('waybill_field_templates').select('*');
                         if (templates && templates.length > 0) {
                             templates.forEach(t => {
                                 const fieldIndex = Schema.findIndex(s => s.id === t.field_id);
@@ -669,20 +554,23 @@
                                 }
                             });
                         }
-                    } catch(e) {}
+                    } catch(e) { console.warn("العمل يتم محلياً حالياً"); }
 
-                    UI.buildForm(); UI.rebuildOverlays(); await StateMgr.init(); 
+                    UI.buildForm(); 
+                    UI.rebuildOverlays(); 
+                    await StateMgr.init(); 
+                    
+                    // استدعاء محرك المزامنة السحابية بحالة تسجيل الدخول
+                    import('./js/services/sync.engine.js').then(module => {
+                        window.SyncEngine = module.SyncEngine; 
+                        window.SyncEngine.init();
+                    }).catch(err => { console.warn("يعمل النظام حالياً في وضع عدم الاتصال."); });
                 }
-            } catch(e) {} finally { UI.hideProcessing(); window.addEventListener('resize', () => ZoomEngine.reset()); }
+            } catch(e) {} finally { 
+                UI.hideProcessing(); 
+                window.addEventListener('resize', () => ZoomEngine.reset()); 
+            }
         });
-    </script>
-    
-    <script type="module">
-        try {
-            import('./js/services/sync.engine.js').then(module => {
-                window.SyncEngine = module.SyncEngine; window.SyncEngine.init();
-            }).catch(err => {});
-        } catch (error) {}
     </script>
 </body>
 </html>

@@ -1,14 +1,14 @@
 {
-  "name": "مؤسسة درة العالم للنقليات",
+  "name": "مؤسسة درة العالم للنقل",
   "short_name": "درة العالم",
-  "description": "نظام إدارة بوليصة الشحن",
+  "description": "نظام إدارة بوليصة الشحن السحابي",
   "lang": "ar",
   "dir": "rtl",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f8fafc",
-  "theme_color": "#1e40af",
+  "background_color": "#020617",
+  "theme_color": "#2563eb",
   "categories": ["business", "productivity"],
   "icons": [
     {
