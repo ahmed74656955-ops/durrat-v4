@@ -1,5 +1,13 @@
-const SUPABASE_URL = 'https://nysjhyfidbtptnfmgcnd.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im55c2poeWZpZGJ0cHRuZm1nY25kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1NjQzMjAsImV4cCI6MjA5ODE0MDMyMH0.KNfsZNGhTdQUv_bctNFJ0hLN0d0rycxm91KosyDfWp0';
+// js/config/supabase.js
 
-// إنشاء كائن الاتصال
-export const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+// بيانات الربط المستخرجة من مشروعك (Durrat_ERP_V2)
+const SUPABASE_URL = 'https://axwzvrrvlnyeoiffvbck.supabase.co';
+const SUPABASE_ANON_KEY = 'EyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4d3p2cnJ2bG55ZW9pZmZ2YmNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxOTY3OTQsImV4cCI6MjA5ODc3Mjc5NH0.loth7vSqVdbEoueaAI45zC4NbIXx29Zi0eeMCc43YJg';
+
+// إنشاء كائن الاتصال الموحد
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// إتاحته عالمياً لتسهيل التعامل معه في أجزاء النظام الأخرى
+window.supabase = supabase;

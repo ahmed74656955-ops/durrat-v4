@@ -1,4 +1,3 @@
-// js/services/sync.engine.js
 import { supabase } from '../config/supabase.js';
 
 export const SyncEngine = {
@@ -10,7 +9,6 @@ export const SyncEngine = {
         window.addEventListener('offline', () => this.handleConnectionChange(false));
         await this.initLocalDB();
         
-        // محاولة المزامنة عند بدء التشغيل إذا كان هناك إنترنت
         if (this.isOnline) {
             this.syncPendingData();
         }
@@ -29,7 +27,7 @@ export const SyncEngine = {
 
     initLocalDB() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open("WaybillERP_Offline", 1);
+            const request = indexedDB.open("DurratERP_Offline", 1);
             request.onupgradeneeded = (e) => {
                 const db = e.target.result;
                 if (!db.objectStoreNames.contains("sync_queue")) {
@@ -60,7 +58,7 @@ export const SyncEngine = {
 
     async pushToCloud(payload) {
         try {
-            const { data, error } = await supabase
+            const { error } = await supabase
                 .from('waybills')
                 .insert([
                     { awb_no: payload.awb_no, branch_id: payload.branch_id, full_data: payload.full_data }
