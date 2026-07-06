@@ -783,3 +783,83 @@ body.exporting .document-wrapper { box-shadow: none !important; margin: 0 !impor
   .workspace, .preview-area { display: block !important; overflow: visible !important; padding: 0 !important; background: #fff !important; }
   .document-wrapper { box-shadow: none !important; transform: none !important; margin: 0 !important; }
 }
+
+
+/* ==========================================================
+   Durrat V4 - Safe Professional Additions
+   لا يغيّر مقاسات الحقول داخل البوليصة
+   ========================================================== */
+
+/* منع ظهور نافذة رفع القالب عند وجود القالب الافتراضي */
+.no-image-overlay { display: none; }
+
+/* تحسين تمرير شريط الأدوات على الجوال بدون تكسير الواجهة */
+.toolbar {
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+.toolbar button,
+.toolbar select {
+  scroll-snap-align: start;
+}
+
+/* إظهار البوليصة بشكل أوضح بدون تغيير نقاط الحقول */
+.document-wrapper {
+  border-radius: 2px;
+}
+.preview-area {
+  overscroll-behavior: contain;
+}
+
+/* لمعالجة مربعات الأيقونات في حال تأخر تحميل الخط */
+i.fas,
+i.fab {
+  min-width: 1em;
+  text-align: center;
+}
+
+/* تحسين بسيط للتبويبات والبطاقات في الجوال */
+@media (max-width: 768px) {
+  header {
+    gap: 10px;
+  }
+  .brand {
+    font-size: 1rem;
+    padding-inline: 4px;
+  }
+  .toolbar button {
+    min-height: 42px;
+  }
+  .preview-area {
+    padding: 16px 12px 80px;
+  }
+}
+
+
+/* ==========================================================
+   Cache-Safe Professional Polish - لا يغير مقاسات الحقول
+   ========================================================== */
+html { scroll-behavior: smooth; }
+body { text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+
+/* تحسين استقرار الواجهة عند الرجوع من لوحة الإدارة */
+.workspace, .preview-area, .document-wrapper { backface-visibility: hidden; }
+
+/* منع تكسير شريط الأدوات على الشاشات الصغيرة */
+.toolbar { overscroll-behavior-inline: contain; }
+.toolbar button { isolation: isolate; }
+
+/* إخفاء نافذة رفع القالب نهائيًا لأن 0.png هو القالب الرسمي */
+.no-image-overlay { display: none !important; }
+
+/* تحسين مظهر البوليصة بدون لمس نسب الحقول */
+.document-wrapper { outline: 1px solid rgba(148,163,184,.22); }
+body.dark-mode .document-wrapper { outline-color: rgba(255,255,255,.10); }
+
+/* منع ظهور مربعات بديلة مزعجة إذا تأخر خط الأيقونات */
+i.fas, i.fab, i.fa, .fas, .fab { display: inline-flex; align-items: center; justify-content: center; }
+
+@media (max-width: 768px) {
+  .toolbar { gap: 7px; padding-bottom: 10px; }
+  .toolbar button { border-radius: 14px; }
+}
