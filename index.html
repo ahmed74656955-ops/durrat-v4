@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>مؤسسة درة العالم للنقليات | نظام إدارة بوليصة الشحن</title>
-    <meta name="app-version" content="durrat-v4-20260706-cache-safe">
+    <meta name="app-version" content="durrat-v4-20260706-final-guard">
     
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/196.png" type="image/png">
@@ -23,12 +23,11 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=20260706-final-admin-3" rel="stylesheet">
+    <link href="./style.css?v=20260706-final-guard" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
     <script>
-        window.__DURRAT_VERSION__ = "20260706-final-admin-3";
         // يمنع رجوع المتصفح من صفحة الإدارة بنسخة محفوظة جزئيًا تكسر الواجهة
         window.addEventListener('pageshow', function(event) {
             if (event.persisted) {
@@ -192,6 +191,30 @@
         </div>
     </div>
 
+
+
+    <div class="modal-overlay" id="system-update-modal" data-force="1">
+        <div class="modal-content update-modal-content">
+            <div class="modal-header update-modal-header">
+                <div>
+                    <span class="update-badge"><i class="fas fa-bell"></i> تحديث نظام متوفر</span>
+                    <h2 id="update-title">تحديث جديد للنظام</h2>
+                </div>
+                <i class="fas fa-shield-alt update-shield"></i>
+            </div>
+            <p id="update-message" class="update-message">يوجد تحديث مهم. سيتم تحديث ملفات النظام فقط دون حذف الأرشيف أو البوالص المحفوظة.</p>
+            <div class="update-safety-list">
+                <div><i class="fas fa-database"></i> لن يتم حذف الأرشيف المحلي.</div>
+                <div><i class="fas fa-file-invoice"></i> لن يتم حذف أي بوليصة محفوظة.</div>
+                <div><i class="fas fa-sync-alt"></i> سيتم تحديث ملفات الواجهة والكاش فقط.</div>
+            </div>
+            <div class="update-actions">
+                <button class="btn-primary" onclick="AppUpdateEngine.applyUpdate()"><i class="fas fa-rotate"></i> تحديث الآن</button>
+                <button class="btn-info" id="update-later-btn" onclick="AppUpdateEngine.closeNotice()"><i class="fas fa-clock"></i> لاحقًا</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="developer-footer" style="background: var(--panel-bg); backdrop-filter: blur(10px); border-top: 1px solid var(--border);">
         تطوير وبرمجة <a href="https://wa.me/message/5WPPYBBO6JMLF1?src=qr" target="_blank">المهندس أمير الذبحاني <i class="fab fa-whatsapp" style="color: #25D366; font-size: 1.1rem;"></i></a>
     </footer>
@@ -302,6 +325,7 @@
                     });
                 } catch(e) { console.warn('لم يتم تسجيل العملية:', e); }
             },
+            getSession() { try { return JSON.parse(localStorage.getItem('enterprise_session') || '{}'); } catch { return {}; } },
             getPrefix() { return localStorage.getItem('waybill_branch_prefix') || 'default'; },
             async logout() {
                 await this.logEvent('logout', 'auth', localStorage.getItem('waybill_active_user'), {});
@@ -424,20 +448,54 @@
         const ArchiveEngine = {
             showModal() { document.getElementById('archive-modal').classList.add('active'); this.loadList(); },
             async saveCurrent() {
+                let cloudMessage = '';
                 try {
-                    const awb = StateMgr.data.awb_no; if (!awb || awb === 'بدون_رقم') return UI.toast("قم بتوليد رقم البوليصة أولاً", "error");
-                    UI.showProcessing("جاري الحفظ والمزامنة...");
-                    if (window.SyncEngine) { await window.SyncEngine.saveWaybill(StateMgr.data); UI.hideProcessing(); return; }
+                    const awb = (StateMgr.data.awb_no || '').trim();
+                    if (!awb || awb === 'بدون_رقم') return UI.toast("قم بتوليد رقم البوليصة أولاً", "error");
+                    UI.showProcessing("جاري حفظ البوليصة...");
                     if(!StorageEngine.db) await StorageEngine.initDB();
-                    const record = { id: new Date().getTime().toString(), branch: AuthManager.getPrefix(), awb: awb, client: StateMgr.data.consignee_name||'بدون عميل', date: StateMgr.data.date||'', data: JSON.parse(JSON.stringify(StateMgr.data)) };
-                    const tx = StorageEngine.db.transaction("archive", "readwrite"); tx.objectStore("archive").put(record);
-                    tx.oncomplete = async () => {
-                        await AuthManager.logEvent('save_waybill', 'waybills', awb, { awb_no: awb, client: StateMgr.data.consignee_name || '', branch_code: AuthManager.getPrefix() });
-                        UI.toast("تم الحفظ في الأرشيف!", "success");
-                        NotificationEngine.notifyNewWaybill();
-                        UI.hideProcessing();
+
+                    // حفظ محلي دائمًا داخل الأرشيف حتى لو تعثر الاتصال السحابي
+                    const record = {
+                        id: `${AuthManager.getPrefix()}_${awb}`,
+                        branch: AuthManager.getPrefix(),
+                        awb: awb,
+                        client: StateMgr.data.consignee_name || 'بدون عميل',
+                        date: StateMgr.data.date || new Date().toISOString().split('T')[0],
+                        saved_at: new Date().toISOString(),
+                        data: JSON.parse(JSON.stringify(StateMgr.data))
                     };
-                } catch(e) { UI.hideProcessing(); UI.toast("خطأ في الحفظ", "error"); }
+                    await new Promise((resolve, reject) => {
+                        const tx = StorageEngine.db.transaction("archive", "readwrite");
+                        tx.objectStore("archive").put(record);
+                        tx.oncomplete = resolve;
+                        tx.onerror = () => reject(tx.error || new Error('فشل الحفظ المحلي'));
+                    });
+
+                    // مزامنة سحابية اختيارية؛ لا تمنع الحفظ المحلي
+                    if (window.SyncEngine) {
+                        try {
+                            await window.SyncEngine.saveWaybill(StateMgr.data);
+                            cloudMessage = ' وتمت المزامنة السحابية';
+                        } catch (syncErr) {
+                            cloudMessage = ' وسيتم رفعها للسحابة عند توفر الاتصال';
+                            console.warn('Cloud sync deferred:', syncErr);
+                        }
+                    }
+
+                    await AuthManager.logEvent('save_waybill', 'waybills', awb, {
+                        awb_no: awb,
+                        client: StateMgr.data.consignee_name || '',
+                        branch_code: AuthManager.getPrefix()
+                    });
+                    NotificationEngine.notifyNewWaybill();
+                    UI.hideProcessing();
+                    UI.toast(`تم حفظ البوليصة في الأرشيف${cloudMessage}`, "success");
+                } catch(e) {
+                    console.error('Archive save failed:', e);
+                    UI.hideProcessing();
+                    UI.toast("فشل حفظ الأرشيف: " + (e.message || "خطأ غير معروف"), "error");
+                }
             },
             async loadList() {
                 const listEl = document.getElementById('archive-list');
@@ -450,13 +508,59 @@
                         if (cursor && results.length < 50) { if(cursor.value.branch === currentBranch) { results.push(cursor.value); } cursor.continue(); } 
                         else {
                             if(results.length === 0) { listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">لا توجد بوليصات في الأرشيف المحلي</div>'; return; }
-                            listEl.innerHTML = results.map(item => `<div class="archive-item" style="padding:15px; border:1px solid var(--border); border-radius:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; background:var(--panel-bg);"><div style="display:flex; flex-direction:column; gap:6px;"><strong style="color:var(--primary); font-size:1.1rem;">رقم: ${item.awb}</strong><span style="font-size:0.9rem; color:var(--text-muted);">العميل: ${item.client}</span></div><div style="display:flex; gap:8px;"><button class="btn-primary" onclick="ArchiveEngine.loadRecord('${item.id}')">استدعاء</button><button class="btn-danger" onclick="ArchiveEngine.deleteRecord('${item.id}')"><i class="fas fa-trash"></i></button></div></div>`).join('');
+                            listEl.innerHTML = results.map(item => `<div class="archive-item" style="padding:15px; border:1px solid var(--border); border-radius:12px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; background:var(--panel-bg);"><div style="display:flex; flex-direction:column; gap:6px;"><strong style="color:var(--primary); font-size:1.1rem;">رقم: ${item.awb}</strong><span style="font-size:0.9rem; color:var(--text-muted);">العميل: ${item.client}</span></div><div style="display:flex; gap:8px;"><button class="btn-primary" onclick="ArchiveEngine.loadRecord('${item.id}')">استدعاء</button><button class="btn-danger" onclick="ArchiveEngine.deleteRecord('${item.id}')"><i class="fas fa-trash-lock"></i> طلب حذف</button></div></div>`).join('');
                         }
                     };
                 } catch(e) { listEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--danger);">فشل تحميل الأرشيف</div>'; }
             },
             async loadRecord(id) { const tx = StorageEngine.db.transaction("archive", "readonly"); const req = tx.objectStore("archive").get(id); req.onsuccess = () => { if(req.result) { HistoryMgr.apply(JSON.stringify(req.result.data)); document.getElementById('archive-modal').classList.remove('active'); UI.toast("تم استدعاء البوليصة بنجاح", "info"); } }; },
-            async deleteRecord(id) { if(confirm("هل أنت متأكد من حذف هذه البوليصة من الأرشيف المحلي؟")) { const tx = StorageEngine.db.transaction("archive", "readwrite"); tx.objectStore("archive").delete(id); tx.oncomplete = () => { this.loadList(); UI.toast("تم الحذف بنجاح", "warning"); }; } }
+            async deleteRecord(id) {
+                try {
+                    if(!StorageEngine.db) await StorageEngine.initDB();
+                    const record = await new Promise((resolve) => {
+                        const tx = StorageEngine.db.transaction("archive", "readonly");
+                        const req = tx.objectStore("archive").get(id);
+                        req.onsuccess = () => resolve(req.result || null);
+                        req.onerror = () => resolve(null);
+                    });
+                    if (!record) return UI.toast("لم يتم العثور على البوليصة في الأرشيف", "error");
+
+                    const session = AuthManager.getSession ? AuthManager.getSession() : JSON.parse(localStorage.getItem('enterprise_session') || '{}');
+                    const isSuperAdmin = session?.user?.role === 'super_admin';
+                    const awb = record.awb || record.data?.awb_no || id;
+
+                    if (isSuperAdmin) {
+                        if(!confirm("سيتم حذف هذه البوليصة من هذا الجهاز فقط. هل تريد المتابعة؟")) return;
+                        await new Promise((resolve, reject) => {
+                            const tx = StorageEngine.db.transaction("archive", "readwrite");
+                            tx.objectStore("archive").delete(id);
+                            tx.oncomplete = resolve;
+                            tx.onerror = () => reject(tx.error || new Error('فشل الحذف المحلي'));
+                        });
+                        await AuthManager.logEvent('delete_waybill_local', 'archive', awb, { awb_no: awb, archive_id: id, by_admin: true });
+                        this.loadList();
+                        return UI.toast("تم حذف البوليصة من الأرشيف المحلي بواسطة الإدارة", "warning");
+                    }
+
+                    // لا يسمح للفرع بالحذف المباشر. يتم رفع طلب للإدارة الرئيسية.
+                    const reason = prompt("اكتب سبب طلب حذف البوليصة. لن يتم الحذف إلا بعد موافقة الإدارة الرئيسية:", "طلب حذف بوليصة مكررة/خاطئة");
+                    if (reason === null) return;
+                    const { data, error } = await window.supabase.rpc('request_waybill_delete', {
+                        p_username: localStorage.getItem('waybill_active_user') || session?.user?.username || 'unknown',
+                        p_branch_code: AuthManager.getPrefix(),
+                        p_branch_name: localStorage.getItem('waybill_branch_title') || session?.branch?.name || '',
+                        p_awb_no: awb,
+                        p_archive_id: id,
+                        p_reason: reason || 'بدون سبب محدد'
+                    });
+                    if (error) throw error;
+                    const msg = data?.message || 'تم إرسال طلب الحذف للإدارة الرئيسية. لن يتم حذف البوليصة من أرشيفك الآن.';
+                    await AuthManager.logEvent('request_delete_waybill', 'archive', awb, { awb_no: awb, archive_id: id, reason });
+                    UI.toast(msg, data?.success === false ? 'warning' : 'info');
+                } catch(e) {
+                    UI.toast("تعذر إرسال طلب الحذف: " + (e.message || e), "error");
+                }
+            }
         };
 
         const BackupEngine = {
@@ -616,6 +720,70 @@
 
     </script>
     
+
+        const AppUpdateEngine = {
+            currentVersion: '20260706-final-guard',
+            lastUpdate: null,
+            async start() {
+                if (!localStorage.getItem('enterprise_session') || !window.supabase) return;
+                await this.check();
+                setInterval(() => this.check(), 5 * 60 * 1000);
+            },
+            async check() {
+                try {
+                    const branch = AuthManager.getPrefix();
+                    const { data, error } = await window.supabase
+                        .from('system_updates')
+                        .select('*')
+                        .eq('is_active', true)
+                        .or(`target_branch_code.is.null,target_branch_code.eq.${branch}`)
+                        .order('created_at', { ascending: false })
+                        .limit(1);
+                    if (error || !data || !data.length) return;
+                    const update = data[0];
+                    this.lastUpdate = update;
+                    const dismissed = localStorage.getItem('dismissed_update_' + update.id);
+                    const applied = localStorage.getItem('applied_update_' + update.id);
+                    if (applied) return;
+                    if (dismissed && !update.is_required) return;
+                    this.show(update);
+                } catch(e) { console.warn('update check failed', e); }
+            },
+            show(update) {
+                const modal = document.getElementById('system-update-modal');
+                if (!modal) return;
+                document.getElementById('update-title').textContent = update.title || 'تحديث جديد للنظام';
+                document.getElementById('update-message').textContent = update.message || 'يوجد تحديث مهم. سيتم تحديث ملفات النظام فقط دون حذف الأرشيف أو البوالص المحفوظة.';
+                const later = document.getElementById('update-later-btn');
+                if (later) later.style.display = update.is_required ? 'none' : 'inline-flex';
+                modal.classList.add('active');
+            },
+            closeNotice() {
+                if (this.lastUpdate) localStorage.setItem('dismissed_update_' + this.lastUpdate.id, '1');
+                document.getElementById('system-update-modal')?.classList.remove('active');
+            },
+            async applyUpdate() {
+                try {
+                    UI.showProcessing('جاري تحديث النظام مع الحفاظ على الأرشيف...');
+                    // نحذف Cache فقط، ولا نلمس localStorage أو IndexedDB حتى لا تضيع البوالص والأرشيف.
+                    if ('serviceWorker' in navigator) {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        await Promise.all(regs.map(r => r.unregister().catch(()=>null)));
+                    }
+                    if (window.caches) {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map(k => caches.delete(k)));
+                    }
+                    if (this.lastUpdate) localStorage.setItem('applied_update_' + this.lastUpdate.id, '1');
+                    await AuthManager.logEvent('apply_system_update', 'system_updates', this.lastUpdate?.id || null, { version: this.lastUpdate?.version || this.currentVersion });
+                    location.replace('index.html?updated=' + Date.now());
+                } catch(e) {
+                    UI.hideProcessing();
+                    UI.toast('تعذر تطبيق التحديث تلقائيًا. اضغط Ctrl + Shift + R مرة واحدة.', 'error');
+                }
+            }
+        };
+
     <script type="module">
         import { supabase } from './js/config/supabase.js';
         
@@ -644,6 +812,7 @@
                     UI.buildForm(); 
                     UI.rebuildOverlays(); 
                     await StateMgr.init(); 
+                    await AppUpdateEngine.start();
                     
                     // استدعاء محرك المزامنة السحابية بحالة تسجيل الدخول
                     import('./js/services/sync.engine.js').then(module => {

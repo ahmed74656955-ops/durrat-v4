@@ -1,4 +1,4 @@
-const CACHE_NAME = "durrat-erp-v20260706-final-admin-3";
+const CACHE_NAME = "durrat-erp-v20260706-final-guard";
 
 const PRECACHE_URLS = [
   "./",
@@ -6,13 +6,10 @@ const PRECACHE_URLS = [
   "./admin.html",
   "./manifest.json",
   "./style.css",
-  "./css/enterprise.css",
   "./0.png",
   "./icons/196.png",
   "./icons/512.png",
   "./js/config/supabase.js",
-  "./js/enterprise/auth-core.js",
-  "./js/enterprise/admin-core.js",
   "./js/services/sync.engine.js"
 ];
 
@@ -35,17 +32,19 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
+
   if (request.method !== "GET") return;
+
   const url = new URL(request.url);
 
-  // لا يتدخل في CDN أو Supabase أو Telegram أو أي مصدر خارجي
+  // لا نتدخل في CDN أو Supabase أو أي مصدر خارجي حتى لا تتكرر أخطاء PROXY/CDN
   if (url.origin !== self.location.origin) return;
 
   const isNavigation = request.mode === "navigate" || request.destination === "document";
-  const isCodeAsset = /\.(html|css|js|json)$/i.test(url.pathname);
+  const isFreshAsset = /\.(html|css|js|json)$/i.test(url.pathname);
 
-  // الصفحات والكود: Network First لمنع الرجوع لنسخة قديمة بعد صفحة الإدارة
-  if (isNavigation || isCodeAsset) {
+  // الصفحات وملفات CSS/JS بنمط Network First حتى لا ترجع نسخة قديمة عند العودة من admin.html
+  if (isNavigation || isFreshAsset) {
     event.respondWith(
       fetch(request, { cache: "no-store" })
         .then((response) => {
@@ -60,7 +59,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // الصور والأيقونات: Cache First مع تحديث خلفي
+  // الصور والأيقونات بنمط Cache First مع تحديث خلفي
   event.respondWith(
     caches.match(request).then((cached) => {
       const networkFetch = fetch(request).then((response) => {
