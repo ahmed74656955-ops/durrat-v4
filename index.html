@@ -717,10 +717,6 @@
             async generatePDF() { try { await UI.showProcessing("جاري تصدير PDF..."); if (typeof window.jspdf === 'undefined') { const loaded = await this.ensureLibrary('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); if (!loaded) throw new Error("مكتبة PDF غير متوفرة."); } document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const copies = document.getElementById('copies-selector').value; const watermarks = ["Original", "Shipper Copy", "Consignee Copy", "Company Copy"]; const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4'); const pdfWidth = doc.internal.pageSize.getWidth(); let firstPageDataUrl = null; for(let i=0; i<copies; i++) { if(copies > 1) { const wm = document.getElementById('watermark'); if(wm) { wm.innerText = watermarks[i]; wm.style.visibility = 'visible'; } } const canvas = await this.safeCapture(this.getDynamicScale()); const imgData = canvas.toDataURL('image/jpeg', 0.95); if (i === 0) firstPageDataUrl = imgData; const imgProps = doc.getImageProperties(imgData); const h = pdfWidth / (imgProps.width / imgProps.height); if(i > 0) doc.addPage(); doc.addImage(imgData, 'JPEG', 0, 10, pdfWidth, h); const wm = document.getElementById('watermark'); if(wm) wm.style.visibility = 'hidden'; } try { doc.save(`${this.getDynamicFileName()}.pdf`); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(firstPageDataUrl), 1000); UI.toast("تم تصدير ملف PDF بنجاح", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ في التصدير", "error"); } },
             async generateImage(format='png') { try { await UI.showProcessing(`جاري التصدير بصيغة ${format.toUpperCase()}...`); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast("تم تصدير الصورة بنجاح", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ في التصدير", "error"); } }
         };
-
-    </script>
-    
-
         const AppUpdateEngine = {
             currentVersion: '20260706-final-guard',
             lastUpdate: null,
@@ -783,6 +779,7 @@
                 }
             }
         };
+    </script>
 
     <script type="module">
         import { supabase } from './js/config/supabase.js';
