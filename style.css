@@ -986,3 +986,30 @@ i.fas, i.fab, i.fa, .fas, .fab { display: inline-flex; align-items: center; just
   .update-modal-content { width: 94vw !important; }
   .update-actions button { width: 100%; }
 }
+
+
+/* ==========================================================
+   Final UI polish - safe, no field coordinate changes
+   ========================================================== */
+#copies-selector { max-width: 145px !important; min-width: 118px !important; width: auto !important; padding-inline: 10px !important; flex: 0 0 auto !important; }
+.form-scroller { overflow-y: auto !important; overflow-x: hidden !important; padding-bottom: 120px !important; }
+.sidebar { min-height: 0 !important; }
+.workspace { min-height: 0 !important; }
+.preview-area { min-height: 0 !important; }
+.toolbar { scrollbar-width: thin; }
+.toolbar::-webkit-scrollbar, .form-scroller::-webkit-scrollbar, .preview-area::-webkit-scrollbar { width: 10px; height: 10px; }
+.toolbar::-webkit-scrollbar-thumb, .form-scroller::-webkit-scrollbar-thumb, .preview-area::-webkit-scrollbar-thumb { background: rgba(59,130,246,.65); border-radius: 999px; }
+.toolbar::-webkit-scrollbar-track, .form-scroller::-webkit-scrollbar-track, .preview-area::-webkit-scrollbar-track { background: rgba(15,23,42,.25); }
+.update-modal-content { max-width: 620px !important; }
+.update-modal-header { display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px; }
+.update-badge { display:inline-flex;align-items:center;gap:8px;background:rgba(245,158,11,.14);color:#fbbf24;border:1px solid rgba(245,158,11,.25);border-radius:999px;padding:6px 12px;font-weight:900;font-size:.86rem; }
+.update-shield { font-size:2.2rem;color:#38bdf8;filter:drop-shadow(0 0 12px rgba(56,189,248,.45)); }
+.update-message { color:var(--text-muted);line-height:1.9;font-weight:700; }
+.update-safety-list { display:grid;gap:10px;margin:16px 0; }
+.update-safety-list div { display:flex;align-items:center;gap:10px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.18);border-radius:14px;padding:12px;color:var(--text-main);font-weight:800; }
+.update-actions { display:flex;gap:10px;flex-wrap:wrap; }
+@media (max-width: 900px) {
+  #copies-selector { max-width: 130px !important; }
+  .form-scroller { max-height: 48vh; }
+  .toolbar button, .toolbar select { min-height: 42px; }
+}
