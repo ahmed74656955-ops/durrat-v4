@@ -23,7 +23,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=20260706-2" rel="stylesheet">
+    <link href="./style.css?v=20260706-admin-audit-1" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
@@ -260,18 +260,53 @@
                 try {
                     // الاعتماد على الاتصال السحابي الموحد عبر window.supabase
                     const { data, error } = await window.supabase.rpc('login_user', { p_username: inputUser, p_password: inputPass });
+                    if (error) throw error;
                     if (data && data.success) {
                         localStorage.setItem('enterprise_session', JSON.stringify(data));
                         localStorage.setItem('waybill_active_user', data.user.username);
                         localStorage.setItem('waybill_branch_prefix', data.branch.code);
                         localStorage.setItem('waybill_branch_title', data.branch.name);
                         localStorage.setItem(`awb_counter_${data.branch.code}`, data.branch.start_seq);
+                        await this.logEvent('login_success', 'auth', data.user.username, {
+                            username: data.user.username,
+                            role: data.user.role,
+                            branch_code: data.branch.code,
+                            branch_name: data.branch.name
+                        }, data);
                         window.location.reload();
-                    } else { UI.toast(data?.error || "بيانات الدخول غير صحيحة!", "error"); btn.innerHTML = originalText; btn.disabled = false; }
-                } catch (err) { UI.toast("انتظر قليلاً حتى يكتمل الاتصال بقاعدة البيانات", "error"); btn.innerHTML = originalText; btn.disabled = false; }
+                    } else {
+                        await this.logEvent('login_failed', 'auth', inputUser, { username: inputUser, reason: data?.error || 'بيانات الدخول غير صحيحة' });
+                        UI.toast(data?.error || "بيانات الدخول غير صحيحة!", "error");
+                        btn.innerHTML = originalText; btn.disabled = false;
+                    }
+                } catch (err) {
+                    await this.logEvent('login_failed', 'auth', inputUser, { username: inputUser, reason: err.message || String(err) });
+                    UI.toast("تعذر تسجيل الدخول: " + (err.message || "تحقق من الاتصال"), "error");
+                    btn.innerHTML = originalText; btn.disabled = false;
+                }
+            },
+            async logEvent(action, entity = 'system', entityId = null, details = {}, sessionOverride = null) {
+                try {
+                    const session = sessionOverride || JSON.parse(localStorage.getItem('enterprise_session') || '{}');
+                    await window.supabase.rpc('log_app_event', {
+                        p_username: session?.user?.username || details.username || localStorage.getItem('waybill_active_user') || 'guest',
+                        p_role: session?.user?.role || details.role || 'guest',
+                        p_branch_code: session?.branch?.code || details.branch_code || localStorage.getItem('waybill_branch_prefix') || null,
+                        p_branch_name: session?.branch?.name || details.branch_name || localStorage.getItem('waybill_branch_title') || null,
+                        p_action: action,
+                        p_entity: entity,
+                        p_entity_id: entityId,
+                        p_details: details,
+                        p_user_agent: navigator.userAgent
+                    });
+                } catch(e) { console.warn('لم يتم تسجيل العملية:', e); }
             },
             getPrefix() { return localStorage.getItem('waybill_branch_prefix') || 'default'; },
-            logout() { localStorage.removeItem('enterprise_session'); window.location.reload(); }
+            async logout() {
+                await this.logEvent('logout', 'auth', localStorage.getItem('waybill_active_user'), {});
+                localStorage.removeItem('enterprise_session');
+                window.location.replace('index.html?v=' + Date.now());
+            }
         };
 
         const SafeStorage = { get(key, fallback = null) { try { return localStorage.getItem(key) || fallback; } catch(e) { return fallback; } }, set(key, value) { try { localStorage.setItem(key, value); } catch(e) {} } };
@@ -395,7 +430,12 @@
                     if(!StorageEngine.db) await StorageEngine.initDB();
                     const record = { id: new Date().getTime().toString(), branch: AuthManager.getPrefix(), awb: awb, client: StateMgr.data.consignee_name||'بدون عميل', date: StateMgr.data.date||'', data: JSON.parse(JSON.stringify(StateMgr.data)) };
                     const tx = StorageEngine.db.transaction("archive", "readwrite"); tx.objectStore("archive").put(record);
-                    tx.oncomplete = () => { UI.toast("تم الحفظ في الأرشيف!", "success"); NotificationEngine.notifyNewWaybill(); UI.hideProcessing(); };
+                    tx.oncomplete = async () => {
+                        await AuthManager.logEvent('save_waybill', 'waybills', awb, { awb_no: awb, client: StateMgr.data.consignee_name || '', branch_code: AuthManager.getPrefix() });
+                        UI.toast("تم الحفظ في الأرشيف!", "success");
+                        NotificationEngine.notifyNewWaybill();
+                        UI.hideProcessing();
+                    };
                 } catch(e) { UI.hideProcessing(); UI.toast("خطأ في الحفظ", "error"); }
             },
             async loadList() {
