@@ -1593,3 +1593,441 @@ body[data-palette] .live-pulse { background: var(--accent) !important; }
   body.mobile-ux-enabled .workspace, body.is-mobile-layout .workspace { flex-direction: row !important; height: calc(100vh - var(--header-height) - var(--footer-height)) !important; }
   body.mobile-ux-enabled .preview-area, body.is-mobile-layout .preview-area { flex: 1 1 auto !important; height: 100% !important; }
 }
+
+/* ==========================================================
+   Durrat V9.1 LTS Real Project
+   إصلاح نهائي لفصل واجهة الحاسوب عن الجوال
+   - الحاسوب يرجع للتخطيط القديم: لوحة الحقول يمين والبوليصة في الوسط/اليسار.
+   - الجوال يبقى بواجهة لمس مرنة دون التأثير على الحاسوب.
+   - لا يغير أماكن الحقول داخل البوليصة.
+   ========================================================== */
+
+/* -------------------- Desktop / Laptop -------------------- */
+@media (min-width: 901px) {
+  html,
+  body {
+    width: 100% !important;
+    height: 100vh !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body.dark-mode,
+  body {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  header {
+    position: relative !important;
+    top: auto !important;
+    height: var(--header-height) !important;
+    min-height: var(--header-height) !important;
+    flex: 0 0 var(--header-height) !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 10px 14px !important;
+    overflow: hidden !important;
+  }
+
+  .brand {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    min-width: max-content !important;
+    white-space: nowrap !important;
+    font-size: 1.05rem !important;
+  }
+
+  #top-toolbar,
+  .toolbar {
+    width: auto !important;
+    flex: 1 1 auto !important;
+    flex-basis: auto !important;
+    min-width: 0 !important;
+    max-height: 52px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    direction: rtl !important;
+    padding-bottom: 7px !important;
+  }
+
+  #top-toolbar button,
+  #top-toolbar select,
+  .toolbar button,
+  .toolbar select {
+    flex: 0 0 auto !important;
+    min-height: 34px !important;
+    max-height: 38px !important;
+    padding: 8px 12px !important;
+    font-size: .78rem !important;
+    border-radius: 10px !important;
+  }
+
+  .workspace {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: calc(100vh - var(--header-height) - var(--footer-height)) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    direction: rtl !important;
+    overflow: hidden !important;
+    background: transparent !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sidebar {
+    order: 0 !important;
+    width: var(--sidebar-width) !important;
+    flex: 0 0 var(--sidebar-width) !important;
+    min-width: 320px !important;
+    max-width: 460px !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border-left: 1px solid var(--border) !important;
+    border-bottom: 0 !important;
+    border-radius: 0 !important;
+    z-index: 120 !important;
+  }
+
+  .sidebar-header {
+    flex: 0 0 auto !important;
+  }
+
+  .form-scroller {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 16px !important;
+  }
+
+  .preview-area {
+    order: 1 !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow: auto !important;
+    padding: 28px !important;
+    text-align: initial !important;
+    direction: ltr !important;
+    background:
+      radial-gradient(circle at 20% 16%, rgba(37,99,235,.13), transparent 34%),
+      linear-gradient(135deg, rgba(15,23,42,.56), rgba(2,6,23,.34)) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  .document-wrapper {
+    width: 1123px !important;
+    min-width: 1123px !important;
+    min-height: 794px !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 auto 38px !important;
+    flex: 0 0 auto !important;
+    display: block !important;
+    transform-origin: top center !important;
+    direction: rtl !important;
+  }
+
+  .bg-img {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .zoom-controls {
+    position: fixed !important;
+    left: calc(var(--sidebar-width) + 18px) !important;
+    bottom: calc(var(--footer-height) + 18px) !important;
+    z-index: 2500 !important;
+  }
+
+  .developer-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: var(--footer-height) !important;
+    z-index: 3000 !important;
+  }
+
+  .mobile-fields-fab,
+  .mobile-save-fab,
+  .mobile-center-fab,
+  .mobile-fields-handle {
+    display: none !important;
+  }
+
+  /* حقول الحاسوب تبقى صغيرة ومنظمة مثل التصميم القديم */
+  .form-group,
+  .field-card,
+  details .field-row {
+    max-width: 100% !important;
+  }
+
+  details {
+    margin-bottom: 10px !important;
+  }
+
+  details summary {
+    min-height: 46px !important;
+  }
+}
+
+/* -------------------- Tablet -------------------- */
+@media (min-width: 701px) and (max-width: 900px) {
+  body {
+    overflow: auto !important;
+    min-height: 100vh !important;
+  }
+
+  header {
+    position: sticky !important;
+    top: 0 !important;
+    height: auto !important;
+    min-height: var(--header-height) !important;
+    flex-wrap: wrap !important;
+  }
+
+  .brand {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  #top-toolbar,
+  .toolbar {
+    width: 100% !important;
+    flex-basis: 100% !important;
+    overflow-x: auto !important;
+  }
+
+  .workspace {
+    display: flex !important;
+    flex-direction: row !important;
+    direction: rtl !important;
+    height: calc(100vh - 130px) !important;
+    overflow: hidden !important;
+  }
+
+  .sidebar {
+    order: 0 !important;
+    flex: 0 0 330px !important;
+    width: 330px !important;
+    min-width: 300px !important;
+    max-width: 360px !important;
+    overflow: hidden !important;
+  }
+
+  .preview-area {
+    order: 1 !important;
+    flex: 1 1 auto !important;
+    overflow: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 18px !important;
+    direction: ltr !important;
+  }
+
+  .document-wrapper {
+    margin: 0 auto 26px !important;
+    transform-origin: top center !important;
+  }
+
+  .form-scroller {
+    overflow-y: auto !important;
+    max-height: calc(100vh - 240px) !important;
+  }
+}
+
+/* -------------------- Mobile -------------------- */
+@media (max-width: 700px) {
+  html,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    min-height: 100vh !important;
+  }
+
+  body {
+    display: block !important;
+    touch-action: manipulation;
+  }
+
+  header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 6000 !important;
+    height: auto !important;
+    min-height: unset !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    padding: 10px 8px !important;
+    gap: 8px !important;
+  }
+
+  .brand {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    font-size: clamp(1rem, 4.2vw, 1.38rem) !important;
+    white-space: nowrap !important;
+  }
+
+  #top-toolbar,
+  .toolbar {
+    width: 100% !important;
+    flex-basis: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 9px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 8px 6px 12px !important;
+  }
+
+  #top-toolbar button,
+  #top-toolbar select,
+  .toolbar button,
+  .toolbar select {
+    flex: 0 0 auto !important;
+    min-height: 46px !important;
+    border-radius: 15px !important;
+    font-size: .95rem !important;
+    padding: 10px 15px !important;
+  }
+
+  .workspace {
+    display: flex !important;
+    flex-direction: column !important;
+    direction: rtl !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+
+  .preview-area {
+    order: 1 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-height: 48dvh !important;
+    max-height: 58dvh !important;
+    overflow: auto !important;
+    display: block !important;
+    text-align: center !important;
+    padding: 14px 0 72px !important;
+    direction: ltr !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-x pan-y !important;
+  }
+
+  .document-wrapper {
+    display: inline-block !important;
+    vertical-align: top !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-bottom: 22px !important;
+    transform-origin: top center !important;
+    direction: rtl !important;
+  }
+
+  .sidebar {
+    order: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    max-height: none !important;
+    height: auto !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border) !important;
+    border-radius: 22px 22px 0 0 !important;
+    overflow: visible !important;
+  }
+
+  .sidebar-header {
+    padding: 16px !important;
+  }
+
+  .form-scroller {
+    max-height: 68dvh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 14px 14px 96px !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .search-box input,
+  .form-scroller input,
+  .form-scroller textarea,
+  .form-scroller select {
+    min-height: 48px !important;
+    font-size: 16px !important;
+    border-radius: 14px !important;
+  }
+
+  details summary {
+    min-height: 58px !important;
+    font-size: 1.08rem !important;
+  }
+
+  .zoom-controls {
+    position: fixed !important;
+    left: 14px !important;
+    bottom: calc(var(--footer-height) + 14px) !important;
+    z-index: 5000 !important;
+  }
+
+  .developer-footer {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 5001 !important;
+  }
+}
+
+/* تحسين عام لشريط التمرير */
+.preview-area::-webkit-scrollbar,
+.form-scroller::-webkit-scrollbar,
+.toolbar::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+.preview-area::-webkit-scrollbar-thumb,
+.form-scroller::-webkit-scrollbar-thumb,
+.toolbar::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, .65);
+  border-radius: 999px;
+}
+.preview-area::-webkit-scrollbar-track,
+.form-scroller::-webkit-scrollbar-track,
+.toolbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, .28);
+}
+
+/* End Durrat LTS Layout Fix */
