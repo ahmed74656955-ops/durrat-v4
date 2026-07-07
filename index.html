@@ -37,7 +37,7 @@
     </script>
 
 <!-- Durrat V7.5 Mobile UX Patch -->
-<style id="durrat-v75-mobile-ux-css">
+<style id="durrat-v76-mobile-ux-css">
 @media (max-width: 900px) {
   html, body { width: 100%; max-width: 100%; overflow-x: hidden !important; overscroll-behavior-y: contain; }
   body { touch-action: manipulation; }
@@ -99,6 +99,29 @@
   .developer-footer { position: sticky; bottom: 0; z-index: 5000; padding: 10px 8px !important; font-size: .95rem !important; }
 }
 @media (min-width: 901px) { .mobile-ux-btn { display:none !important; } }
+
+  /* V7.6: مساحة كتابة أوضح على الجوال وترتيب أفضل للأزرار */
+  #top-toolbar { scroll-padding-inline: 18px; }
+  #top-toolbar button, #top-toolbar select { min-width: 96px; padding-inline: 16px !important; font-weight:900 !important; }
+  #top-toolbar .admin-tool { display:none !important; }
+  body.is-admin-user #top-toolbar .admin-tool { display:inline-flex !important; }
+  .sidebar { height: min(82dvh, 780px) !important; transform: translateY(calc(100% - 64px)); }
+  .sidebar::before { height: 40px; line-height: 40px; font-size: 1rem; }
+  .sidebar-header { padding: 10px 14px !important; }
+  .branch-permissions-card { margin: 10px 0 14px !important; padding: 14px !important; border-radius: 20px !important; }
+  .branch-permissions-card h3 { font-size: 1.25rem !important; margin-bottom: 8px !important; }
+  .perm-chip { padding: 9px 12px !important; font-size: .92rem !important; }
+  .permissions-grid, .perm-grid, .branch-permissions-card .perm-list { max-height: 150px !important; overflow:auto !important; }
+  .form-scroller { height: calc(100% - 118px) !important; padding: 10px 14px 160px !important; }
+  .input-group { padding: 14px !important; gap: 10px !important; border-radius: 18px !important; }
+  .input-group label { font-size: 1.05rem !important; line-height:1.6 !important; }
+  .input-group input, .input-group textarea, .input-group select { min-height: 58px !important; font-size: 18px !important; padding: 14px 16px !important; border-radius: 16px !important; }
+  .input-group textarea { min-height: 105px !important; line-height: 1.8 !important; }
+  .align-controls { gap: 8px !important; }
+  .align-controls button, .align-btn { min-width: 48px !important; min-height: 44px !important; }
+  #mobile-fields-toggle { bottom: 92px; right: 16px; }
+  #mobile-quick-save, #mobile-center-waybill { bottom: 92px; }
+  .developer-footer { font-size: .9rem !important; }
 </style>
 
 </head>
@@ -139,29 +162,31 @@
             <span class="live-pulse" title="متصل بالنظام السحابي"></span>
         </div>
         <div class="toolbar" id="top-toolbar">
+            <!-- الأساسيات أولاً: حفظ / تصدير / تراجع / مسح -->
+            <button onclick="ArchiveEngine.saveCurrent()" class="btn-primary" data-perm="can_archive"><i class="fas fa-save"></i> حفظ</button>
+            <button onclick="ExportEngine.generateImage('jpeg')" class="btn-accent" data-perm="can_export" style="background: #059669;"><i class="fas fa-file-image"></i> JPG</button>
+            <button onclick="ExportEngine.generatePDF()" class="btn-primary" data-perm="can_print"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button onclick="ExportEngine.shareDocument()" class="btn-info" data-perm="can_export" style="background: #8b5cf6;"><i class="fas fa-share-nodes"></i> مشاركة</button>
+            <button onclick="HistoryMgr.undo()"><i class="fas fa-undo"></i> تراجع</button>
+            <button onclick="StateMgr.clearData()" class="btn-danger" style="background: #be123c;"><i class="fas fa-eraser"></i> مسح</button>
+            <button onclick="ArchiveEngine.showModal()" class="btn-info" data-perm="can_archive"><i class="fas fa-archive"></i> الأرشيف</button>
+            <button onclick="SignatureEngine.showModal()" class="btn-accent"><i class="fas fa-signature"></i> التوقيع الحر</button>
+            <select id="copies-selector" title="عدد نسخ التصدير">
+                <option value="1">نسخة أصلية</option>
+                <option value="3">3 نسخ</option>
+            </select>
+            <span style="border-left: 1px solid var(--border); margin: 0 4px; height: 24px;"></span>
+            <!-- الأدوات الثانوية في النهاية -->
             <button onclick="UI.installPWA()" id="installAppBtn" class="btn-warning"><i class="fas fa-download"></i> تثبيت</button>
             <button onclick="UI.toggleTheme()"><i class="fas fa-moon"></i> المظهر</button>
             <button onclick="ThemePaletteEngine.open()" class="btn-theme"><i class="fas fa-palette"></i> الألوان</button>
-            <button onclick="HistoryMgr.undo()"><i class="fas fa-undo"></i> تراجع</button>
-            <button onclick="SignatureEngine.showModal()" class="btn-accent"><i class="fas fa-signature"></i> التوقيع الحر</button>
-            <span style="border-left: 1px solid var(--border); margin: 0 4px; height: 24px;"></span>
-            <button onclick="ArchiveEngine.showModal()" class="btn-info" data-perm="can_archive"><i class="fas fa-archive"></i> الأرشيف</button>
-            <button onclick="ArchiveEngine.saveCurrent()" class="btn-primary" data-perm="can_archive"><i class="fas fa-save"></i> حفظ</button>
-            <button onclick="BackupEngine.export()" class="btn-info admin-tool" data-perm="can_edit_fields" style="background:#4b5563;"><i class="fas fa-file-export"></i> إعدادات</button>
+            <button onclick="BackupEngine.export()" class="btn-info admin-tool" data-admin-only="1" data-perm="can_edit_fields" style="background:#4b5563;"><i class="fas fa-file-export"></i> إعدادات</button>
             <input type="file" id="import-file" style="display:none" accept=".json" onchange="BackupEngine.import(event)">
-            <button onclick="document.getElementById('import-file').click()" class="btn-info admin-tool" data-perm="can_edit_fields" style="background:#6b7280;"><i class="fas fa-file-import"></i> استيراد</button>
-            <span style="border-left: 1px solid var(--border); margin: 0 4px; height: 24px;"></span>
-            <button onclick="CalibrationEngine.toggle()" id="btn-calib" class="admin-tool" data-perm="can_edit_fields" style="background:#475569;"><i class="fas fa-tools"></i> معايرة</button><button onclick="CalibrationEngine.restorePrevious()" id="btn-calib-restore" class="admin-tool" data-perm="can_edit_fields" style="background:#64748b;"><i class="fas fa-rotate-left"></i> استرجاع المعايرة</button>
+            <button onclick="document.getElementById('import-file').click()" class="btn-info admin-tool" data-admin-only="1" data-perm="can_edit_fields" style="background:#6b7280;"><i class="fas fa-file-import"></i> استيراد</button>
+            <button onclick="CalibrationEngine.toggle()" id="btn-calib" class="admin-tool" data-admin-only="1" data-perm="can_edit_fields" style="background:#475569;"><i class="fas fa-tools"></i> معايرة</button>
+            <button onclick="CalibrationEngine.restorePrevious()" id="btn-calib-restore" class="admin-tool" data-admin-only="1" data-perm="can_edit_fields" style="background:#64748b;"><i class="fas fa-rotate-left"></i> استرجاع المعايرة</button>
             <input type="file" id="bg-upload-overlay" style="display:none" accept="image/png, image/jpeg" onchange="StorageEngine.uploadImage(event)">
             <button onclick="AuthManager.logout()" class="btn-danger"><i class="fas fa-sign-out-alt"></i> خروج</button>
-            <button onclick="StateMgr.clearData()" class="btn-danger" style="background: #be123c;"><i class="fas fa-eraser"></i> مسح</button>
-            <select id="copies-selector">
-                <option value="1">نسخة أصلية</option>
-                <option value="3">3 نسخ (مرسل، مستلم، شركة)</option>
-            </select>
-            <button onclick="ExportEngine.shareDocument()" class="btn-info" data-perm="can_export" style="background: #8b5cf6;"><i class="fas fa-share-nodes"></i> مشاركة</button>
-            <button onclick="ExportEngine.generatePDF()" class="btn-primary" data-perm="can_print"><i class="fas fa-file-pdf"></i> PDF</button>
-            <button onclick="ExportEngine.generateImage('jpeg')" class="btn-accent" data-perm="can_export" style="background: #059669;"><i class="fas fa-file-image"></i> JPG</button>
         </div>
     </header>
 
@@ -339,6 +364,7 @@
                     document.getElementById('branch-title').innerText = "- " + branchTitle;
 
                     const userData = JSON.parse(session).user;
+                    document.body.classList.toggle('is-admin-user', userData.role === 'super_admin' || userData.role === 'branch_manager');
                     if(userData.role === 'super_admin' && !document.getElementById('admin-btn')) {
                         const btn = document.createElement('button'); btn.id = 'admin-btn';
                         btn.innerHTML = '<i class="fas fa-cogs"></i> لوحة الإدارة';
@@ -348,6 +374,7 @@
                         btn.onclick = () => window.location.href = 'admin.html';
                         document.querySelector('.toolbar').prepend(btn);
                     }
+                    this.startLiveGuard();
                     setTimeout(() => {
                         const tb = document.getElementById('top-toolbar');
                         if(tb && tb.scrollWidth > tb.clientWidth) {
@@ -409,6 +436,48 @@
                         p_user_agent: navigator.userAgent
                     });
                 } catch(e) { console.warn('لم يتم تسجيل العملية:', e); }
+            },
+
+            startLiveGuard() {
+                if (this._liveGuardStarted) return;
+                this._liveGuardStarted = true;
+                setTimeout(() => this.enforceLiveAccess(), 1200);
+                setInterval(() => this.enforceLiveAccess(), 12000);
+                window.addEventListener('focus', () => this.enforceLiveAccess());
+            },
+            async enforceLiveAccess() {
+                try {
+                    const session = this.getSession();
+                    const username = session?.user?.username || localStorage.getItem('waybill_active_user');
+                    if (!username || !window.supabase) return;
+                    let status = null;
+                    const rpcRes = await window.supabase.rpc('get_user_live_status', { p_username: username });
+                    if (!rpcRes.error && rpcRes.data) status = rpcRes.data;
+                    if (!status) {
+                        const { data: u, error } = await window.supabase.from('app_users').select('*').eq('username', username).maybeSingle();
+                        if (error) return;
+                        status = { success: !!u, active: !!u && u.is_active !== false && u.status !== 'suspended', branch_active: true };
+                    }
+                    const active = status.active !== false && status.branch_active !== false && status.success !== false;
+                    if (!active) {
+                        UI.toast(status.error || 'تم إيقاف حسابك أو فرعك من الإدارة الرئيسية', 'error');
+                        await this.forceLogoutBlocked();
+                        return;
+                    }
+                    if (status.permissions && window.PermissionEngine) {
+                        PermissionEngine.permissions = status.permissions;
+                        PermissionEngine.render(session);
+                        PermissionEngine.applyToToolbar(session);
+                    }
+                } catch(e) { console.warn('live access check skipped', e); }
+            },
+            async forceLogoutBlocked() {
+                try { await this.logEvent('forced_logout_blocked', 'auth', localStorage.getItem('waybill_active_user'), {}); } catch(e) {}
+                localStorage.removeItem('enterprise_session');
+                localStorage.removeItem('waybill_active_user');
+                const authScreen = document.getElementById('auth-screen');
+                if (authScreen) { authScreen.style.display = 'flex'; authScreen.style.opacity = '1'; authScreen.style.visibility = 'visible'; }
+                setTimeout(() => window.location.replace('index.html?blocked=1&v=' + Date.now()), 1200);
             },
             getSession() { try { return JSON.parse(localStorage.getItem('enterprise_session') || '{}'); } catch { return {}; } },
             getPrefix() { return localStorage.getItem('waybill_branch_prefix') || 'default'; },
@@ -1057,15 +1126,20 @@
                 box.innerHTML = `<div class="perm-card-head"><i class="fas fa-user-shield"></i><div><b>${title}</b><small>${branch}</small></div></div><div class="perm-chip-grid">${chips}</div>${adminBtn}`;
             },
             applyToToolbar(session) {
-                const role = session?.user?.role || '';
+                const role = session?.user?.role || 'employee';
+                const isAdminUser = role === 'super_admin' || role === 'branch_manager';
+                document.body.classList.toggle('is-admin-user', isAdminUser);
+                document.querySelectorAll('[data-admin-only="1"]').forEach(el => {
+                    el.style.display = isAdminUser ? '' : 'none';
+                    if (!isAdminUser && 'disabled' in el) el.disabled = true;
+                });
                 document.querySelectorAll('[data-perm]').forEach(el => {
                     const key = el.getAttribute('data-perm');
-                    const ok = role === 'super_admin' ? true : this.allowed(key);
-                    const adminTool = el.classList.contains('admin-tool');
-                    if (adminTool && !ok) { el.style.display = 'none'; return; }
-                    el.classList.toggle('perm-disabled', !ok);
-                    el.disabled = !ok;
-                    if (!ok) el.title = 'هذه الصلاحية غير مفعلة من الإدارة';
+                    const ok = this.allowed(key);
+                    el.style.opacity = ok ? '' : '.45';
+                    el.style.pointerEvents = ok ? '' : 'none';
+                    if ('disabled' in el) el.disabled = !ok;
+                    if (el.classList.contains('admin-tool') && !isAdminUser) el.style.display = 'none';
                 });
             }
         };
@@ -1172,7 +1246,7 @@
         });
     </script>
 
-<script id="durrat-v75-mobile-ux-js">
+<script id="durrat-v76-mobile-ux-js">
 (function(){
   const mq = () => window.matchMedia('(max-width: 900px)').matches;
   const ready = (fn) => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn) : fn();
