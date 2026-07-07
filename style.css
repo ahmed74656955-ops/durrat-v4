@@ -1147,3 +1147,79 @@ body[data-palette] .live-pulse { background: var(--accent) !important; }
 .perm-chip.perm-link.ok { cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
 .perm-chip.perm-link.ok:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37,99,235,.25); }
 .perm-admin-open { margin-top: 12px; width: 100%; border: 1px solid rgba(59,130,246,.35); background: var(--primary-gradient); color:#fff; border-radius: 14px; padding: 11px 14px; font-weight: 900; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:8px; }
+
+/* ==========================================================
+   V7.4 Mobile Center + Field Visibility Fix
+   يحافظ على أماكن الحقول داخل البوليصة، ويصلح انحراف الجوال
+   ========================================================== */
+@media (max-width: 900px) {
+  body { overflow-x: hidden !important; }
+  .workspace { width: 100% !important; max-width: 100vw !important; overflow-x: hidden !important; }
+
+  /* إظهار قائمة الحقول بتمرير واضح وعدم اختفائها خلف البوليصة أو الفوتر */
+  .sidebar {
+    width: 100% !important;
+    max-width: 100vw !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .form-scroller {
+    max-height: 56vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 10px 12px 120px !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  #form-builder details {
+    scroll-margin-top: 90px;
+  }
+  #form-builder summary {
+    position: relative;
+    min-height: 58px;
+  }
+  #form-builder details[open] .group-content {
+    display: block !important;
+  }
+
+  /* البوليصة في الجوال: لا transform، لا انحراف، لا فراغ كبير يمين/يسار */
+  .preview-area {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    direction: ltr !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 16px 8px 96px !important;
+    min-height: auto !important;
+  }
+  .document-wrapper,
+  .document-wrapper.mobile-centered-waybill {
+    width: 1123px !important;
+    min-width: 1123px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform: none !important;
+    transform-origin: top center !important;
+    direction: rtl !important;
+  }
+  .bg-img {
+    width: 1123px !important;
+    max-width: none !important;
+  }
+
+  .zoom-controls {
+    position: sticky !important;
+    left: 12px !important;
+    right: auto !important;
+    bottom: calc(var(--footer-height) + 12px) !important;
+    z-index: 6000 !important;
+    align-self: flex-start !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .form-scroller { max-height: 52vh !important; }
+  .preview-area { padding-left: 6px !important; padding-right: 6px !important; }
+}
