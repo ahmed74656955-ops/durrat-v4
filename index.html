@@ -303,6 +303,141 @@
 }
 </style>
 
+
+
+<!-- Durrat V8.1 Definitive Desktop/Mobile Layout Fix -->
+<style id="durrat-v81-definitive-layout-fix">
+@media (min-width: 901px) {
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body:not(.is-mobile-layout) .workspace,
+  .workspace {
+    direction: ltr !important;
+    display: grid !important;
+    grid-template-columns: minmax(760px, 1fr) clamp(330px, 24vw, 430px) !important;
+    grid-template-areas: "preview sidebar" !important;
+    gap: 14px !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: calc(100vh - 112px) !important;
+    min-height: calc(100vh - 112px) !important;
+    padding: 10px 14px 48px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  body:not(.is-mobile-layout) .preview-area,
+  .preview-area {
+    grid-area: preview !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    order: 0 !important;
+    direction: ltr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding: 14px 20px 90px !important;
+    box-sizing: border-box !important;
+    background: rgba(2, 6, 23, .28) !important;
+    border: 1px solid rgba(148,163,184,.12) !important;
+    border-radius: 18px !important;
+    scroll-behavior: auto !important;
+  }
+
+  body:not(.is-mobile-layout) .document-wrapper,
+  .document-wrapper {
+    direction: rtl !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    margin: 0 auto !important;
+    transform-origin: top center !important;
+    flex: 0 0 auto !important;
+  }
+
+  body:not(.is-mobile-layout) .sidebar,
+  .sidebar {
+    grid-area: sidebar !important;
+    grid-column: auto !important;
+    grid-row: auto !important;
+    order: 0 !important;
+    direction: rtl !important;
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    border-radius: 18px !important;
+    background: rgba(15, 23, 42, .90) !important;
+    border: 1px solid rgba(148,163,184,.14) !important;
+    box-shadow: none !important;
+  }
+
+  body:not(.is-mobile-layout) .sidebar::before,
+  .sidebar::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  body:not(.is-mobile-layout) .form-scroller,
+  .form-scroller {
+    height: calc(100% - 115px) !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 10px 12px 96px !important;
+    box-sizing: border-box !important;
+  }
+
+  body:not(.is-mobile-layout) #top-toolbar {
+    direction: rtl !important;
+    height: auto !important;
+    max-height: 52px !important;
+  }
+
+  body:not(.is-mobile-layout) .developer-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 36px !important;
+    z-index: 3000 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  html, body { overflow-x: hidden !important; }
+  .workspace { direction: rtl !important; }
+  .preview-area {
+    direction: ltr !important;
+    display: block !important;
+    text-align: center !important;
+    overflow: auto !important;
+    scroll-snap-type: none !important;
+  }
+  .document-wrapper {
+    display: inline-block !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    vertical-align: top !important;
+    transform-origin: top center !important;
+  }
+}
+</style>
+
 </head>
 <body class="dark-mode">
 
@@ -1581,5 +1716,44 @@
   setTimeout(applyLayoutMode, 700);
 })();
 </script>
+
+
+<script id="durrat-v81-layout-stabilizer">
+(function(){
+  function stabilizeLayout(){
+    var isMobile = window.matchMedia('(max-width: 900px)').matches;
+    document.body.classList.toggle('is-mobile-layout', isMobile);
+    document.body.classList.toggle('is-desktop-layout', !isMobile);
+    var preview = document.getElementById('preview-container') || document.querySelector('.preview-area');
+    var doc = document.getElementById('document-wrapper') || document.querySelector('.document-wrapper');
+    if(!preview || !doc) return;
+    if(!isMobile){
+      preview.style.direction = 'ltr';
+      preview.style.display = 'flex';
+      preview.style.justifyContent = 'center';
+      preview.style.alignItems = 'flex-start';
+      doc.style.marginLeft = 'auto';
+      doc.style.marginRight = 'auto';
+      doc.style.left = 'auto';
+      doc.style.right = 'auto';
+      requestAnimationFrame(function(){ preview.scrollLeft = 0; });
+    } else {
+      preview.style.direction = 'ltr';
+      doc.style.marginLeft = 'auto';
+      doc.style.marginRight = 'auto';
+      setTimeout(function(){
+        try { preview.scrollLeft = Math.max(0, (preview.scrollWidth - preview.clientWidth) / 2); } catch(e) {}
+      }, 120);
+    }
+  }
+  window.addEventListener('load', stabilizeLayout);
+  window.addEventListener('resize', stabilizeLayout);
+  window.addEventListener('orientationchange', function(){ setTimeout(stabilizeLayout, 250); });
+  document.addEventListener('DOMContentLoaded', stabilizeLayout);
+  setTimeout(stabilizeLayout, 500);
+  setTimeout(stabilizeLayout, 1500);
+})();
+</script>
+
 </body>
 </html>
