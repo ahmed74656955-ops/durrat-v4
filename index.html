@@ -23,7 +23,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=20260707-v8-enterprise-ultimate-final" rel="stylesheet">
+    <link href="./style.css?v=v9-lts-20260707" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
@@ -1752,6 +1752,41 @@
   document.addEventListener('DOMContentLoaded', stabilizeLayout);
   setTimeout(stabilizeLayout, 500);
   setTimeout(stabilizeLayout, 1500);
+})();
+</script>
+
+
+<script id="durrat-v9-lts-layout-stabilizer">
+(function(){
+  function isMobile(){ return window.matchMedia('(max-width: 900px)').matches; }
+  function apply(){
+    const mobile = isMobile();
+    document.body.classList.toggle('is-mobile-layout', mobile);
+    document.body.classList.toggle('is-desktop-layout', !mobile);
+    const preview = document.getElementById('preview-container') || document.querySelector('.preview-area');
+    const doc = document.getElementById('document-wrapper') || document.querySelector('.document-wrapper');
+    if(!preview || !doc) return;
+    if(!mobile){
+      preview.style.direction = 'ltr';
+      preview.style.display = 'flex';
+      preview.style.justifyContent = 'center';
+      preview.style.alignItems = 'flex-start';
+      preview.style.overflow = 'auto';
+      doc.style.marginLeft = 'auto';
+      doc.style.marginRight = 'auto';
+      doc.classList.remove('mobile-centered-waybill');
+      setTimeout(()=>{ try { preview.scrollLeft = 0; } catch(e){} }, 60);
+    } else {
+      preview.style.direction = 'ltr';
+      setTimeout(()=>{ try { preview.scrollLeft = Math.max(0, (preview.scrollWidth - preview.clientWidth) / 2); } catch(e){} }, 120);
+    }
+  }
+  window.addEventListener('load', apply);
+  window.addEventListener('resize', apply);
+  window.addEventListener('orientationchange', ()=>setTimeout(apply, 300));
+  document.addEventListener('DOMContentLoaded', apply);
+  setTimeout(apply, 700);
+  setTimeout(apply, 1800);
 })();
 </script>
 
