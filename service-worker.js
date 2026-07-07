@@ -1,4 +1,4 @@
-const CACHE_NAME = "durrat-erp-v9-1-lts-real-project";
+const CACHE_NAME = "durrat-erp-v9-lts-20260707";
 
 const PRECACHE_URLS = [
   "./",
