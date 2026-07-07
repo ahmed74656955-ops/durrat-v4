@@ -28,20 +28,20 @@
     <aside class="sidebar glass-panel">
         <div class="sidebar-header">
             <i class="fas fa-chess-king fa-2x" style="color: var(--warning); margin-bottom:10px; filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));"></i>
-            <h2>الإدارة العليا</h2>
+            <h2 id="admin-panel-title">الإدارة العليا</h2><small id="admin-panel-subtitle" style="color:var(--text-muted);font-weight:800;">لوحة صلاحيات مركزية</small>
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" onclick="AdminApp.showSection('dashboard')"><i class="fas fa-chart-pie"></i> نظرة عامة</div>
-            <div class="nav-item" onclick="AdminApp.showSection('branches')"><i class="fas fa-building"></i> إدارة الفروع</div>
-            <div class="nav-item" onclick="AdminApp.showSection('users')"><i class="fas fa-users-shield"></i> المستخدمين</div>
-            <div class="nav-item" onclick="AdminApp.showSection('templates')"><i class="fas fa-sliders-h"></i> تخصيص الحقول</div>
-            <div class="nav-item" onclick="AdminApp.showSection('audit')"><i class="fas fa-history"></i> سجل العمليات</div>
-            <div class="nav-item" onclick="AdminApp.showSection('reports')"><i class="fas fa-chart-line"></i> التقارير</div>
-            <div class="nav-item" onclick="AdminApp.showSection('permissions')"><i class="fas fa-user-lock"></i> الصلاحيات</div>
-            <div class="nav-item" onclick="AdminApp.showSection('backups')"><i class="fas fa-database"></i> النسخ الاحتياطي</div>
-            <div class="nav-item" onclick="AdminApp.showSection('security')"><i class="fas fa-shield-halved"></i> الأمان</div>
-            <div class="nav-item" onclick="AdminApp.showSection('updates')"><i class="fas fa-bullhorn"></i> التحديثات</div>
-            <div class="nav-item" onclick="AdminApp.showSection('delete_requests')"><i class="fas fa-trash-shield"></i> طلبات الحذف</div>
+            <div class="nav-item active" data-section="dashboard" onclick="AdminApp.showSection('dashboard')"><i class="fas fa-chart-pie"></i> نظرة عامة</div>
+            <div class="nav-item" data-section="branches" data-perm="can_manage_branches" onclick="AdminApp.showSection('branches')"><i class="fas fa-building"></i> إدارة الفروع</div>
+            <div class="nav-item" data-section="users" data-perm="can_manage_users" onclick="AdminApp.showSection('users')"><i class="fas fa-users-shield"></i> المستخدمين</div>
+            <div class="nav-item" data-section="templates" data-perm="can_edit_fields" onclick="AdminApp.showSection('templates')"><i class="fas fa-sliders-h"></i> تخصيص الحقول</div>
+            <div class="nav-item" data-section="audit" data-perm="can_view_reports" onclick="AdminApp.showSection('audit')"><i class="fas fa-history"></i> سجل العمليات</div>
+            <div class="nav-item" data-section="reports" data-perm="can_view_reports" onclick="AdminApp.showSection('reports')"><i class="fas fa-chart-line"></i> التقارير</div>
+            <div class="nav-item" data-section="permissions" data-super-only="1" onclick="AdminApp.showSection('permissions')"><i class="fas fa-user-lock"></i> الصلاحيات</div>
+            <div class="nav-item" data-section="backups" data-perm="can_view_reports" onclick="AdminApp.showSection('backups')"><i class="fas fa-database"></i> النسخ الاحتياطي</div>
+            <div class="nav-item" data-section="security" data-super-only="1" onclick="AdminApp.showSection('security')"><i class="fas fa-shield-halved"></i> الأمان</div>
+            <div class="nav-item" data-section="updates" data-super-only="1" onclick="AdminApp.showSection('updates')"><i class="fas fa-bullhorn"></i> التحديثات</div>
+            <div class="nav-item" data-section="delete_requests" data-perm="can_delete_request" onclick="AdminApp.showSection('delete_requests')"><i class="fas fa-trash-shield"></i> طلبات الحذف</div>
         </div>
     </aside>
 

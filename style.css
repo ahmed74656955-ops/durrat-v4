@@ -1141,3 +1141,9 @@ body[data-palette] .live-pulse { background: var(--accent) !important; }
   .preview-area { justify-content: center !important; align-items: flex-start !important; padding-left: 12px !important; padding-right: 12px !important; }
   .document-wrapper { margin-left: auto !important; margin-right: auto !important; }
 }
+
+
+/* V7.3 - بطاقة الصلاحيات القابلة للنقر */
+.perm-chip.perm-link.ok { cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
+.perm-chip.perm-link.ok:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37,99,235,.25); }
+.perm-admin-open { margin-top: 12px; width: 100%; border: 1px solid rgba(59,130,246,.35); background: var(--primary-gradient); color:#fff; border-radius: 14px; padding: 11px 14px; font-weight: 900; cursor: pointer; display:flex; align-items:center; justify-content:center; gap:8px; }

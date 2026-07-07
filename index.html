@@ -935,10 +935,15 @@
                 const branch = session?.branch?.name || localStorage.getItem('waybill_branch_title') || '';
                 const chips = this.flags.map(([k, label]) => {
                     const ok = this.permissions[k] !== false;
-                    return `<span class="perm-chip ${ok ? 'ok' : 'off'}"><i class="fas fa-${ok ? 'check' : 'lock'}"></i>${label}</span>`;
+                    const sectionMap = { can_manage_users:'users', can_manage_branches:'branches', can_view_reports:'reports', can_delete_request:'delete_requests', can_edit_fields:'templates' };
+                    const section = sectionMap[k];
+                    const click = ok && section ? ` onclick="window.location.href='admin.html?section=${section}&v=' + Date.now()" role="button" title="فتح ${label}"` : '';
+                    return `<span class="perm-chip ${ok ? 'ok' : 'off'} ${section ? 'perm-link' : ''}"${click}><i class="fas fa-${ok ? 'check' : 'lock'}"></i>${label}</span>`;
                 }).join('');
                 box.style.display = 'block';
-                box.innerHTML = `<div class="perm-card-head"><i class="fas fa-user-shield"></i><div><b>${title}</b><small>${branch}</small></div></div><div class="perm-chip-grid">${chips}</div>`;
+                const canOpen = ['can_manage_users','can_manage_branches','can_view_reports','can_delete_request','can_edit_fields'].some(k => this.permissions[k] !== false);
+                const adminBtn = canOpen ? `<button class="perm-admin-open" onclick="window.location.href='admin.html?section=dashboard&v=' + Date.now()"><i class="fas fa-gauge-high"></i> فتح لوحة الصلاحيات</button>` : '';
+                box.innerHTML = `<div class="perm-card-head"><i class="fas fa-user-shield"></i><div><b>${title}</b><small>${branch}</small></div></div><div class="perm-chip-grid">${chips}</div>${adminBtn}`;
             },
             applyToToolbar(session) {
                 const role = session?.user?.role || '';
