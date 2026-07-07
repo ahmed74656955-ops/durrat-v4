@@ -338,13 +338,27 @@
 
         const Utils = {
             debounce(func, wait) { let timeout; return function(...args) { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), wait); }; },
-            genAWB() {
-                const prefix = AuthManager.getPrefix(); const counterKey = `awb_counter_${prefix}`;
-                let currentCount = parseInt(localStorage.getItem(counterKey));
-                if (isNaN(currentCount)) currentCount = 10000; else currentCount++;
-                localStorage.setItem(counterKey, currentCount);
-                const year = new Date().getFullYear().toString().substr(-2);
-                const num = `AWB-${prefix}${year}-${currentCount}`;
+            async genAWB() {
+                const prefix = AuthManager.getPrefix();
+                let num = null;
+                // ترقيم مركزي من Supabase عند توفر الاتصال لمنع التكرار بين الفروع
+                try {
+                    if (window.supabase) {
+                        const { data, error } = await window.supabase.rpc('reserve_awb_number', { p_branch_code: prefix });
+                        if (!error && data && data.success && data.awb_no) num = data.awb_no;
+                    }
+                } catch(e) { console.warn('Central AWB fallback:', e); }
+
+                // احتياطي محلي عند انقطاع الإنترنت فقط
+                if (!num) {
+                    const counterKey = `awb_counter_${prefix}`;
+                    let currentCount = parseInt(localStorage.getItem(counterKey));
+                    if (isNaN(currentCount)) currentCount = 10000; else currentCount++;
+                    localStorage.setItem(counterKey, currentCount);
+                    const year = new Date().getFullYear().toString().substr(-2);
+                    num = `AWB-${prefix}${year}-${currentCount}`;
+                    UI.toast('تم توليد رقم محلي مؤقت بسبب تعذر الاتصال السحابي', 'warning');
+                }
                 const awbInput = document.getElementById('in_awb_no');
                 if(awbInput) { awbInput.value = num; StateMgr.data['awb_no'] = num; SmartText.update('awb_no'); HistoryMgr.save(); UI.updateProgress(); }
             }
@@ -685,9 +699,9 @@
                 groups.forEach(g => {
                     const items = Schema.filter(s => s.group === g); const det = document.createElement('details'); det.innerHTML = `<summary><i class="fas fa-folder" style="color:var(--primary);"></i> ${g}</summary><div class="group-content"></div>`; const gc = det.querySelector('.group-content');
                     items.forEach(f => {
-                        if(f.type === 'readonly') return; const ig = document.createElement('div'); ig.className = `input-group ${f.req ? 'required' : ''}`;
+                        if(f.type === 'readonly' || f.hideFromForm) return; const ig = document.createElement('div'); ig.className = `input-group ${f.req ? 'required' : ''}`;
                         let inputHTML = ''; if(f.type === 'textarea') inputHTML = `<textarea id="in_${f.id}" rows="2"></textarea>`; else if(f.type === 'checkbox') inputHTML = `<div class="checkbox-group"><input type="checkbox" id="in_${f.id}"></div>`; else inputHTML = `<input type="${f.type}" id="in_${f.id}">`;
-                        let alignHTML = ''; const calibAlign = StateMgr.calibration[f.id]?.align || f.align;
+                        let alignHTML = ''; const calibAlign = f.align || StateMgr.calibration[f.id]?.align || 'right';
                         if (['text', 'textarea', 'number'].includes(f.type)) { alignHTML = `<div class="align-controls" id="align_${f.id}"><button type="button" class="align-btn ${calibAlign === 'right' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'right')"><i class="fas fa-align-right"></i></button><button type="button" class="align-btn ${calibAlign === 'center' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'center')"><i class="fas fa-align-center"></i></button><button type="button" class="align-btn ${calibAlign === 'left' ? 'active' : ''}" onclick="CalibrationEngine.setAlignment('${f.id}', 'left')"><i class="fas fa-align-left"></i></button></div>`; }
                         let reqStar = f.req ? '<span style="color:var(--danger); margin-right:4px;">*</span>' : '';
                         let labelHTML = `<label style="display:flex; justify-content:space-between; width:100%; align-items:center;"> <div style="display:flex; align-items:center; gap:5px;"> <span style="font-size:0.9rem;">${f.name} ${reqStar}</span> ${f.hasGenBtn ? '<button type="button" class="btn-gen" style="margin-right:10px; padding:6px 12px; background:var(--primary-gradient);" onclick="Utils.genAWB()"><i class="fas fa-magic"></i> توليد رقم</button>' : ''} </div> ${alignHTML} </label>`;
@@ -700,7 +714,7 @@
                 const layer = document.getElementById('overlays-layer'); layer.innerHTML = '';
                 Schema.forEach(f => {
                     const calib = StateMgr.calibration[f.id] || {}; const div = document.createElement('div'); div.className = 'field-overlay'; div.id = `out_${f.id}`; div.style.left = calib.left || f.x; div.style.top = calib.top || f.y; div.style.width = calib.width || f.w; div.style.height = calib.height || f.h; div.style.color = f.color || '#000';
-                    const calibAlign = calib.align || f.align; div.style.justifyContent = calibAlign === 'center' ? 'center' : (calibAlign === 'left' ? 'flex-start' : 'flex-end'); div.style.textAlign = calibAlign;
+                    const calibAlign = f.align || calib.align || 'right'; div.style.justifyContent = calibAlign === 'center' ? 'center' : (calibAlign === 'left' ? 'flex-start' : 'flex-end'); div.style.textAlign = calibAlign;
                     div.innerHTML = `<div class="field-label-tag">${f.name}</div><div class="calib-toolbar"><button onclick="CalibrationEngine.adjust('${f.id}', 'w', 0.5)"><i class="fas fa-arrows-alt-h"></i></button><button onclick="CalibrationEngine.adjust('${f.id}', 'h', 0.5)"><i class="fas fa-arrows-alt-v"></i></button></div><span id="content_${f.id}" style="width:100%; height:100%; display:flex; align-items:center; justify-content:${calibAlign === 'center' ? 'center' : (calibAlign === 'left' ? 'flex-start' : 'flex-end')}; font-size:${calib.size || f.size}px;"></span>`;
                     layer.appendChild(div); SmartText.update(f.id);
                 });
@@ -799,8 +813,10 @@
                                 const fieldIndex = Schema.findIndex(s => s.id === t.field_id);
                                 if(fieldIndex > -1) {
                                     if(t.label) Schema[fieldIndex].name = t.label;
-                                    Schema[fieldIndex].req = t.is_required;
-                                    if(!t.is_visible) Schema[fieldIndex].type = 'readonly';
+                                    if(t.text_align) Schema[fieldIndex].align = t.text_align;
+                                    Schema[fieldIndex].req = !!t.is_required;
+                                    Schema[fieldIndex].admin_hidden = (t.is_visible === false);
+                                    if(!t.is_visible) Schema[fieldIndex].hideFromForm = true;
                                 }
                             });
                         }
