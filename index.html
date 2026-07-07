@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>مؤسسة درة العالم للنقليات | نظام إدارة بوليصة الشحن</title>
-    <meta name="app-version" content="durrat-v7-enterprise-theme">
+    <meta name="app-version" content="durrat-v7.2-admin-tools-calibration-archive">
     
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/196.png" type="image/png">
@@ -23,7 +23,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=20260707-v7-theme" rel="stylesheet">
+    <link href="./style.css?v=20260707-v72-admin-tools-calibration-archive" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
@@ -79,13 +79,13 @@
             <button onclick="HistoryMgr.undo()"><i class="fas fa-undo"></i> تراجع</button>
             <button onclick="SignatureEngine.showModal()" class="btn-accent"><i class="fas fa-signature"></i> التوقيع الحر</button>
             <span style="border-left: 1px solid var(--border); margin: 0 4px; height: 24px;"></span>
-            <button onclick="ArchiveEngine.showModal()" class="btn-info"><i class="fas fa-archive"></i> الأرشيف</button>
-            <button onclick="ArchiveEngine.saveCurrent()" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
-            <button onclick="BackupEngine.export()" class="btn-info" style="background:#4b5563;"><i class="fas fa-file-export"></i> إعدادات</button>
+            <button onclick="ArchiveEngine.showModal()" class="btn-info" data-perm="can_archive"><i class="fas fa-archive"></i> الأرشيف</button>
+            <button onclick="ArchiveEngine.saveCurrent()" class="btn-primary" data-perm="can_archive"><i class="fas fa-save"></i> حفظ</button>
+            <button onclick="BackupEngine.export()" class="btn-info admin-tool" data-perm="can_edit_fields" style="background:#4b5563;"><i class="fas fa-file-export"></i> إعدادات</button>
             <input type="file" id="import-file" style="display:none" accept=".json" onchange="BackupEngine.import(event)">
-            <button onclick="document.getElementById('import-file').click()" class="btn-info" style="background:#6b7280;"><i class="fas fa-file-import"></i> استيراد</button>
+            <button onclick="document.getElementById('import-file').click()" class="btn-info admin-tool" data-perm="can_edit_fields" style="background:#6b7280;"><i class="fas fa-file-import"></i> استيراد</button>
             <span style="border-left: 1px solid var(--border); margin: 0 4px; height: 24px;"></span>
-            <button onclick="CalibrationEngine.toggle()" id="btn-calib" style="background:#475569;"><i class="fas fa-tools"></i> معايرة</button>
+            <button onclick="CalibrationEngine.toggle()" id="btn-calib" class="admin-tool" data-perm="can_edit_fields" style="background:#475569;"><i class="fas fa-tools"></i> معايرة</button><button onclick="CalibrationEngine.restorePrevious()" id="btn-calib-restore" class="admin-tool" data-perm="can_edit_fields" style="background:#64748b;"><i class="fas fa-rotate-left"></i> استرجاع المعايرة</button>
             <input type="file" id="bg-upload-overlay" style="display:none" accept="image/png, image/jpeg" onchange="StorageEngine.uploadImage(event)">
             <button onclick="AuthManager.logout()" class="btn-danger"><i class="fas fa-sign-out-alt"></i> خروج</button>
             <button onclick="StateMgr.clearData()" class="btn-danger" style="background: #be123c;"><i class="fas fa-eraser"></i> مسح</button>
@@ -93,9 +93,9 @@
                 <option value="1">نسخة أصلية</option>
                 <option value="3">3 نسخ (مرسل، مستلم، شركة)</option>
             </select>
-            <button onclick="ExportEngine.shareDocument()" class="btn-info" style="background: #8b5cf6;"><i class="fas fa-share-nodes"></i> مشاركة</button>
-            <button onclick="ExportEngine.generatePDF()" class="btn-primary"><i class="fas fa-file-pdf"></i> PDF</button>
-            <button onclick="ExportEngine.generateImage('jpeg')" class="btn-accent" style="background: #059669;"><i class="fas fa-file-image"></i> JPG</button>
+            <button onclick="ExportEngine.shareDocument()" class="btn-info" data-perm="can_export" style="background: #8b5cf6;"><i class="fas fa-share-nodes"></i> مشاركة</button>
+            <button onclick="ExportEngine.generatePDF()" class="btn-primary" data-perm="can_print"><i class="fas fa-file-pdf"></i> PDF</button>
+            <button onclick="ExportEngine.generateImage('jpeg')" class="btn-accent" data-perm="can_export" style="background: #059669;"><i class="fas fa-file-image"></i> JPG</button>
         </div>
     </header>
 
@@ -113,6 +113,7 @@
                     </div>
                     <div class="progress-track"><div class="progress-bar" id="progress-bar"></div></div>
                 </div>
+                <div id="branch-permissions-card" class="branch-permissions-card" style="display:none;"></div>
             </div>
             <div class="form-scroller" id="form-builder"></div>
         </aside>
@@ -677,10 +678,32 @@
 
         const CalibrationEngine = {
             active: false, gridSize: 0.1,
-            toggle() { this.active = !this.active; document.body.classList.toggle('calibration-mode'); const btn = document.getElementById('btn-calib'); if(this.active) { btn.innerHTML = `<i class="fas fa-save"></i> حفظ المعايرة`; btn.classList.add('btn-accent'); this.enableDragAndDrop(); UI.toast("وضع المعايرة مفعل", "warning"); } else { btn.innerHTML = `<i class="fas fa-tools"></i> معايرة`; btn.classList.remove('btn-accent'); this.save(); } },
+            isAdminAllowed() {
+                try {
+                    const session = AuthManager.getSession ? AuthManager.getSession() : JSON.parse(localStorage.getItem('enterprise_session') || '{}');
+                    return session?.user?.role === 'super_admin' || (window.BranchPermissionEngine && BranchPermissionEngine.allowed('can_edit_fields'));
+                } catch(e) { return false; }
+            },
+            toggle() {
+                if (!this.isAdminAllowed()) return UI.toast('المعايرة مخصصة للإدارة فقط', 'error');
+                this.active = !this.active;
+                document.body.classList.toggle('calibration-mode', this.active);
+                const btn = document.getElementById('btn-calib');
+                if(this.active) {
+                    btn.innerHTML = `<i class="fas fa-save"></i> حفظ ونشر المعايرة`;
+                    btn.classList.add('btn-accent');
+                    this.enableDragAndDrop();
+                    UI.toast('وضع المعايرة مفعل: حرّك الحقول ثم اضغط حفظ ونشر المعايرة', 'warning');
+                } else {
+                    btn.innerHTML = `<i class="fas fa-tools"></i> معايرة`;
+                    btn.classList.remove('btn-accent');
+                    this.save();
+                }
+            },
             enableDragAndDrop() {
                 const overlays = document.querySelectorAll('.field-overlay'); const wrapper = document.getElementById('document-wrapper'); const guideH = document.getElementById('guide-h'); const guideV = document.getElementById('guide-v');
                 overlays.forEach(el => {
+                    if (el.dataset.dragReady === '1') return; el.dataset.dragReady = '1';
                     const startDrag = (e) => {
                         if (!this.active) return; const isTouch = e.type === 'touchstart'; const clientX = isTouch ? e.touches[0].clientX : e.clientX; const clientY = isTouch ? e.touches[0].clientY : e.clientY;
                         const rect = el.getBoundingClientRect(); if (clientX > rect.right - 15 && clientY > rect.bottom - 15) return; if(!isTouch) e.preventDefault();
@@ -697,16 +720,60 @@
             setAlignment(id, align) {
                 if(!StateMgr.calibration[id]) StateMgr.calibration[id] = {}; StateMgr.calibration[id].align = align; SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(StateMgr.calibration));
                 const container = document.getElementById(`align_${id}`);
-                if(container) { container.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active')); if(align === 'right') container.querySelector('.fa-align-right').parentElement.classList.add('active'); if(align === 'center') container.querySelector('.fa-align-center').parentElement.classList.add('active'); if(align === 'left') container.querySelector('.fa-align-left').parentElement.classList.add('active'); }
+                if(container) { container.querySelectorAll('.align-btn').forEach(b => b.classList.remove('active')); if(align === 'right') container.querySelector('.fa-align-right')?.parentElement.classList.add('active'); if(align === 'center') container.querySelector('.fa-align-center')?.parentElement.classList.add('active'); if(align === 'left') container.querySelector('.fa-align-left')?.parentElement.classList.add('active'); }
                 const overlay = document.getElementById(`out_${id}`); const contentBox = document.getElementById(`content_${id}`);
                 if(overlay && contentBox) { const justifyVal = align === 'center' ? 'center' : (align === 'left' ? 'flex-start' : 'flex-end'); overlay.style.justifyContent = justifyVal; overlay.style.textAlign = align; contentBox.style.justifyContent = justifyVal; }
             },
-            save() { const overlays = document.querySelectorAll('.field-overlay'); overlays.forEach(el => { const id = el.id.replace('out_', ''); if(!StateMgr.calibration[id]) StateMgr.calibration[id] = {}; StateMgr.calibration[id].left = el.style.left; StateMgr.calibration[id].top = el.style.top; StateMgr.calibration[id].width = el.style.width; StateMgr.calibration[id].height = el.style.height; }); SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(StateMgr.calibration)); UI.toast("تم حفظ إعدادات المعايرة", "success"); }
+            collect() {
+                const snapshot = {};
+                document.querySelectorAll('.field-overlay').forEach(el => {
+                    const id = el.id.replace('out_', ''); const f = Schema.find(x => x.id === id) || {};
+                    const prev = StateMgr.calibration[id] || {};
+                    snapshot[id] = { left: el.style.left || f.x, top: el.style.top || f.y, width: el.style.width || f.w, height: el.style.height || f.h, align: prev.align || f.align || 'right', size: prev.size || f.size || 14 };
+                });
+                return snapshot;
+            },
+            async publishToCloud(snapshot) {
+                if (!window.supabase) return;
+                const rows = Object.entries(snapshot).map(([id, c]) => {
+                    const f = Schema.find(x => x.id === id) || {};
+                    return { field_id: id, label: f.name || id, text_align: c.align || f.align || 'right', is_required: !!f.req, is_visible: f.admin_hidden ? false : true, pos_left: c.left, pos_top: c.top, pos_width: c.width, pos_height: c.height, font_size: Number(c.size || f.size || 14), updated_at: new Date().toISOString() };
+                });
+                const { error } = await window.supabase.from('waybill_field_templates').upsert(rows, { onConflict: 'field_id' });
+                if (error) throw error;
+                try {
+                    await window.supabase.from('system_updates').insert([{ version: 'calibration-' + Date.now(), title: 'تحديث معايرة الحقول', message: 'تم نشر معايرة جديدة للحقول من الإدارة. سيتم تطبيقها على جميع الفروع عند التحديث دون حذف الأرشيف.', is_required: true, is_active: true }]);
+                } catch(e) { console.warn(e); }
+            },
+            async save() {
+                const old = JSON.stringify(StateMgr.calibration || {});
+                SafeStorage.set('waybill_calib_previous_' + AuthManager.getPrefix(), old);
+                const snapshot = this.collect();
+                StateMgr.calibration = snapshot;
+                SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), JSON.stringify(snapshot));
+                try { await this.publishToCloud(snapshot); UI.toast('تم حفظ ونشر المعايرة لجميع الفروع', 'success'); }
+                catch(e) { UI.toast('تم الحفظ محلياً وتعذر النشر السحابي: ' + (e.message || e), 'warning'); }
+            },
+            restorePrevious() {
+                if (!this.isAdminAllowed()) return UI.toast('استرجاع المعايرة مخصص للإدارة فقط', 'error');
+                const prev = SafeStorage.get('waybill_calib_previous_' + AuthManager.getPrefix());
+                if (!prev) return UI.toast('لا توجد نسخة معايرة سابقة على هذا الجهاز', 'warning');
+                if (!confirm('هل تريد استرجاع المعايرة السابقة ثم نشرها للفروع؟')) return;
+                try { StateMgr.calibration = JSON.parse(prev); SafeStorage.set('waybill_calib_' + AuthManager.getPrefix(), prev); UI.rebuildOverlays(); this.publishToCloud(StateMgr.calibration).then(()=>UI.toast('تم استرجاع ونشر المعايرة السابقة', 'success')).catch(()=>UI.toast('تم الاسترجاع محلياً فقط', 'warning')); }
+                catch(e) { UI.toast('تعذر استرجاع المعايرة', 'error'); }
+            }
         };
 
         const UI = {
             installPWA() { if (pwaPrompt) { pwaPrompt.prompt(); pwaPrompt.userChoice.then((choice) => { if (choice.outcome === 'accepted') pwaPrompt = null; }); } else { this.toast("التثبيت متاح من إعدادات المتصفح", "info"); } },
             toggleTheme() { document.body.classList.toggle('dark-mode'); SafeStorage.set('waybill_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); },
+            centerPreviewOnMobile() {
+                const area = document.getElementById('preview-container');
+                if (!area) return;
+                if (window.innerWidth <= 900 && area.scrollWidth > area.clientWidth) {
+                    area.scrollLeft = Math.max(0, (area.scrollWidth - area.clientWidth) / 2);
+                }
+            },
             filterFields(val) { const term = val.toLowerCase(); document.querySelectorAll('details').forEach(d => { let hasMatch = false; d.querySelectorAll('.input-group').forEach(ig => { const label = ig.innerText.toLowerCase(); if(label.includes(term)) { ig.style.display = 'flex'; hasMatch = true; } else ig.style.display = 'none'; }); d.style.display = hasMatch ? 'block' : 'none'; if(term !== '') d.open = true; }); },
             updateProgress() { const reqs = Schema.filter(s => s.req); let filled = 0; reqs.forEach(s => { if(StateMgr.data[s.id] && String(StateMgr.data[s.id]).trim() !== '') filled++; }); const pct = reqs.length ? Math.round((filled / reqs.length) * 100) : 0; document.getElementById('progress-bar').style.width = pct + '%'; document.getElementById('progress-text').innerText = pct + '%'; document.getElementById('counter-badge').innerText = `${filled}/${reqs.length}`; },
             toast(msg, type='info') { const t = document.createElement('div'); t.className = `toast ${type}`; let icon = type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'; t.innerHTML = `<i class="fas fa-${icon}"></i> ${msg}`; document.getElementById('toast-container').appendChild(t); setTimeout(() => { t.style.animation = 'fadeOutRight 0.3s forwards'; setTimeout(() => t.remove(), 300); }, 3000); },
@@ -742,12 +809,23 @@
         const ExportEngine = {
             getDynamicFileName() { const awb = StateMgr.data.awb_no || 'بدون_رقم'; let client = StateMgr.data.consignee_name || ''; if (client) client = '_' + client.trim().split(' ').slice(0, 2).join('_'); return `Waybill_${AuthManager.getPrefix()}_${awb}${client}`; },
             getDynamicScale() { return window.innerWidth <= 768 ? 1.5 : 2.5; },
-            async ensureLibrary(objName, url) { if (objName === 'jspdf' && typeof window.jspdf !== 'undefined') return true; if (typeof window[objName] !== 'undefined') return true; return new Promise((resolve, reject) => { UI.toast("جاري سحب مكتبات التصدير...", "info"); const script = document.createElement('script'); script.src = url; script.onload = () => resolve(true); script.onerror = () => reject(false); document.head.appendChild(script); }); },
+            async ensureLibrary(objName, url) { if (objName === 'jspdf' && typeof window.jspdf !== 'undefined') return true; if (typeof window[objName] !== 'undefined') return true; return new Promise((resolve, reject) => { UI.toast('جاري سحب مكتبات التصدير...', 'info'); const script = document.createElement('script'); script.src = url; script.onload = () => resolve(true); script.onerror = () => reject(false); document.head.appendChild(script); }); },
             showFallback(dataUrl) { const container = document.getElementById('export-result-container'); container.innerHTML = `<img src="${dataUrl}" style="max-width:100%; border-radius:8px;">`; document.getElementById('export-fallback-modal').classList.add('active'); },
-            async safeCapture(scale) { if (typeof html2canvas === 'undefined') { const loaded = await this.ensureLibrary('html2canvas', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'); if (!loaded) throw new Error("فشل تحميل مكتبة التصدير."); } const wrapper = document.getElementById('document-wrapper'); const oldTransform = wrapper.style.transform; wrapper.style.transform = 'scale(1)'; await new Promise(r => setTimeout(r, 50)); const canvas = await html2canvas(wrapper, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: "#ffffff", logging: false, imageTimeout: 0 }); wrapper.style.transform = oldTransform; return canvas; },
-            async shareDocument() { try { await UI.showProcessing("جاري تجهيز البوليصة للمشاركة..."); document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL('image/jpeg', 0.90); if (!navigator.share) { this.showFallback(dataUrl); UI.hideProcessing(); return; } canvas.toBlob(async (blob) => { const file = new File([blob], `${this.getDynamicFileName()}.jpg`, { type: 'image/jpeg' }); try { await navigator.share({ title: 'بوليصة درة العالم', text: `بوليصة شحن رقم: ${StateMgr.data.awb_no || '---'}`, files: [file] }); } catch(err) { this.showFallback(dataUrl); } UI.hideProcessing(); }, 'image/jpeg', 0.90); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ أثناء التجهيز", "error"); } },
-            async generatePDF() { try { await UI.showProcessing("جاري تصدير PDF..."); if (typeof window.jspdf === 'undefined') { const loaded = await this.ensureLibrary('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); if (!loaded) throw new Error("مكتبة PDF غير متوفرة."); } document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const copies = document.getElementById('copies-selector').value; const watermarks = ["Original", "Shipper Copy", "Consignee Copy", "Company Copy"]; const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4'); const pdfWidth = doc.internal.pageSize.getWidth(); let firstPageDataUrl = null; for(let i=0; i<copies; i++) { if(copies > 1) { const wm = document.getElementById('watermark'); if(wm) { wm.innerText = watermarks[i]; wm.style.visibility = 'visible'; } } const canvas = await this.safeCapture(this.getDynamicScale()); const imgData = canvas.toDataURL('image/jpeg', 0.95); if (i === 0) firstPageDataUrl = imgData; const imgProps = doc.getImageProperties(imgData); const h = pdfWidth / (imgProps.width / imgProps.height); if(i > 0) doc.addPage(); doc.addImage(imgData, 'JPEG', 0, 10, pdfWidth, h); const wm = document.getElementById('watermark'); if(wm) wm.style.visibility = 'hidden'; } try { doc.save(`${this.getDynamicFileName()}.pdf`); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(firstPageDataUrl), 1000); UI.toast("تم تصدير ملف PDF بنجاح", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ في التصدير", "error"); } },
-            async generateImage(format='png') { try { await UI.showProcessing(`جاري التصدير بصيغة ${format.toUpperCase()}...`); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast("تم تصدير الصورة بنجاح", "success"); } catch(e) { UI.hideProcessing(); UI.toast("حدث خطأ في التصدير", "error"); } }
+            async ensureArchivedBeforeExport() {
+                try {
+                    if (!StateMgr.data.awb_no || StateMgr.data.awb_no === 'بدون_رقم') Utils.genAWB();
+                    if(!StorageEngine.db) await StorageEngine.initDB();
+                    const awb = (StateMgr.data.awb_no || 'بدون_رقم').trim();
+                    const record = { id: `${AuthManager.getPrefix()}_${awb}`, branch: AuthManager.getPrefix(), awb, client: StateMgr.data.consignee_name || 'بدون عميل', date: StateMgr.data.date || new Date().toISOString().split('T')[0], saved_at: new Date().toISOString(), auto_saved_on_export: true, data: JSON.parse(JSON.stringify(StateMgr.data)) };
+                    await new Promise((resolve, reject) => { const tx = StorageEngine.db.transaction('archive', 'readwrite'); tx.objectStore('archive').put(record); tx.oncomplete = resolve; tx.onerror = () => reject(tx.error || new Error('فشل الحفظ الإجباري')); });
+                    await AuthManager.logEvent('auto_archive_before_export', 'waybills', awb, { reason: 'export_or_pdf', awb_no: awb });
+                    if (window.SyncEngine) window.SyncEngine.saveWaybill(StateMgr.data).catch(()=>{});
+                } catch(e) { console.warn('auto archive before export failed', e); UI.toast('تنبيه: تعذر الحفظ التلقائي في الأرشيف، سيتم التصدير فقط', 'warning'); }
+            },
+            async safeCapture(scale) { if (typeof html2canvas === 'undefined') { const loaded = await this.ensureLibrary('html2canvas', 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'); if (!loaded) throw new Error('فشل تحميل مكتبة التصدير.'); } const wrapper = document.getElementById('document-wrapper'); const oldTransform = wrapper.style.transform; wrapper.style.transform = 'scale(1)'; await new Promise(r => setTimeout(r, 50)); const canvas = await html2canvas(wrapper, { scale: scale, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false, imageTimeout: 0 }); wrapper.style.transform = oldTransform; return canvas; },
+            async shareDocument() { try { await UI.showProcessing('جاري الحفظ الإجباري ثم تجهيز المشاركة...'); await this.ensureArchivedBeforeExport(); document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL('image/jpeg', 0.90); if (!navigator.share) { this.showFallback(dataUrl); UI.hideProcessing(); return; } canvas.toBlob(async (blob) => { const file = new File([blob], `${this.getDynamicFileName()}.jpg`, { type: 'image/jpeg' }); try { await navigator.share({ title: 'بوليصة درة العالم', text: `بوليصة شحن رقم: ${StateMgr.data.awb_no || '---'}`, files: [file] }); } catch(err) { this.showFallback(dataUrl); } UI.hideProcessing(); }, 'image/jpeg', 0.90); } catch(e) { UI.hideProcessing(); UI.toast('حدث خطأ أثناء التجهيز', 'error'); } },
+            async generatePDF() { try { await UI.showProcessing('جاري الحفظ الإجباري ثم تصدير PDF...'); await this.ensureArchivedBeforeExport(); if (typeof window.jspdf === 'undefined') { const loaded = await this.ensureLibrary('jspdf', 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js'); if (!loaded) throw new Error('مكتبة PDF غير متوفرة.'); } document.body.classList.remove('calibration-mode'); CalibrationEngine.active = false; const copies = document.getElementById('copies-selector').value; const watermarks = ['Original', 'Shipper Copy', 'Consignee Copy', 'Company Copy']; const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4'); const pdfWidth = doc.internal.pageSize.getWidth(); let firstPageDataUrl = null; for(let i=0; i<copies; i++) { if(copies > 1) { const wm = document.getElementById('watermark'); if(wm) { wm.innerText = watermarks[i]; wm.style.visibility = 'visible'; } } const canvas = await this.safeCapture(this.getDynamicScale()); const imgData = canvas.toDataURL('image/jpeg', 0.95); if (i === 0) firstPageDataUrl = imgData; const imgProps = doc.getImageProperties(imgData); const h = pdfWidth / (imgProps.width / imgProps.height); if(i > 0) doc.addPage(); doc.addImage(imgData, 'JPEG', 0, 10, pdfWidth, h); const wm = document.getElementById('watermark'); if(wm) wm.style.visibility = 'hidden'; } try { doc.save(`${this.getDynamicFileName()}.pdf`); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(firstPageDataUrl), 1000); UI.toast('تم حفظ البوليصة في الأرشيف وتصدير PDF بنجاح', 'success'); } catch(e) { UI.hideProcessing(); UI.toast('حدث خطأ في التصدير', 'error'); } },
+            async generateImage(format='png') { try { await UI.showProcessing(`جاري الحفظ الإجباري ثم التصدير بصيغة ${format.toUpperCase()}...`); await this.ensureArchivedBeforeExport(); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast('تم حفظ البوليصة في الأرشيف وتصدير الصورة بنجاح', 'success'); } catch(e) { UI.hideProcessing(); UI.toast('حدث خطأ في التصدير', 'error'); } }
         };
         const AppUpdateEngine = {
             currentVersion: '20260706-final-guard',
@@ -816,6 +894,68 @@
 
 
     <script>
+        const BranchPermissionEngine = {
+            flags: [
+                ['can_print','طباعة'], ['can_archive','أرشيف وحفظ'], ['can_export','تصدير ومشاركة'],
+                ['can_delete_request','طلب حذف'], ['can_edit_fields','معايرة الحقول'],
+                ['can_manage_users','إدارة مستخدمين'], ['can_manage_branches','إدارة فروع'], ['can_view_reports','التقارير']
+            ],
+            permissions: null,
+            async init() {
+                try {
+                    const session = AuthManager.getSession ? AuthManager.getSession() : JSON.parse(localStorage.getItem('enterprise_session') || '{}');
+                    const username = session?.user?.username || localStorage.getItem('waybill_active_user');
+                    if (!username || !window.supabase) return;
+                    const { data, error } = await window.supabase.from('user_permissions').select('*').eq('username', username).maybeSingle();
+                    if (error) throw error;
+                    this.permissions = data || this.defaultByRole(session?.user?.role);
+                    this.render(session);
+                    this.applyToToolbar(session);
+                } catch (e) {
+                    console.warn('permissions load failed', e);
+                    const session = AuthManager.getSession ? AuthManager.getSession() : JSON.parse(localStorage.getItem('enterprise_session') || '{}');
+                    this.permissions = this.defaultByRole(session?.user?.role);
+                    this.render(session);
+                }
+            },
+            defaultByRole(role) {
+                const all = { can_print:true, can_archive:true, can_export:true, can_delete_request:true, can_edit_fields:true, can_manage_users:true, can_manage_branches:true, can_view_reports:true };
+                const branch = { can_print:true, can_archive:true, can_export:true, can_delete_request:true, can_edit_fields:false, can_manage_users:false, can_manage_branches:false, can_view_reports:false };
+                return role === 'super_admin' ? all : branch;
+            },
+            allowed(key) {
+                if (!this.permissions) return true;
+                return this.permissions[key] !== false;
+            },
+            render(session) {
+                const box = document.getElementById('branch-permissions-card');
+                if (!box || !this.permissions) return;
+                const role = session?.user?.role || 'employee';
+                const title = role === 'super_admin' ? 'صلاحيات المدير العام' : (role === 'branch_manager' ? 'صلاحيات مدير الفرع' : 'صلاحيات المستخدم');
+                const branch = session?.branch?.name || localStorage.getItem('waybill_branch_title') || '';
+                const chips = this.flags.map(([k, label]) => {
+                    const ok = this.permissions[k] !== false;
+                    return `<span class="perm-chip ${ok ? 'ok' : 'off'}"><i class="fas fa-${ok ? 'check' : 'lock'}"></i>${label}</span>`;
+                }).join('');
+                box.style.display = 'block';
+                box.innerHTML = `<div class="perm-card-head"><i class="fas fa-user-shield"></i><div><b>${title}</b><small>${branch}</small></div></div><div class="perm-chip-grid">${chips}</div>`;
+            },
+            applyToToolbar(session) {
+                const role = session?.user?.role || '';
+                document.querySelectorAll('[data-perm]').forEach(el => {
+                    const key = el.getAttribute('data-perm');
+                    const ok = role === 'super_admin' ? true : this.allowed(key);
+                    const adminTool = el.classList.contains('admin-tool');
+                    if (adminTool && !ok) { el.style.display = 'none'; return; }
+                    el.classList.toggle('perm-disabled', !ok);
+                    el.disabled = !ok;
+                    if (!ok) el.title = 'هذه الصلاحية غير مفعلة من الإدارة';
+                });
+            }
+        };
+    </script>
+
+    <script>
         const ThemePaletteEngine = {
             key: 'durrat_ui_palette_v7',
             selected: null,
@@ -875,6 +1015,7 @@
                 if(localStorage.getItem('enterprise_session')) { 
                     try {
                         const { data: templates } = await supabase.from('waybill_field_templates').select('*');
+                        const remoteCalib = {};
                         if (templates && templates.length > 0) {
                             templates.forEach(t => {
                                 const fieldIndex = Schema.findIndex(s => s.id === t.field_id);
@@ -884,15 +1025,22 @@
                                     Schema[fieldIndex].req = !!t.is_required;
                                     Schema[fieldIndex].admin_hidden = (t.is_visible === false);
                                     if(!t.is_visible) Schema[fieldIndex].hideFromForm = true;
+                                    if (t.pos_left || t.pos_top || t.pos_width || t.pos_height || t.font_size) {
+                                        remoteCalib[t.field_id] = { left: t.pos_left || Schema[fieldIndex].x, top: t.pos_top || Schema[fieldIndex].y, width: t.pos_width || Schema[fieldIndex].w, height: t.pos_height || Schema[fieldIndex].h, align: t.text_align || Schema[fieldIndex].align || 'right', size: Number(t.font_size || Schema[fieldIndex].size || 14) };
+                                    }
                                 }
                             });
                         }
+                        const localCalib = JSON.parse(SafeStorage.get('waybill_calib_' + AuthManager.getPrefix(), '{}') || '{}');
+                        StateMgr.calibration = Object.assign({}, localCalib, remoteCalib);
                     } catch(e) { console.warn("العمل يتم محلياً حالياً"); }
 
                     UI.buildForm(); 
                     UI.rebuildOverlays(); 
                     await StateMgr.init(); 
                     await AppUpdateEngine.start();
+                    await BranchPermissionEngine.init();
+                    setTimeout(() => UI.centerPreviewOnMobile && UI.centerPreviewOnMobile(), 450);
                     
                     // استدعاء محرك المزامنة السحابية بحالة تسجيل الدخول
                     import('./js/services/sync.engine.js').then(module => {
@@ -902,7 +1050,7 @@
                 }
             } catch(e) {} finally { 
                 UI.hideProcessing(); 
-                window.addEventListener('resize', () => ZoomEngine.reset()); 
+                window.addEventListener('resize', () => { ZoomEngine.reset(); UI.centerPreviewOnMobile && UI.centerPreviewOnMobile(); }); 
             }
         });
     </script>

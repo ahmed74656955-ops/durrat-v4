@@ -1072,3 +1072,72 @@ body[data-palette] .live-pulse { background: var(--accent) !important; }
 @supports not (color: color-mix(in srgb, #000 10%, transparent)) {
   .theme-card:hover, .theme-card.active { box-shadow: 0 14px 34px rgba(0,0,0,.24); }
 }
+
+
+/* ==========================================================
+   V7.1 Fixes: mobile centering + branch permissions card
+   ========================================================== */
+.branch-permissions-card {
+  margin-top: 14px;
+  background: rgba(15, 23, 42, .46);
+  border: 1px solid rgba(56,189,248,.22);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.perm-card-head {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+.perm-card-head > i { color: var(--accent); font-size: 1.25rem; }
+.perm-card-head b { display:block; font-size:.98rem; font-weight:900; }
+.perm-card-head small { display:block; margin-top:2px; color:var(--text-muted); font-weight:700; }
+.perm-chip-grid { display:flex; flex-wrap:wrap; gap:8px; }
+.perm-chip {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 10px; border-radius:999px;
+  font-size:.78rem; font-weight:900;
+  border:1px solid var(--border);
+  background:rgba(148,163,184,.10);
+  color:var(--text-main);
+}
+.perm-chip.ok { border-color:rgba(16,185,129,.30); background:rgba(16,185,129,.10); color:#34d399; }
+.perm-chip.off { opacity:.68; color:var(--text-muted); }
+.perm-disabled { opacity:.45 !important; cursor:not-allowed !important; filter:grayscale(.45); }
+
+@media (max-width: 900px) {
+  .preview-area {
+    direction: ltr !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding-left: max(12px, env(safe-area-inset-left)) !important;
+    padding-right: max(12px, env(safe-area-inset-right)) !important;
+    scroll-padding-inline: 18px !important;
+  }
+  .document-wrapper {
+    direction: rtl !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    transform-origin: top center !important;
+  }
+  .zoom-controls { left: 18px !important; right: auto !important; }
+  .branch-permissions-card { margin-inline: 12px; }
+}
+
+@media (max-width: 560px) {
+  .preview-area { padding-top: 16px !important; }
+  .document-wrapper { min-width: 980px; }
+}
+
+
+/* V7.2 - أدوات الإدارة والمعايرة */
+.perm-disabled { opacity: .45 !important; filter: grayscale(1); cursor: not-allowed !important; }
+.calibration-mode .field-overlay { outline: 2px dashed rgba(37,99,235,.85); background: rgba(37,99,235,.06); cursor: move; }
+#btn-calib-restore { color:#fff; }
+@media (max-width: 768px) {
+  .preview-area { justify-content: center !important; align-items: flex-start !important; padding-left: 12px !important; padding-right: 12px !important; }
+  .document-wrapper { margin-left: auto !important; margin-right: auto !important; }
+}
