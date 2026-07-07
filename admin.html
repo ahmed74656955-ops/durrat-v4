@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="app-version" content="durrat-admin-20260706-final-guard">
+    <meta name="app-version" content="durrat-admin-v7-enterprise-theme">
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     <link href="./css/enterprise.css" rel="stylesheet">
 
@@ -52,6 +52,7 @@
                 <div class="user-badge">
                     <i class="fas fa-user-circle"></i> <span id="admin-name">المدير</span>
                 </div>
+                <button class="btn btn-outline" onclick="AdminThemePalette.open()"><i class="fas fa-palette"></i> الألوان</button>
                 <button class="btn btn-outline" onclick="window.location.replace('index.html?v=' + Date.now())"><i class="fas fa-arrow-right"></i> البوليصة</button>
                 <button class="btn btn-danger" onclick="AuthCore.logout()"><i class="fas fa-power-off"></i> خروج</button>
             </div>
@@ -59,6 +60,43 @@
         <div class="content-area" id="content-area">
             </div>
     </main>
+
+
+    <div class="ent-modal-overlay" id="admin-theme-modal">
+      <div class="ent-modal-box theme-admin-box">
+        <div class="ent-modal-header">
+          <h3><i class="fas fa-palette"></i> ألوان لوحة الإدارة</h3>
+          <button class="btn btn-outline" onclick="AdminThemePalette.close()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="ent-modal-body">
+          <p style="color:var(--text-muted);line-height:1.8;margin-bottom:14px;">اختر لون الواجهة. يحفظ الاختيار على جهازك فقط ويمكن تغييره في أي وقت.</p>
+          <div id="admin-theme-grid" class="theme-palette-grid"></div>
+        </div>
+        <div class="ent-modal-footer">
+          <button class="btn btn-primary" onclick="AdminThemePalette.save()"><i class="fas fa-save"></i> حفظ</button>
+          <button class="btn btn-outline" onclick="AdminThemePalette.reset()"><i class="fas fa-rotate-left"></i> الافتراضي</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const AdminThemePalette = {
+        key: 'durrat_ui_palette_v7', selected: null,
+        palettes: [
+          {id:'ocean',name:'الأزرق المحيطي',primary:'#3b82f6',accent:'#10b981',gradient:'linear-gradient(135deg,#1e3a8a,#2563eb,#22d3ee)'},
+          {id:'emerald',name:'الأخضر الزمردي',primary:'#059669',accent:'#34d399',gradient:'linear-gradient(135deg,#064e3b,#059669,#5eead4)'},
+          {id:'royal',name:'البنفسجي الملكي',primary:'#7c3aed',accent:'#a78bfa',gradient:'linear-gradient(135deg,#312e81,#7c3aed,#ec4899)'},
+          {id:'sunset',name:'غروب احترافي',primary:'#ea580c',accent:'#fb7185',gradient:'linear-gradient(135deg,#7c2d12,#ea580c,#f43f5e)'},
+          {id:'steel',name:'رمادي تقني',primary:'#475569',accent:'#38bdf8',gradient:'linear-gradient(135deg,#0f172a,#475569,#38bdf8)'},
+          {id:'gold',name:'ذهبي إداري',primary:'#b45309',accent:'#f59e0b',gradient:'linear-gradient(135deg,#451a03,#b45309,#facc15)'}
+        ],
+        apply(id){ const p=this.palettes.find(x=>x.id===id)||this.palettes[0]; this.selected=p.id; document.documentElement.style.setProperty('--primary',p.primary); document.documentElement.style.setProperty('--primary-hover',p.primary); document.documentElement.style.setProperty('--accent',p.accent); document.body?.setAttribute('data-palette',p.id); this.mark(); },
+        render(){ const g=document.getElementById('admin-theme-grid'); if(!g)return; g.innerHTML=this.palettes.map(p=>`<button class="theme-card" data-theme-id="${p.id}" onclick="AdminThemePalette.apply('${p.id}')"><span class="theme-swatch" style="background:${p.gradient}"></span><strong>${p.name}</strong><small>لوحة إدارة</small></button>`).join(''); this.mark(); },
+        mark(){ document.querySelectorAll('.theme-card').forEach(b=>b.classList.toggle('active', b.dataset.themeId===this.selected)); },
+        init(){ this.apply(localStorage.getItem(this.key)||'ocean'); this.render(); }, open(){ this.render(); document.getElementById('admin-theme-modal')?.classList.add('active'); }, close(){ document.getElementById('admin-theme-modal')?.classList.remove('active'); }, save(){ localStorage.setItem(this.key,this.selected||'ocean'); this.close(); }, reset(){ localStorage.removeItem(this.key); this.apply('ocean'); this.save(); }
+      };
+      document.addEventListener('DOMContentLoaded',()=>AdminThemePalette.init());
+    </script>
 
     <script type="module" src="./js/enterprise/auth-core.js"></script>
     <script type="module" src="./js/enterprise/admin-core.js"></script>

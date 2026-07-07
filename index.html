@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>مؤسسة درة العالم للنقليات | نظام إدارة بوليصة الشحن</title>
-    <meta name="app-version" content="durrat-v4-20260706-final-guard">
+    <meta name="app-version" content="durrat-v7-enterprise-theme">
     
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/196.png" type="image/png">
@@ -23,7 +23,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=20260706-final-guard" rel="stylesheet">
+    <link href="./style.css?v=20260707-v7-theme" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
@@ -75,6 +75,7 @@
         <div class="toolbar" id="top-toolbar">
             <button onclick="UI.installPWA()" id="installAppBtn" class="btn-warning"><i class="fas fa-download"></i> تثبيت</button>
             <button onclick="UI.toggleTheme()"><i class="fas fa-moon"></i> المظهر</button>
+            <button onclick="ThemePaletteEngine.open()" class="btn-theme"><i class="fas fa-palette"></i> الألوان</button>
             <button onclick="HistoryMgr.undo()"><i class="fas fa-undo"></i> تراجع</button>
             <button onclick="SignatureEngine.showModal()" class="btn-accent"><i class="fas fa-signature"></i> التوقيع الحر</button>
             <span style="border-left: 1px solid var(--border); margin: 0 4px; height: 24px;"></span>
@@ -211,6 +212,23 @@
             <div class="update-actions">
                 <button class="btn-primary" onclick="AppUpdateEngine.applyUpdate()"><i class="fas fa-rotate"></i> تحديث الآن</button>
                 <button class="btn-info" id="update-later-btn" onclick="AppUpdateEngine.closeNotice()"><i class="fas fa-clock"></i> لاحقًا</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="modal-overlay" id="theme-palette-modal">
+        <div class="modal-content theme-modal-content">
+            <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                <span style="font-size:1.2rem;font-weight:900;color:var(--text-main);"><i class="fas fa-palette" style="color:var(--primary);"></i> تخصيص ألوان الواجهة</span>
+                <i class="fas fa-times close-modal" style="cursor:pointer;color:var(--danger);font-size:1.2rem;"></i>
+            </div>
+            <p style="color:var(--text-muted);line-height:1.8;margin-bottom:16px;">اختر هوية لونية مناسبة لك. الاختيار محفوظ على هذا الجهاز ولا يؤثر على أماكن حقول البوليصة أو مقاساتها.</p>
+            <div id="theme-palette-grid" class="theme-palette-grid"></div>
+            <div class="theme-actions">
+                <button class="btn-primary" onclick="ThemePaletteEngine.save()"><i class="fas fa-save"></i> حفظ اللون</button>
+                <button class="btn-info" onclick="ThemePaletteEngine.reset()"><i class="fas fa-rotate-left"></i> الافتراضي</button>
             </div>
         </div>
     </div>
@@ -793,6 +811,55 @@
                 }
             }
         };
+    </script>
+
+
+
+    <script>
+        const ThemePaletteEngine = {
+            key: 'durrat_ui_palette_v7',
+            selected: null,
+            palettes: [
+                {id:'ocean', name:'الأزرق المحيطي', primary:'#2563eb', accent:'#06b6d4', warning:'#f59e0b', gradient:'linear-gradient(135deg,#1e3a8a 0%,#2563eb 46%,#22d3ee 100%)'},
+                {id:'emerald', name:'الأخضر الزمردي', primary:'#059669', accent:'#34d399', warning:'#f59e0b', gradient:'linear-gradient(135deg,#064e3b 0%,#059669 48%,#5eead4 100%)'},
+                {id:'royal', name:'البنفسجي الملكي', primary:'#7c3aed', accent:'#a78bfa', warning:'#f59e0b', gradient:'linear-gradient(135deg,#312e81 0%,#7c3aed 52%,#ec4899 100%)'},
+                {id:'sunset', name:'غروب احترافي', primary:'#ea580c', accent:'#fb7185', warning:'#facc15', gradient:'linear-gradient(135deg,#7c2d12 0%,#ea580c 48%,#f43f5e 100%)'},
+                {id:'steel', name:'رمادي تقني', primary:'#475569', accent:'#38bdf8', warning:'#eab308', gradient:'linear-gradient(135deg,#0f172a 0%,#475569 52%,#38bdf8 100%)'},
+                {id:'gold', name:'ذهبي إداري', primary:'#b45309', accent:'#f59e0b', warning:'#facc15', gradient:'linear-gradient(135deg,#451a03 0%,#b45309 50%,#facc15 100%)'},
+                {id:'rose', name:'وردي عصري', primary:'#be185d', accent:'#fb7185', warning:'#f59e0b', gradient:'linear-gradient(135deg,#831843 0%,#be185d 50%,#fb7185 100%)'},
+                {id:'tealblue', name:'فيروزي أزرق', primary:'#0891b2', accent:'#2dd4bf', warning:'#f59e0b', gradient:'linear-gradient(135deg,#164e63 0%,#0891b2 50%,#2dd4bf 100%)'}
+            ],
+            apply(paletteId) {
+                const p = this.palettes.find(x => x.id === paletteId) || this.palettes[0];
+                this.selected = p.id;
+                document.documentElement.style.setProperty('--primary', p.primary);
+                document.documentElement.style.setProperty('--primary-dark', p.primary);
+                document.documentElement.style.setProperty('--accent', p.accent);
+                document.documentElement.style.setProperty('--warning', p.warning);
+                document.documentElement.style.setProperty('--primary-gradient', p.gradient);
+                document.body?.setAttribute('data-palette', p.id);
+                this.mark();
+            },
+            init() { this.apply(localStorage.getItem(this.key) || 'ocean'); this.render(); },
+            render() {
+                const grid = document.getElementById('theme-palette-grid');
+                if (!grid) return;
+                grid.innerHTML = this.palettes.map(p => `
+                    <button class="theme-card" data-theme-id="${p.id}" onclick="ThemePaletteEngine.apply('${p.id}')">
+                        <span class="theme-swatch" style="background:${p.gradient}"></span>
+                        <strong>${p.name}</strong>
+                        <small>مظهر زجاجي متدرج</small>
+                    </button>`).join('');
+                this.mark();
+            },
+            mark() {
+                document.querySelectorAll('.theme-card').forEach(btn => btn.classList.toggle('active', btn.dataset.themeId === this.selected));
+            },
+            open() { this.render(); document.getElementById('theme-palette-modal')?.classList.add('active'); },
+            save() { localStorage.setItem(this.key, this.selected || 'ocean'); document.getElementById('theme-palette-modal')?.classList.remove('active'); UI?.toast?.('تم حفظ ألوان الواجهة', 'success'); },
+            reset() { localStorage.removeItem(this.key); this.apply('ocean'); this.save(); }
+        };
+        document.addEventListener('DOMContentLoaded', () => ThemePaletteEngine.init());
     </script>
 
     <script type="module">
