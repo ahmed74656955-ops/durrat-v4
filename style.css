@@ -1593,3 +1593,7 @@ body[data-palette] .live-pulse { background: var(--accent) !important; }
   body.mobile-ux-enabled .workspace, body.is-mobile-layout .workspace { flex-direction: row !important; height: calc(100vh - var(--header-height) - var(--footer-height)) !important; }
   body.mobile-ux-enabled .preview-area, body.is-mobile-layout .preview-area { flex: 1 1 auto !important; height: 100% !important; }
 }
+
+
+/* Durrat V11 cache marker */
+body:after{content:'';display:none;}
