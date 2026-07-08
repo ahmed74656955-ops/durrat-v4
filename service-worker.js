@@ -1,4 +1,4 @@
-const CACHE_NAME = "durrat-erp-v9-lts-20260707";
+const CACHE_NAME = "durrat-erp-v10-lts";
 
 const PRECACHE_URLS = [
   "./",
@@ -6,6 +6,8 @@ const PRECACHE_URLS = [
   "./admin.html",
   "./manifest.json",
   "./style.css",
+  "./js/v10-runtime-fixes.js",
+  "./css/v10-enterprise-lts-fixes.css",
   "./css/enterprise.css",
   "./0.png",
   "./icons/196.png",
