@@ -7,9 +7,10 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="app-version" content="durrat-admin-v17-ops-reports-lts">
+    <meta name="app-version" content="durrat-admin-v18-enterprise-dashboard">
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="./css/enterprise.css" rel="stylesheet">
+    <link href="./css/enterprise.css?v=18" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <script>
       window.addEventListener('pageshow', function(event) {
@@ -50,7 +51,10 @@
             <h2 id="admin-panel-title">الإدارة العليا</h2><small id="admin-panel-subtitle" style="color:var(--text-muted);font-weight:800;">لوحة صلاحيات مركزية</small>
         </div>
         <div class="nav-menu">
-            <div class="nav-item active" data-section="dashboard" onclick="AdminApp.showSection('dashboard')"><i class="fas fa-chart-pie"></i> نظرة عامة</div>
+            <div class="nav-item active" data-section="dashboard" onclick="AdminApp.showSection('dashboard')"><i class="fas fa-chart-pie"></i> لوحة التنفيذ</div>
+            <div class="nav-item" data-section="live_monitoring" data-perm="can_view_reports" onclick="AdminApp.showSection('live_monitoring')"><i class="fas fa-tower-broadcast"></i> المراقبة المباشرة</div>
+            <div class="nav-item" data-section="employees_overview" data-perm="can_view_reports" onclick="AdminApp.showSection('employees_overview')"><i class="fas fa-id-card-clip"></i> أداء الموظفين</div>
+            <div class="nav-item" data-section="branches_overview" data-perm="can_view_reports" onclick="AdminApp.showSection('branches_overview')"><i class="fas fa-chart-column"></i> أداء الفروع</div>
             <div class="nav-item" data-section="branches" data-perm="can_manage_branches" onclick="AdminApp.showSection('branches')"><i class="fas fa-building"></i> إدارة الفروع</div>
             <div class="nav-item" data-section="users" data-perm="can_manage_users" onclick="AdminApp.showSection('users')"><i class="fas fa-users-shield"></i> المستخدمين</div>
             <div class="nav-item" data-section="templates" data-perm="can_edit_fields" onclick="AdminApp.showSection('templates')"><i class="fas fa-sliders-h"></i> تخصيص الحقول</div>
@@ -72,6 +76,8 @@
         <header class="topbar glass-panel">
             <h3 id="page-title" style="margin: 0; color: var(--text-main); font-weight: 800;">الرئيسية</h3>
             <div style="display:flex; gap:15px; align-items:center;">
+                <button class="notification-bell" id="notification-bell" onclick="AdminApp.showSection('instant_notifications')" title="الإشعارات"><i class="fas fa-bell"></i><span id="notification-count">0</span></button>
+                <div class="system-health-pill" id="system-health-pill"><i class="fas fa-circle"></i> جارٍ الفحص</div>
                 <div class="user-badge">
                     <i class="fas fa-user-circle"></i> <span id="admin-name">المدير</span>
                 </div>
