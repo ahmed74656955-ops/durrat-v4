@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>مؤسسة درة العالم للنقليات | نظام إدارة بوليصة الشحن</title>
-    <meta name="app-version" content="durrat-v13-mobile-pro-lts">
+    <meta name="app-version" content="durrat-v14-desktop-ultimate-lts">
     
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/196.png" type="image/png">
@@ -23,7 +23,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=v13-mobile-pro-20260709" rel="stylesheet">
+    <link href="./style.css?v=v14-desktop-ultimate-20260709" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
@@ -438,6 +438,31 @@
 }
 </style>
 
+
+<style id="durrat-v14-desktop-ultimate-css">
+@media (min-width: 901px){
+  body.is-desktop-layout .desktop-command-bar{position:fixed;right:22px;top:66px;z-index:6500;display:flex;gap:8px;align-items:center}
+  body.is-desktop-layout .desktop-command-bar button{border:1px solid rgba(148,163,184,.25);background:rgba(15,23,42,.92);color:#e5e7eb;border-radius:12px;padding:9px 12px;font-weight:900;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.22)}
+  body.is-desktop-layout .desktop-dashboard{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px;margin:8px 0 12px}
+  body.is-desktop-layout .desktop-card{border:1px solid rgba(148,163,184,.18);background:linear-gradient(145deg,rgba(15,23,42,.78),rgba(30,41,59,.62));border-radius:16px;padding:10px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  body.is-desktop-layout .desktop-card b{display:block;color:#f8fafc;font-size:1.05rem;margin-top:3px}
+  body.is-desktop-layout .desktop-card span{color:#94a3b8;font-size:.78rem;font-weight:800}
+  body.is-desktop-layout .sidebar-header{padding-top:46px!important}
+  body.is-desktop-layout .branch-permissions-card{max-height:92px!important;overflow:hidden!important;padding:10px 12px!important;margin-bottom:10px!important}
+  body.is-desktop-layout .branch-permissions-card h3{font-size:.92rem!important;margin:0 0 5px!important}
+  body.is-desktop-layout .permissions-grid, body.is-desktop-layout .perm-grid{display:flex!important;gap:6px!important;flex-wrap:wrap!important;max-height:42px!important;overflow:auto!important}
+  body.is-desktop-layout .perm-chip, body.is-desktop-layout .permission-chip{padding:4px 8px!important;font-size:.72rem!important}
+  .desktop-modal{position:fixed;inset:0;z-index:90000;background:rgba(2,6,23,.82);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:22px}
+  .desktop-modal.active{display:flex}
+  .desktop-modal-card{width:min(1180px,96vw);height:min(760px,92vh);background:#08111f;border:1px solid rgba(56,189,248,.25);border-radius:22px;box-shadow:0 30px 90px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow:hidden}
+  .desktop-modal-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(148,163,184,.18)}
+  .desktop-modal-body{flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:20px;background:radial-gradient(circle at top,rgba(14,165,233,.13),transparent 40%)}
+  .desktop-modal-actions{display:flex;gap:8px;flex-wrap:wrap}.desktop-modal-actions button{border:0;border-radius:12px;padding:10px 14px;font-weight:900;color:white;cursor:pointer;background:#2563eb}
+  .desktop-command-palette{position:fixed;inset:0;z-index:95000;background:rgba(2,6,23,.72);display:none;align-items:flex-start;justify-content:center;padding-top:12vh}
+  .desktop-command-palette.active{display:flex}.palette-box{width:min(650px,92vw);background:#0f172a;border:1px solid rgba(56,189,248,.25);border-radius:20px;box-shadow:0 25px 80px rgba(0,0,0,.5);overflow:hidden}.palette-box input{width:100%;padding:18px 20px;background:#020617;color:white;border:0;border-bottom:1px solid rgba(148,163,184,.2);font-size:1.1rem;outline:0}.palette-item{padding:14px 18px;color:#e2e8f0;border-bottom:1px solid rgba(148,163,184,.1);cursor:pointer;font-weight:800}.palette-item:hover{background:rgba(37,99,235,.22)}
+}
+@media (max-width:900px){.desktop-command-bar,.desktop-dashboard{display:none!important}}
+</style>
 </head>
 <body class="dark-mode">
 
@@ -478,6 +503,7 @@
         <div class="toolbar" id="top-toolbar">
             <!-- الأساسيات أولاً: حفظ / تصدير / تراجع / مسح -->
             <button onclick="ArchiveEngine.saveCurrent()" class="btn-primary" data-perm="can_archive"><i class="fas fa-save"></i> حفظ</button>
+            <button onclick="DesktopUX.openPreview()" class="btn-info" style="background:#0ea5e9;"><i class="fas fa-eye"></i> معاينة</button>
             <button onclick="ExportEngine.generateImage('jpeg')" class="btn-accent" data-perm="can_export" style="background: #059669;"><i class="fas fa-file-image"></i> JPG</button>
             <button onclick="ExportEngine.generatePDF()" class="btn-primary" data-perm="can_print"><i class="fas fa-file-pdf"></i> PDF</button>
             <button onclick="ExportEngine.shareDocument()" class="btn-info" data-perm="can_export" style="background: #8b5cf6;"><i class="fas fa-share-nodes"></i> مشاركة</button>
@@ -2134,5 +2160,66 @@
 })();
 </script>
 
+
+<script id="durrat-v14-desktop-ultimate-js">
+(function(){
+  const $=(q)=>document.querySelector(q);
+  window.DesktopUX = {
+    init(){
+      if(document.getElementById('desktop-command-bar')) return;
+      this.makeCommandBar(); this.makePalette(); this.makePreviewModal(); this.injectDashboard(); this.bindKeys();
+      setTimeout(()=>this.refreshDashboard(),700);
+    },
+    isDesktop(){ return window.innerWidth>900; },
+    makeCommandBar(){
+      const bar=document.createElement('div'); bar.id='desktop-command-bar'; bar.className='desktop-command-bar';
+      bar.innerHTML=`<button onclick="DesktopUX.openPreview()"><i class="fas fa-eye"></i> معاينة كبيرة</button><button onclick="DesktopUX.toggleFocus()"><i class="fas fa-bullseye"></i> تركيز</button><button onclick="DesktopUX.openPalette()"><i class="fas fa-search"></i> Ctrl+K</button><button onclick="ArchiveEngine.showModal()"><i class="fas fa-box-archive"></i> الأرشيف</button>`;
+      document.body.appendChild(bar);
+    },
+    injectDashboard(){
+      const sidebarHeader=document.querySelector('.sidebar-header'); if(!sidebarHeader || document.getElementById('desktop-dashboard')) return;
+      const dash=document.createElement('div'); dash.id='desktop-dashboard'; dash.className='desktop-dashboard';
+      dash.innerHTML=`<div class="desktop-card"><span>الإكتمال</span><b id="dsk-complete">0%</b></div><div class="desktop-card"><span>الفرع</span><b id="dsk-branch">-</b></div><div class="desktop-card"><span>رقم البوليصة</span><b id="dsk-awb">-</b></div><div class="desktop-card"><span>آخر حفظ</span><b id="dsk-save">-</b></div><div class="desktop-card"><span>الحالة</span><b>متصل</b></div>`;
+      sidebarHeader.prepend(dash);
+    },
+    refreshDashboard(){
+      try{
+        const pct=document.getElementById('progress-text')?.textContent||'0%';
+        const awb=(window.StateMgr&&StateMgr.data&&StateMgr.data.awb_no)||'بدون رقم';
+        const branch=localStorage.getItem('waybill_branch_title')||localStorage.getItem('waybill_branch_code')||'';
+        const s=localStorage.getItem('durrat_last_autosave')||'-';
+        const a=$('#dsk-complete'); if(a) a.textContent=pct; const b=$('#dsk-awb'); if(b) b.textContent=awb; const c=$('#dsk-branch'); if(c)c.textContent=branch; const d=$('#dsk-save'); if(d)d.textContent=s;
+      }catch(e){}
+      setTimeout(()=>this.refreshDashboard(),1500);
+    },
+    makePreviewModal(){
+      const m=document.createElement('div'); m.id='desktop-preview-modal'; m.className='desktop-modal';
+      m.innerHTML=`<div class="desktop-modal-card"><div class="desktop-modal-head"><b style="color:#fff;font-size:1.1rem"><i class="fas fa-eye" style="color:#38bdf8"></i> معاينة البوليصة قبل الإخراج</b><div class="desktop-modal-actions"><button onclick="ExportEngine.generateImage('jpeg')" style="background:#059669">JPG</button><button onclick="ExportEngine.generatePDF()" style="background:#dc2626">PDF</button><button onclick="DesktopUX.closePreview()" style="background:#475569">رجوع</button></div></div><div class="desktop-modal-body" id="desktop-preview-body"></div></div>`;
+      document.body.appendChild(m);
+    },
+    openPreview(){
+      const m=$('#desktop-preview-modal'), body=$('#desktop-preview-body'), doc=$('#document-wrapper'); if(!m||!body||!doc) return;
+      body.innerHTML=''; const clone=doc.cloneNode(true); clone.id='desktop-preview-clone'; clone.style.transform='none'; clone.style.zoom='1'; clone.style.margin='0 auto'; clone.style.pointerEvents='none';
+      body.appendChild(clone); m.classList.add('active');
+    },
+    closePreview(){ $('#desktop-preview-modal')?.classList.remove('active'); },
+    toggleFocus(){ document.body.classList.toggle('desktop-focus-mode'); const on=document.body.classList.contains('desktop-focus-mode'); const h=document.querySelector('header'); if(h) h.style.display=on?'none':''; UI?.toast?.(on?'تم تفعيل وضع التركيز':'تم إلغاء وضع التركيز','info'); },
+    makePalette(){
+      const p=document.createElement('div'); p.id='desktop-command-palette'; p.className='desktop-command-palette';
+      const items=[['إنشاء/مسح بوليصة','StateMgr.clearData()'],['حفظ البوليصة','ArchiveEngine.saveCurrent()'],['فتح الأرشيف','ArchiveEngine.showModal()'],['معاينة كبيرة','DesktopUX.openPreview()'],['تصدير PDF','ExportEngine.generatePDF()'],['تصدير JPG','ExportEngine.generateImage(\'jpeg\')'],['لوحة الإدارة','location.href=\'admin.html\'']];
+      p.innerHTML=`<div class="palette-box"><input id="palette-search" placeholder="اكتب أمرًا سريعًا..." oninput="DesktopUX.filterPalette(this.value)"><div id="palette-list">${items.map(i=>`<div class="palette-item" data-title="${i[0]}" onclick="DesktopUX.closePalette(); ${i[1]}"><i class="fas fa-bolt" style="color:#f59e0b"></i> ${i[0]}</div>`).join('')}</div></div>`;
+      p.addEventListener('click',e=>{ if(e.target===p) this.closePalette(); }); document.body.appendChild(p);
+    },
+    openPalette(){ $('#desktop-command-palette')?.classList.add('active'); setTimeout(()=>$('#palette-search')?.focus(),50); },
+    closePalette(){ $('#desktop-command-palette')?.classList.remove('active'); },
+    filterPalette(v){ document.querySelectorAll('.palette-item').forEach(el=>{el.style.display=(el.dataset.title||'').includes(v)?'block':'none';}); },
+    bindKeys(){ document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();this.openPalette();} if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();ArchiveEngine.saveCurrent();} if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='p'){e.preventDefault();ExportEngine.generatePDF();} if(e.key==='Escape'){this.closePalette();this.closePreview();} }); },
+    autosaveMark(){ localStorage.setItem('durrat_last_autosave', new Date().toLocaleTimeString('ar')); }
+  };
+  document.addEventListener('DOMContentLoaded',()=>DesktopUX.init());
+  setTimeout(()=>DesktopUX.init(),1000);
+  document.addEventListener('input',()=>{ clearTimeout(window.__durratAutoSaveTick); window.__durratAutoSaveTick=setTimeout(()=>{ try{ DesktopUX.autosaveMark(); }catch(e){} },800); }, true);
+})();
+</script>
 </body>
 </html>
