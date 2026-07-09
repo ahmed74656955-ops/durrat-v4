@@ -2221,5 +2221,63 @@
   document.addEventListener('input',()=>{ clearTimeout(window.__durratAutoSaveTick); window.__durratAutoSaveTick=setTimeout(()=>{ try{ DesktopUX.autosaveMark(); }catch(e){} },800); }, true);
 })();
 </script>
+
+
+<script id="durrat-v15-ops-audit-patch">
+(function(){
+  const later = (fn, ms=700)=>setTimeout(fn, ms);
+  function getSession(){ try{return JSON.parse(localStorage.getItem('enterprise_session')||'{}')}catch(e){return {}} }
+  async function log(action, entity='system', entityId=null, details={}){
+    try{
+      if(typeof AuthManager !== 'undefined' && AuthManager.logEvent) return await AuthManager.logEvent(action, entity, entityId, details);
+      const s=getSession();
+      if(window.supabase && window.supabase.rpc){
+        await window.supabase.rpc('log_app_event',{p_username:s?.user?.username||localStorage.getItem('waybill_active_user')||'guest',p_role:s?.user?.role||'user',p_branch_code:s?.branch?.code||localStorage.getItem('waybill_branch_prefix')||'',p_branch_name:s?.branch?.name||localStorage.getItem('waybill_branch_title')||'',p_action:action,p_entity:entity,p_entity_id:entityId,p_details:details,p_user_agent:navigator.userAgent});
+      }
+    }catch(e){console.warn('v15 audit log failed',e)}
+  }
+  function patchExports(){
+    try{
+      if(typeof ExportEngine === 'undefined' || ExportEngine.__v15Patched) return;
+      ExportEngine.__v15Patched = true;
+      const oldPdf = ExportEngine.generatePDF?.bind(ExportEngine);
+      const oldImg = ExportEngine.generateImage?.bind(ExportEngine);
+      const oldShare = ExportEngine.shareDocument?.bind(ExportEngine);
+      ExportEngine.generatePDF = async function(){ const awb=(StateMgr?.data?.awb_no||'بدون_رقم'); await log('export_pdf','waybills',awb,{awb_no:awb,client:StateMgr?.data?.consignee_name||'',source:'pdf_button'}); return oldPdf ? oldPdf() : null; };
+      ExportEngine.generateImage = async function(format='jpeg'){ const awb=(StateMgr?.data?.awb_no||'بدون_رقم'); await log('export_image','waybills',awb,{awb_no:awb,format,client:StateMgr?.data?.consignee_name||'',source:'image_button'}); return oldImg ? oldImg(format) : null; };
+      ExportEngine.shareDocument = async function(){ const awb=(StateMgr?.data?.awb_no||'بدون_رقم'); await log('share_waybill','waybills',awb,{awb_no:awb,client:StateMgr?.data?.consignee_name||'',source:'share_button'}); return oldShare ? oldShare() : null; };
+    }catch(e){console.warn('v15 export patch failed',e)}
+  }
+  function patchArchive(){
+    try{
+      if(typeof ArchiveEngine === 'undefined' || ArchiveEngine.__v15Patched) return;
+      ArchiveEngine.__v15Patched = true;
+      const oldSave = ArchiveEngine.saveCurrent?.bind(ArchiveEngine);
+      ArchiveEngine.saveCurrent = async function(){
+        const awb=(StateMgr?.data?.awb_no||'بدون_رقم');
+        await log('save_waybill_click','waybills',awb,{awb_no:awb,client:StateMgr?.data?.consignee_name||'',source:'archive_save_button'});
+        return oldSave ? oldSave() : null;
+      };
+    }catch(e){console.warn('v15 archive patch failed',e)}
+  }
+  function patchSync(){
+    try{
+      if(!window.SyncEngine || window.SyncEngine.__v15LogPatched) return false;
+      window.SyncEngine.__v15LogPatched = true;
+      const old = window.SyncEngine.pushToCloud?.bind(window.SyncEngine);
+      window.SyncEngine.pushToCloud = async function(payload){
+        const r = old ? await old(payload) : null;
+        try{ await log('sync_waybill_cloud','waybills',payload?.awb_no||'',{awb_no:payload?.awb_no,username:payload?.username,branch_code:payload?.branch_code,client_name:payload?.client_name}); }catch(e){}
+        return r;
+      };
+      return true;
+    }catch(e){return false}
+  }
+  function start(){ patchExports(); patchArchive(); if(!patchSync()) later(start,1000); }
+  document.addEventListener('DOMContentLoaded',()=>later(start,900));
+  window.addEventListener('load',()=>later(start,1300));
+})();
+</script>
+
 </body>
 </html>
