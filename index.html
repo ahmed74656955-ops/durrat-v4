@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>مؤسسة درة العالم للنقليات | نظام إدارة بوليصة الشحن</title>
-    <meta name="app-version" content="durrat-v11-enterprise-lts-stable">
+    <meta name="app-version" content="durrat-v12-enterprise-preview-lts">
     
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/196.png" type="image/png">
@@ -23,7 +23,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=v11-enterprise-lts-stable" rel="stylesheet">
+    <link href="./style.css?v=v12-enterprise-preview-lts" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
@@ -247,6 +247,23 @@
 }
 </style>
 
+
+
+<!-- Durrat V12 Fullscreen Preview Patch -->
+<style id="durrat-v12-preview-patch">
+  .btn-preview{background:linear-gradient(135deg,#0ea5e9,#2563eb)!important;color:#fff!important;box-shadow:0 10px 22px rgba(37,99,235,.28)!important}
+  #waybill-preview-modal{position:fixed;inset:0;z-index:999999;display:none;background:rgba(2,6,23,.92);backdrop-filter:blur(12px);padding:14px;box-sizing:border-box}
+  #waybill-preview-modal.active{display:flex;flex-direction:column}
+  .preview-modal-topbar{height:auto;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid rgba(148,163,184,.18);border-radius:18px;background:rgba(15,23,42,.88);box-shadow:0 18px 45px rgba(0,0,0,.28);direction:rtl}
+  .preview-modal-title{font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;font-size:1rem}.preview-modal-title i{color:#22d3ee}
+  .preview-modal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.preview-modal-actions button{border:0;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;color:#fff;background:rgba(30,41,59,.95);box-shadow:inset 0 0 0 1px rgba(148,163,184,.20)}
+  .preview-modal-actions button.primary{background:linear-gradient(135deg,#2563eb,#22d3ee)}.preview-modal-actions button.green{background:linear-gradient(135deg,#059669,#10b981)}.preview-modal-actions button.red{background:linear-gradient(135deg,#dc2626,#f97316)}
+  .preview-modal-body{position:relative;flex:1;min-height:0;margin-top:12px;border:1px solid rgba(148,163,184,.16);border-radius:20px;background:radial-gradient(circle at top,#0f172a,#020617 70%);overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:22px;direction:ltr;-webkit-overflow-scrolling:touch}
+  #waybill-preview-stage{position:relative;transform-origin:top center;transition:transform .16s ease;direction:rtl}.preview-modal-hint{position:absolute;left:16px;bottom:16px;z-index:5;background:rgba(15,23,42,.86);color:#cbd5e1;border:1px solid rgba(148,163,184,.18);border-radius:14px;padding:9px 12px;font-size:.86rem}
+  #waybill-preview-stage .document-wrapper{margin:0!important;box-shadow:0 18px 55px rgba(0,0,0,.40)!important;background:#fff!important}.preview-modal-body.preview-fit #waybill-preview-stage{transform:scale(var(--preview-fit-scale,1))}
+  @media(max-width:900px){#waybill-preview-modal{padding:8px}.preview-modal-topbar{border-radius:16px;gap:8px}.preview-modal-actions{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.preview-modal-actions button{padding:11px 8px;font-size:.85rem}.preview-modal-body{padding:12px;border-radius:16px}.preview-modal-title{font-size:.95rem}.preview-modal-hint{display:none}}
+</style>
+
 </head>
 <body class="dark-mode">
 
@@ -293,6 +310,7 @@
             <button onclick="HistoryMgr.undo()"><i class="fas fa-undo"></i> تراجع</button>
             <button onclick="StateMgr.clearData()" class="btn-danger" style="background: #be123c;"><i class="fas fa-eraser"></i> مسح</button>
             <button onclick="ArchiveEngine.showModal()" class="btn-info" data-perm="can_archive"><i class="fas fa-archive"></i> الأرشيف</button>
+            <button onclick="PreviewEngine.open()" class="btn-preview"><i class="fas fa-eye"></i> معاينة</button>
             <button onclick="SignatureEngine.showModal()" class="btn-accent"><i class="fas fa-signature"></i> التوقيع الحر</button>
             <select id="copies-selector" title="عدد نسخ التصدير">
                 <option value="1">نسخة أصلية</option>
@@ -384,6 +402,26 @@
             </p>
             <div class="export-result-box" id="export-result-container" style="border: 2px dashed var(--border); padding: 10px; border-radius: 12px; background: var(--bg);"></div>
             <button class="btn-primary close-modal" style="margin-top: 15px; width: 100%; justify-content: center; padding: 12px;">إغلاق النافذة</button>
+        </div>
+    </div>
+
+
+
+    <div id="waybill-preview-modal" aria-hidden="true">
+        <div class="preview-modal-topbar">
+            <div class="preview-modal-title"><i class="fas fa-eye"></i> معاينة البوليصة قبل التصدير</div>
+            <div class="preview-modal-actions">
+                <button type="button" onclick="PreviewEngine.zoomIn()"><i class="fas fa-search-plus"></i> تكبير</button>
+                <button type="button" onclick="PreviewEngine.zoomOut()"><i class="fas fa-search-minus"></i> تصغير</button>
+                <button type="button" onclick="PreviewEngine.fit()" class="primary"><i class="fas fa-expand"></i> ملء الشاشة</button>
+                <button type="button" onclick="ExportEngine.generateImage('jpeg')" class="green"><i class="fas fa-file-image"></i> JPG</button>
+                <button type="button" onclick="ExportEngine.generatePDF()" class="primary"><i class="fas fa-file-pdf"></i> PDF</button>
+                <button type="button" onclick="PreviewEngine.close()" class="red"><i class="fas fa-arrow-right"></i> رجوع</button>
+            </div>
+        </div>
+        <div class="preview-modal-body" id="waybill-preview-body">
+            <div id="waybill-preview-stage"></div>
+            <div class="preview-modal-hint">اسحب للتحريك، واستخدم الأزرار للتكبير أو الرجوع</div>
         </div>
     </div>
 
@@ -1109,6 +1147,60 @@
             }
         };
 
+
+        const PreviewEngine = {
+            zoom: 1,
+            open() {
+                const modal = document.getElementById('waybill-preview-modal');
+                const stage = document.getElementById('waybill-preview-stage');
+                const source = document.getElementById('document-wrapper');
+                if (!modal || !stage || !source) return UI.toast('تعذر فتح المعاينة', 'error');
+                stage.innerHTML = '';
+                const clone = source.cloneNode(true);
+                clone.id = 'document-wrapper-preview-clone';
+                clone.classList.remove('mobile-centered-waybill');
+                clone.querySelectorAll('.guide-line,.calib-toolbar,.field-label-tag').forEach(el => el.style.display = 'none');
+                clone.style.transform = 'none';
+                clone.style.margin = '0';
+                stage.appendChild(clone);
+                modal.classList.add('active');
+                modal.setAttribute('aria-hidden','false');
+                document.body.style.overflow = 'hidden';
+                this.zoom = 1;
+                this.fit();
+                try { AuthManager.logEvent('open_waybill_preview','ui',StateMgr.data.awb_no || '',{}); } catch(e) {}
+            },
+            close() {
+                const modal = document.getElementById('waybill-preview-modal');
+                const stage = document.getElementById('waybill-preview-stage');
+                if (modal) { modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); }
+                if (stage) stage.innerHTML = '';
+                document.body.style.overflow = '';
+            },
+            apply() {
+                const stage = document.getElementById('waybill-preview-stage');
+                if (stage) stage.style.transform = `scale(${this.zoom})`;
+            },
+            zoomIn() { this.zoom = Math.min(2.5, this.zoom + 0.15); this.apply(); },
+            zoomOut() { this.zoom = Math.max(0.25, this.zoom - 0.15); this.apply(); },
+            fit() {
+                const body = document.getElementById('waybill-preview-body');
+                const stage = document.getElementById('waybill-preview-stage');
+                const doc = stage?.querySelector('.document-wrapper');
+                if (!body || !stage || !doc) return;
+                const bw = Math.max(240, body.clientWidth - 34);
+                const bh = Math.max(240, body.clientHeight - 34);
+                const dw = doc.offsetWidth || 1123;
+                const dh = doc.offsetHeight || 794;
+                this.zoom = Math.max(0.25, Math.min(1.35, bw / dw, bh / dh));
+                this.apply();
+                body.scrollLeft = 0;
+                body.scrollTop = 0;
+            }
+        };
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') PreviewEngine.close(); });
+        window.addEventListener('resize', () => { const m = document.getElementById('waybill-preview-modal'); if (m?.classList.contains('active')) PreviewEngine.fit(); });
+
         const ExportEngine = {
             getDynamicFileName() { const awb = StateMgr.data.awb_no || 'بدون_رقم'; let client = StateMgr.data.consignee_name || ''; if (client) client = '_' + client.trim().split(' ').slice(0, 2).join('_'); return `Waybill_${AuthManager.getPrefix()}_${awb}${client}`; },
             getDynamicScale() { return window.innerWidth <= 768 ? 1.5 : 2.5; },
@@ -1233,7 +1325,7 @@
             async generateImage(format='png') { try { await UI.showProcessing(`جاري الحفظ الإجباري ثم التصدير بصيغة ${format.toUpperCase()}...`); await this.ensureArchivedBeforeExport(); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast('تم حفظ البوليصة في الأرشيف وتصدير الصورة بنجاح', 'success'); } catch(e) { UI.hideProcessing(); UI.toast('حدث خطأ في التصدير', 'error'); } }
         };
         const AppUpdateEngine = {
-            currentVersion: '20260707-export-stable-v1',
+            currentVersion: '20260709-v12-preview-lts',
             lastUpdate: null,
             async start() {
                 if (!localStorage.getItem('enterprise_session') || !window.supabase) return;
