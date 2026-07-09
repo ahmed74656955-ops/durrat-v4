@@ -2279,5 +2279,228 @@
 })();
 </script>
 
+
+
+<!-- Durrat V17 Mobile VIP Polish Patch -->
+<style id="durrat-v17-mobile-vip-css">
+@media (max-width: 900px) {
+  /* حذف مربع الأوامر السريعة من الجوال نهائياً */
+  #desktop-command-palette,
+  .desktop-command-palette,
+  .palette-box,
+  #palette-search,
+  #palette-list {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+  }
+
+  /* واجهة جوال VIP: التركيز على البوليصة والحقول */
+  :root { --v13-bottom-nav-h: 76px; }
+  body {
+    overflow-x: hidden !important;
+    background: linear-gradient(180deg,#f8fafc,#eaf2ff) !important;
+  }
+  body.dark-mode, body.theme-dark {
+    background: linear-gradient(180deg,#020617,#0b1220) !important;
+  }
+
+  header, .topbar, .toolbar, #top-toolbar {
+    max-width: 100vw !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  header::-webkit-scrollbar, .topbar::-webkit-scrollbar, .toolbar::-webkit-scrollbar, #top-toolbar::-webkit-scrollbar { display:none !important; }
+
+  /* تقليل ازدحام الأزرار العلوية */
+  #top-toolbar button, header button, .toolbar button {
+    min-height: 46px !important;
+    border-radius: 15px !important;
+    padding: 9px 14px !important;
+    font-size: .9rem !important;
+    flex: 0 0 auto !important;
+  }
+
+  /* إخفاء أزرار الإدارة الثانوية عن شاشة العميل في الجوال عند عدم الحاجة */
+  body:not(.v13-focus-mode) #desktop-command-bar { display:none !important; }
+
+  /* البوليصة في الجوال تكون في المنتصف بدون انزياح */
+  .preview-area, .document-stage, #document-stage, #document-wrapper {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  #document-wrapper {
+    transform-origin: top center !important;
+  }
+
+  /* تحسين درج الحقول */
+  .sidebar {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 24px 24px 0 0 !important;
+    box-shadow: 0 -18px 60px rgba(2,6,23,.38) !important;
+    border: 1px solid rgba(148,163,184,.22) !important;
+  }
+  .sidebar::before {
+    font-size: 1.02rem !important;
+    letter-spacing: 0 !important;
+  }
+  .form-scroller {
+    padding: 8px 12px 210px !important;
+  }
+  details {
+    border-radius: 18px !important;
+    margin-bottom: 10px !important;
+  }
+  details summary {
+    min-height: 56px !important;
+    font-size: 1.05rem !important;
+    font-weight: 1000 !important;
+  }
+  .input-group {
+    background: rgba(15,23,42,.88) !important;
+    border: 1px solid rgba(56,189,248,.18) !important;
+    box-shadow: 0 10px 26px rgba(2,6,23,.20) !important;
+  }
+  body:not(.dark-mode):not(.theme-dark) .input-group {
+    background: rgba(255,255,255,.96) !important;
+    border-color: rgba(37,99,235,.14) !important;
+  }
+  .input-group input, .input-group textarea, .input-group select {
+    font-size: 18px !important;
+    line-height: 1.4 !important;
+    border-radius: 16px !important;
+  }
+
+  /* جعل لوحة الصلاحيات مجرد شريط مصغر غير مزعج */
+  #branch-permissions-card.branch-permissions-card, .branch-permissions-card {
+    max-height: 70px !important;
+    margin: 6px 0 8px !important;
+    padding: 8px 10px !important;
+  }
+  #branch-permissions-card.v13-expanded { max-height: 270px !important; }
+  #branch-permissions-card .perm-chip { font-size:.72rem !important; padding:5px 8px !important; }
+  #branch-permissions-card:not(.v13-expanded) .perm-admin-open { display:none !important; }
+
+  /* أزرار عائمة أوضح وأقل إزعاجاً */
+  #mobile-quick-save {
+    width: 50px !important; height: 50px !important;
+    left: 88px !important;
+    bottom: calc(var(--v13-bottom-nav-h) + 18px) !important;
+    box-shadow: 0 12px 32px rgba(239,68,68,.26) !important;
+  }
+  #mobile-center-waybill {
+    bottom: calc(var(--v13-bottom-nav-h) + 18px) !important;
+  }
+  #mobile-fields-toggle {
+    bottom: calc(var(--v13-bottom-nav-h) + 18px) !important;
+    right: 12px !important;
+    min-width: 132px !important;
+    height: 50px !important;
+    border-radius: 999px !important;
+    box-shadow: 0 14px 34px rgba(14,165,233,.30) !important;
+  }
+
+  /* شريط سفلي أخف وأكثر احترافية */
+  #v13-bottom-nav {
+    height: var(--v13-bottom-nav-h) !important;
+    background: rgba(2,6,23,.90) !important;
+    box-shadow: 0 -12px 34px rgba(2,6,23,.38) !important;
+  }
+  #v13-bottom-nav button {
+    border-radius: 16px !important;
+    padding: 6px 8px !important;
+  }
+  #v13-bottom-nav button.primary {
+    box-shadow: 0 10px 28px rgba(14,165,233,.28) !important;
+  }
+
+  /* تحسين المعاينة بملء الشاشة */
+  #v13-preview-modal {
+    background: linear-gradient(180deg,rgba(2,6,23,.98),rgba(15,23,42,.98)) !important;
+  }
+  #v13-preview-stage {
+    padding: 10px !important;
+  }
+}
+
+@media (min-width: 901px) {
+  /* تبقى لوحة الأوامر السريعة للحاسوب فقط */
+  #desktop-command-palette.desktop-command-palette { display: none; }
+  #desktop-command-palette.desktop-command-palette.active { display: flex; }
+}
+</style>
+<script id="durrat-v17-mobile-vip-js">
+(function(){
+  const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+  function killMobileCommandPalette(){
+    if(!isMobile()) return;
+    try{
+      const p = document.getElementById('desktop-command-palette');
+      if(p){ p.classList.remove('active'); p.style.display='none'; p.setAttribute('aria-hidden','true'); }
+      const s = document.getElementById('palette-search');
+      if(s) s.blur();
+    }catch(e){}
+  }
+  function patchDesktopUX(){
+    if(!window.DesktopUX || window.DesktopUX.__v16MobilePatched) return;
+    const oldOpen = window.DesktopUX.openPalette?.bind(window.DesktopUX);
+    window.DesktopUX.openPalette = function(){
+      if(isMobile()){ killMobileCommandPalette(); return; }
+      return oldOpen ? oldOpen() : null;
+    };
+    window.DesktopUX.__v16MobilePatched = true;
+  }
+  function addVipHints(){
+    if(!isMobile()) return;
+    document.documentElement.classList.add('durrat-mobile-vip');
+    const side = document.querySelector('.sidebar');
+    if(side && !side.dataset.vipReady){
+      side.dataset.vipReady='1';
+      side.addEventListener('click', function(e){
+        const sum = e.target.closest('summary');
+        if(sum){ setTimeout(()=>{ try{ sum.scrollIntoView({behavior:'smooth', block:'start'}); }catch(_){} },160); }
+      }, true);
+    }
+  }
+  function init(){ patchDesktopUX(); killMobileCommandPalette(); addVipHints(); }
+  document.addEventListener('DOMContentLoaded', init);
+  window.addEventListener('load', init);
+  window.addEventListener('resize', init);
+  setInterval(init, 1200);
+})();
+</script>
+
+
+<script id="durrat-v17-notification-watcher">
+(function(){
+  async function pollNotifications(){
+    try{
+      if(!window.supabase) return;
+      const session = JSON.parse(localStorage.getItem('enterprise_session')||'{}');
+      const branch = (session?.branch?.code || localStorage.getItem('waybill_branch_prefix') || '').toUpperCase();
+      const seenKey = 'durrat_seen_notifications_v17';
+      const seen = new Set(JSON.parse(localStorage.getItem(seenKey)||'[]'));
+      const since = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+      let q = window.supabase.from('system_notifications').select('*').eq('is_active', true).gte('created_at', since).order('created_at',{ascending:false}).limit(10);
+      const {data, error} = await q;
+      if(error || !Array.isArray(data)) return;
+      const items = data.filter(n => !seen.has(n.id) && (!n.branch_code || String(n.branch_code).toUpperCase() === branch));
+      if(!items.length) return;
+      const n = items[0];
+      seen.add(n.id); localStorage.setItem(seenKey, JSON.stringify(Array.from(seen).slice(-100)));
+      const msg = n.title || n.message || 'إشعار جديد من الإدارة';
+      if(window.UI && UI.toast) UI.toast(msg, n.level === 'danger' ? 'error' : (n.level === 'warning' ? 'warning' : 'success'));
+      else alert(msg);
+    }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(pollNotifications, 3000); setInterval(pollNotifications, 30000); });
+})();
+</script>
 </body>
 </html>
