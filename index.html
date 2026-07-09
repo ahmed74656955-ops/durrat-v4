@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>مؤسسة درة العالم للنقليات | نظام إدارة بوليصة الشحن</title>
-    <meta name="app-version" content="durrat-v12-enterprise-preview-lts">
+    <meta name="app-version" content="durrat-v13-mobile-pro-lts">
     
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" href="./icons/196.png" type="image/png">
@@ -23,7 +23,7 @@
     
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     
-    <link href="./style.css?v=v12-enterprise-preview-lts" rel="stylesheet">
+    <link href="./style.css?v=v13-mobile-pro-20260709" rel="stylesheet">
 
     <script type="module" src="./js/config/supabase.js"></script>
 
@@ -37,6 +37,271 @@
     </script>
 
 <!-- Durrat V7.5 Mobile UX Patch -->
+<style id="durrat-v76-mobile-ux-css">
+@media (max-width: 900px) {
+  html, body { width: 100%; max-width: 100%; overflow-x: hidden !important; overscroll-behavior-y: contain; }
+  body { touch-action: manipulation; }
+  header { position: sticky; top: 0; z-index: 6000; padding-inline: 10px !important; }
+  .brand { width: 100%; justify-content: center; text-align: center; font-size: clamp(1.05rem, 4vw, 1.45rem) !important; white-space: nowrap; }
+  #top-toolbar {
+    width: 100%; display: flex !important; gap: 10px !important; overflow-x: auto !important; overflow-y: hidden !important;
+    scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; padding: 8px 10px 12px !important;
+  }
+  #top-toolbar > * { flex: 0 0 auto !important; scroll-snap-align: center; }
+  #top-toolbar button, #top-toolbar select { min-height: 48px; border-radius: 16px !important; font-size: 1rem !important; }
+
+  .workspace { min-height: calc(100dvh - 140px); display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+  .preview-area {
+    order: 2; width: 100vw !important; max-width: 100vw !important; min-height: 48dvh !important; height: 52dvh !important;
+    overflow: auto !important; direction: ltr !important; display: block !important; padding: 14px 0 90px !important;
+    -webkit-overflow-scrolling: touch; scroll-behavior: smooth; overscroll-behavior: contain; touch-action: pan-x pan-y;
+  }
+  .document-wrapper {
+    direction: rtl !important; transform-origin: top center !important; margin-left: auto !important; margin-right: auto !important;
+    left: auto !important; right: auto !important; position: relative !important; will-change: transform;
+  }
+  .bg-img { display:block !important; }
+
+  .sidebar {
+    position: fixed !important; left: 0 !important; right: 0 !important; bottom: 0 !important; top: auto !important;
+    width: 100vw !important; max-width: 100vw !important; height: min(74dvh, 720px) !important;
+    transform: translateY(calc(100% - 74px)); transition: transform .28s ease; z-index: 6500;
+    border-radius: 24px 24px 0 0 !important; border: 1px solid rgba(59,130,246,.35) !important;
+    box-shadow: 0 -20px 60px rgba(0,0,0,.45); overflow: hidden !important; background: rgba(15,23,42,.96) !important;
+    backdrop-filter: blur(18px);
+  }
+  .sidebar.mobile-open { transform: translateY(0) !important; }
+  .sidebar::before {
+    content: "حقول البوليصة — اسحب للأعلى"; display: block; height: 44px; line-height: 44px; text-align: center;
+    color: #e2e8f0; font-weight: 900; border-bottom: 1px solid rgba(148,163,184,.18);
+  }
+  .sidebar.mobile-open::before { content: "حقول البوليصة — اسحب للأسفل للإخفاء"; }
+  .sidebar-header { padding: 12px 16px !important; }
+  .form-scroller {
+    height: calc(100% - 155px) !important; max-height: none !important; overflow-y: auto !important; overflow-x: hidden !important;
+    padding: 12px 16px 130px !important; -webkit-overflow-scrolling: touch;
+  }
+  .form-scroller details { margin-bottom: 12px !important; border-radius: 18px !important; }
+  .form-scroller details[open] summary { position: sticky; top: 0; z-index: 2; background: rgba(15,23,42,.98); }
+  .input-group input, .input-group textarea, .input-group select { min-height: 48px !important; font-size: 16px !important; }
+  .align-controls button, .align-btn { min-width: 42px !important; min-height: 38px !important; }
+
+  .mobile-ux-btn {
+    position: fixed; z-index: 7000; border: 0; color: white; font-weight: 900; border-radius: 999px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.38); backdrop-filter: blur(12px); cursor: pointer;
+  }
+  #mobile-fields-toggle { right: 16px; bottom: 88px; padding: 14px 18px; background: linear-gradient(135deg,#2563eb,#06b6d4); }
+  #mobile-center-waybill { left: 16px; bottom: 88px; width: 54px; height: 54px; background: rgba(15,23,42,.92); border:1px solid rgba(148,163,184,.25); }
+  #mobile-quick-save { left: 82px; bottom: 88px; width: 54px; height: 54px; background: linear-gradient(135deg,#f59e0b,#ef4444); }
+
+  .zoom-controls { position: fixed !important; left: 14px !important; bottom: 150px !important; z-index: 6200 !important; display:flex !important; gap:10px !important; }
+  .zoom-controls button { width: 48px !important; height: 48px !important; border-radius: 50% !important; }
+  .developer-footer { position: sticky; bottom: 0; z-index: 5000; padding: 10px 8px !important; font-size: .95rem !important; }
+}
+@media (min-width: 901px) { .mobile-ux-btn { display:none !important; } }
+
+@media (max-width: 900px) {
+  /* V8: مساحة كتابة أوضح على الجوال وترتيب أفضل للأزرار */
+  #top-toolbar { scroll-padding-inline: 18px; }
+  #top-toolbar button, #top-toolbar select { min-width: 96px; padding-inline: 16px !important; font-weight:900 !important; }
+  #top-toolbar .admin-tool { display:none !important; }
+  body.is-admin-user #top-toolbar .admin-tool { display:inline-flex !important; }
+  .sidebar { height: min(82dvh, 780px) !important; transform: translateY(calc(100% - 64px)); }
+  .sidebar::before { height: 40px; line-height: 40px; font-size: 1rem; }
+  .sidebar-header { padding: 10px 14px !important; }
+  .branch-permissions-card { margin: 10px 0 14px !important; padding: 14px !important; border-radius: 20px !important; }
+  .branch-permissions-card h3 { font-size: 1.25rem !important; margin-bottom: 8px !important; }
+  .perm-chip { padding: 9px 12px !important; font-size: .92rem !important; }
+  .permissions-grid, .perm-grid, .branch-permissions-card .perm-list { max-height: 150px !important; overflow:auto !important; }
+  .form-scroller { height: calc(100% - 118px) !important; padding: 10px 14px 160px !important; }
+  .input-group { padding: 14px !important; gap: 10px !important; border-radius: 18px !important; }
+  .input-group label { font-size: 1.05rem !important; line-height:1.6 !important; }
+  .input-group input, .input-group textarea, .input-group select { min-height: 58px !important; font-size: 18px !important; padding: 14px 16px !important; border-radius: 16px !important; }
+  .input-group textarea { min-height: 105px !important; line-height: 1.8 !important; }
+  .align-controls { gap: 8px !important; }
+  .align-controls button, .align-btn { min-width: 48px !important; min-height: 44px !important; }
+  #mobile-fields-toggle { bottom: 92px; right: 16px; }
+  #mobile-quick-save, #mobile-center-waybill { bottom: 92px; }
+  .developer-footer { font-size: .9rem !important; }
+}
+
+/* Durrat V8: فصل كامل بين واجهة الحاسوب وواجهة الجوال */
+@media (min-width: 901px) {
+  html, body {
+    overflow-x: hidden !important;
+  }
+
+  body {
+    min-height: 100vh !important;
+  }
+
+  header, .app-header, .top-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 4000 !important;
+  }
+
+  #top-toolbar {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    gap: 8px !important;
+    padding: 6px 10px 8px !important;
+    scrollbar-width: thin;
+  }
+
+  #top-toolbar button,
+  #top-toolbar select {
+    flex: 0 0 auto !important;
+    min-height: 34px !important;
+    min-width: auto !important;
+    padding: 7px 12px !important;
+    font-size: .85rem !important;
+    border-radius: 10px !important;
+    white-space: nowrap !important;
+  }
+
+  .workspace {
+    display: grid !important;
+    grid-template-columns: minmax(720px, 1fr) clamp(300px, 25vw, 430px) !important;
+    gap: 14px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-height: calc(100vh - 115px) !important;
+    height: calc(100vh - 115px) !important;
+    overflow: hidden !important;
+    padding: 10px 14px 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .preview-area {
+    order: unset !important;
+    grid-column: 1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    overflow: auto !important;
+    padding: 12px 14px 34px !important;
+    direction: ltr !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    background: rgba(2, 6, 23, .35) !important;
+    border-radius: 18px !important;
+  }
+
+  .document-wrapper {
+    direction: rtl !important;
+    margin: 0 auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform-origin: top center !important;
+    position: relative !important;
+  }
+
+  .sidebar {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    grid-column: 2 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+    background: rgba(15, 23, 42, .88) !important;
+    box-shadow: none !important;
+  }
+
+  .sidebar::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  .sidebar-header {
+    padding: 12px 14px !important;
+  }
+
+  .form-scroller {
+    height: calc(100% - 90px) !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 10px 12px 80px !important;
+  }
+
+  .input-group {
+    padding: 10px !important;
+    border-radius: 14px !important;
+  }
+
+  .input-group input,
+  .input-group textarea,
+  .input-group select {
+    min-height: 38px !important;
+    font-size: .92rem !important;
+    padding: 9px 11px !important;
+    border-radius: 11px !important;
+  }
+
+  .input-group textarea {
+    min-height: 70px !important;
+  }
+
+  .branch-permissions-card {
+    margin: 8px 0 12px !important;
+    padding: 12px !important;
+  }
+
+  .perm-chip {
+    padding: 7px 9px !important;
+    font-size: .82rem !important;
+  }
+
+  .zoom-controls {
+    position: absolute !important;
+    left: 18px !important;
+    bottom: 18px !important;
+    z-index: 2500 !important;
+  }
+
+  .developer-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 3000 !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .preview-area {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    padding-left: max(10px, env(safe-area-inset-left)) !important;
+    padding-right: max(10px, env(safe-area-inset-right)) !important;
+    box-sizing: border-box !important;
+  }
+
+  .document-wrapper {
+    margin-inline: auto !important;
+    transform-origin: top center !important;
+  }
+
+  .bg-img { max-width: none !important; }
+}
+</style>
 
 
 
@@ -173,97 +438,6 @@
 }
 </style>
 
-
-<style id="durrat-v11-enterprise-lts-layout-css">
-/* Durrat V11 Enterprise LTS: فصل ثابت بين الحاسوب والجوال */
-:root{ --durrat-doc-w:1123px; --durrat-doc-h:794px; }
-@media (min-width: 901px){
-  html,body{width:100%!important;height:100%!important;overflow:hidden!important;}
-  body{display:flex!important;flex-direction:column!important;}
-  body.is-desktop-layout{--sidebar-width:400px!important;}
-  header{height:var(--header-height)!important;min-height:var(--header-height)!important;max-height:var(--header-height)!important;flex:0 0 var(--header-height)!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:14px!important;padding:10px 16px!important;}
-  .brand{width:auto!important;min-width:max-content!important;flex:0 0 auto!important;justify-content:flex-start!important;text-align:start!important;font-size:1.05rem!important;}
-  #top-toolbar,.toolbar{flex:1 1 auto!important;width:auto!important;min-width:0!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:7px!important;overflow-x:auto!important;overflow-y:hidden!important;padding:4px 4px 8px!important;}
-  #top-toolbar button,#top-toolbar select,.toolbar button,.toolbar select{min-height:32px!important;height:auto!important;min-width:auto!important;padding:7px 11px!important;border-radius:10px!important;font-size:.78rem!important;white-space:nowrap!important;flex:0 0 auto!important;}
-  .workspace{flex:1 1 auto!important;width:100%!important;height:calc(100vh - var(--header-height) - var(--footer-height))!important;min-height:0!important;display:flex!important;flex-direction:row!important;overflow:hidden!important;padding:0!important;gap:0!important;}
-  .sidebar{position:relative!important;order:0!important;right:auto!important;left:auto!important;top:auto!important;bottom:auto!important;width:var(--sidebar-width)!important;flex:0 0 var(--sidebar-width)!important;min-width:340px!important;max-width:460px!important;height:100%!important;max-height:none!important;transform:none!important;overflow:hidden!important;border-left:1px solid var(--border)!important;border-top:0!important;border-radius:0!important;background:var(--panel-bg)!important;z-index:120!important;box-shadow:var(--shadow-md)!important;}
-  .sidebar:before{display:none!important;content:none!important;}
-  .sidebar-header{display:block!important;flex:0 0 auto!important;padding:14px 16px!important;}
-  .form-scroller{flex:1 1 auto!important;min-height:0!important;height:auto!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;padding:14px 16px 90px!important;-webkit-overflow-scrolling:auto!important;}
-  .form-scroller details{margin-bottom:10px!important;border-radius:14px!important;}
-  .form-scroller summary{min-height:44px!important;padding:12px 14px!important;font-size:.92rem!important;}
-  .input-group{padding:10px 12px!important;margin-bottom:10px!important;border-radius:12px!important;gap:8px!important;}
-  .input-group label{font-size:.86rem!important;}
-  .input-group input,.input-group textarea,.input-group select,.search-box input{min-height:38px!important;height:auto!important;font-size:.88rem!important;padding:9px 11px!important;border-radius:10px!important;line-height:1.4!important;}
-  .input-group textarea{min-height:70px!important;}
-  .align-controls button,.align-btn{min-width:34px!important;min-height:32px!important;padding:5px 8px!important;}
-  .branch-permissions-card{margin:10px 0!important;padding:12px!important;border-radius:14px!important;}
-  .perm-chip{padding:6px 10px!important;font-size:.78rem!important;}
-  .preview-area{position:relative!important;order:1!important;flex:1 1 auto!important;min-width:0!important;height:100%!important;min-height:0!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;overflow:auto!important;direction:ltr!important;padding:22px 24px 30px!important;background:radial-gradient(circle at 20% 16%, rgba(37,99,235,.10), transparent 34%), linear-gradient(135deg, rgba(148,163,184,.18), rgba(226,232,240,.12))!important;}
-  body.dark-mode .preview-area{background:radial-gradient(circle at 20% 16%, rgba(37,99,235,.14), transparent 34%), linear-gradient(135deg, rgba(15,23,42,.92), rgba(2,6,23,.80))!important;}
-  .document-wrapper,.document-wrapper.mobile-centered-waybill{position:relative!important;width:var(--durrat-doc-w)!important;min-width:var(--durrat-doc-w)!important;max-width:none!important;min-height:var(--durrat-doc-h)!important;margin:0 auto 28px!important;left:auto!important;right:auto!important;transform-origin:top center!important;direction:rtl!important;}
-  .bg-img{display:block!important;width:var(--durrat-doc-w)!important;max-width:none!important;min-height:var(--durrat-doc-h)!important;}
-  .mobile-ux-btn,#mobile-fields-toggle,#mobile-center-waybill,#mobile-quick-save,.mobile-drawer-handle{display:none!important;}
-  .zoom-controls{position:fixed!important;left:18px!important;right:auto!important;bottom:calc(var(--footer-height) + 16px)!important;z-index:1500!important;}
-  .developer-footer{height:var(--footer-height)!important;min-height:var(--footer-height)!important;max-height:var(--footer-height)!important;flex:0 0 var(--footer-height)!important;}
-}
-@media (min-width:901px) and (max-width:1280px){
-  body.is-desktop-layout{--sidebar-width:360px!important;}
-  header{gap:8px!important;padding-inline:10px!important;}
-  #top-toolbar button,#top-toolbar select,.toolbar button,.toolbar select{font-size:.72rem!important;padding:6px 9px!important;}
-}
-@media (max-width:900px){
-  html,body{width:100%!important;min-height:100vh!important;height:auto!important;overflow-x:hidden!important;overflow-y:auto!important;}
-  body{display:block!important;}
-  header{position:sticky!important;top:0!important;z-index:5000!important;height:auto!important;min-height:62px!important;max-height:none!important;display:flex!important;flex-wrap:wrap!important;gap:8px!important;padding:8px 10px!important;}
-  .brand{width:100%!important;justify-content:center!important;text-align:center!important;font-size:clamp(1rem,4vw,1.35rem)!important;white-space:nowrap!important;}
-  #top-toolbar,.toolbar{width:100%!important;display:flex!important;gap:9px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity!important;-webkit-overflow-scrolling:touch!important;padding:6px 2px 10px!important;}
-  #top-toolbar button,#top-toolbar select,.toolbar button,.toolbar select{flex:0 0 auto!important;min-height:46px!important;min-width:92px!important;padding:12px 15px!important;border-radius:16px!important;font-size:.98rem!important;scroll-snap-align:start!important;}
-  .workspace{display:flex!important;flex-direction:column!important;width:100%!important;max-width:100vw!important;min-height:auto!important;height:auto!important;overflow:visible!important;padding:0!important;}
-  .preview-area{order:1!important;width:100vw!important;max-width:100vw!important;min-height:48vh!important;height:auto!important;display:block!important;overflow-x:auto!important;overflow-y:visible!important;direction:ltr!important;padding:12px 0 98px!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain!important;}
-  .document-wrapper,.document-wrapper.mobile-centered-waybill{width:var(--durrat-doc-w)!important;min-width:var(--durrat-doc-w)!important;max-width:none!important;min-height:var(--durrat-doc-h)!important;margin-left:auto!important;margin-right:auto!important;left:auto!important;right:auto!important;transform-origin:top center!important;direction:rtl!important;}
-  .bg-img{display:block!important;width:var(--durrat-doc-w)!important;max-width:none!important;min-height:var(--durrat-doc-h)!important;}
-  .sidebar{position:fixed!important;left:0!important;right:0!important;bottom:0!important;top:auto!important;order:2!important;width:100vw!important;max-width:100vw!important;min-width:0!important;height:min(82dvh,780px)!important;max-height:none!important;transform:translateY(calc(100% - 64px))!important;transition:transform .28s ease!important;z-index:6500!important;border-radius:24px 24px 0 0!important;border:1px solid rgba(59,130,246,.35)!important;box-shadow:0 -20px 60px rgba(0,0,0,.45)!important;overflow:hidden!important;background:rgba(15,23,42,.97)!important;backdrop-filter:blur(18px)!important;}
-  .sidebar.mobile-open{transform:translateY(0)!important;}
-  .sidebar:before{content:"حقول البوليصة — اسحب للأعلى"!important;display:block!important;height:40px!important;line-height:40px!important;text-align:center!important;color:#e2e8f0!important;font-weight:900!important;border-bottom:1px solid rgba(148,163,184,.18)!important;}
-  .sidebar.mobile-open:before{content:"حقول البوليصة — اسحب للأسفل للإخفاء"!important;}
-  .sidebar-header{padding:10px 14px!important;}
-  .form-scroller{height:calc(100% - 116px)!important;max-height:none!important;overflow-y:auto!important;overflow-x:hidden!important;padding:10px 14px 160px!important;-webkit-overflow-scrolling:touch!important;}
-  .form-scroller details{margin-bottom:12px!important;border-radius:18px!important;}
-  .form-scroller details[open] summary{position:sticky!important;top:0!important;z-index:2!important;background:rgba(15,23,42,.98)!important;}
-  .input-group{padding:14px!important;gap:10px!important;border-radius:18px!important;}
-  .input-group label{font-size:1.04rem!important;line-height:1.6!important;}
-  .input-group input,.input-group textarea,.input-group select,.search-box input{min-height:56px!important;font-size:16px!important;padding:14px 16px!important;border-radius:16px!important;line-height:1.6!important;}
-  .input-group textarea{min-height:105px!important;}
-  .branch-permissions-card{margin:10px 0 14px!important;padding:14px!important;border-radius:20px!important;}
-  .perm-chip{padding:9px 12px!important;font-size:.92rem!important;}
-  .zoom-controls{position:fixed!important;left:14px!important;bottom:150px!important;z-index:6200!important;display:flex!important;gap:10px!important;}
-  .zoom-controls button{width:48px!important;height:48px!important;border-radius:50%!important;}
-  .developer-footer{position:sticky!important;bottom:0!important;z-index:5000!important;padding:10px 8px!important;font-size:.9rem!important;}
-  .mobile-ux-btn{position:fixed!important;z-index:7000!important;border:0!important;color:white!important;font-weight:900!important;border-radius:999px!important;box-shadow:0 12px 35px rgba(0,0,0,.38)!important;backdrop-filter:blur(12px)!important;cursor:pointer!important;}
-  #mobile-fields-toggle{right:16px!important;bottom:92px!important;padding:14px 18px!important;background:linear-gradient(135deg,#2563eb,#06b6d4)!important;}
-  #mobile-center-waybill{left:16px!important;bottom:92px!important;width:54px!important;height:54px!important;background:rgba(15,23,42,.92)!important;border:1px solid rgba(148,163,184,.25)!important;}
-  #mobile-quick-save{left:82px!important;bottom:92px!important;width:54px!important;height:54px!important;background:linear-gradient(135deg,#f59e0b,#ef4444)!important;}
-}
-</style>
-
-
-
-<!-- Durrat V12 Fullscreen Preview Patch -->
-<style id="durrat-v12-preview-patch">
-  .btn-preview{background:linear-gradient(135deg,#0ea5e9,#2563eb)!important;color:#fff!important;box-shadow:0 10px 22px rgba(37,99,235,.28)!important}
-  #waybill-preview-modal{position:fixed;inset:0;z-index:999999;display:none;background:rgba(2,6,23,.92);backdrop-filter:blur(12px);padding:14px;box-sizing:border-box}
-  #waybill-preview-modal.active{display:flex;flex-direction:column}
-  .preview-modal-topbar{height:auto;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;border:1px solid rgba(148,163,184,.18);border-radius:18px;background:rgba(15,23,42,.88);box-shadow:0 18px 45px rgba(0,0,0,.28);direction:rtl}
-  .preview-modal-title{font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;font-size:1rem}.preview-modal-title i{color:#22d3ee}
-  .preview-modal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.preview-modal-actions button{border:0;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;color:#fff;background:rgba(30,41,59,.95);box-shadow:inset 0 0 0 1px rgba(148,163,184,.20)}
-  .preview-modal-actions button.primary{background:linear-gradient(135deg,#2563eb,#22d3ee)}.preview-modal-actions button.green{background:linear-gradient(135deg,#059669,#10b981)}.preview-modal-actions button.red{background:linear-gradient(135deg,#dc2626,#f97316)}
-  .preview-modal-body{position:relative;flex:1;min-height:0;margin-top:12px;border:1px solid rgba(148,163,184,.16);border-radius:20px;background:radial-gradient(circle at top,#0f172a,#020617 70%);overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:22px;direction:ltr;-webkit-overflow-scrolling:touch}
-  #waybill-preview-stage{position:relative;transform-origin:top center;transition:transform .16s ease;direction:rtl}.preview-modal-hint{position:absolute;left:16px;bottom:16px;z-index:5;background:rgba(15,23,42,.86);color:#cbd5e1;border:1px solid rgba(148,163,184,.18);border-radius:14px;padding:9px 12px;font-size:.86rem}
-  #waybill-preview-stage .document-wrapper{margin:0!important;box-shadow:0 18px 55px rgba(0,0,0,.40)!important;background:#fff!important}.preview-modal-body.preview-fit #waybill-preview-stage{transform:scale(var(--preview-fit-scale,1))}
-  @media(max-width:900px){#waybill-preview-modal{padding:8px}.preview-modal-topbar{border-radius:16px;gap:8px}.preview-modal-actions{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.preview-modal-actions button{padding:11px 8px;font-size:.85rem}.preview-modal-body{padding:12px;border-radius:16px}.preview-modal-title{font-size:.95rem}.preview-modal-hint{display:none}}
-</style>
-
 </head>
 <body class="dark-mode">
 
@@ -310,7 +484,6 @@
             <button onclick="HistoryMgr.undo()"><i class="fas fa-undo"></i> تراجع</button>
             <button onclick="StateMgr.clearData()" class="btn-danger" style="background: #be123c;"><i class="fas fa-eraser"></i> مسح</button>
             <button onclick="ArchiveEngine.showModal()" class="btn-info" data-perm="can_archive"><i class="fas fa-archive"></i> الأرشيف</button>
-            <button onclick="PreviewEngine.open()" class="btn-preview"><i class="fas fa-eye"></i> معاينة</button>
             <button onclick="SignatureEngine.showModal()" class="btn-accent"><i class="fas fa-signature"></i> التوقيع الحر</button>
             <select id="copies-selector" title="عدد نسخ التصدير">
                 <option value="1">نسخة أصلية</option>
@@ -402,26 +575,6 @@
             </p>
             <div class="export-result-box" id="export-result-container" style="border: 2px dashed var(--border); padding: 10px; border-radius: 12px; background: var(--bg);"></div>
             <button class="btn-primary close-modal" style="margin-top: 15px; width: 100%; justify-content: center; padding: 12px;">إغلاق النافذة</button>
-        </div>
-    </div>
-
-
-
-    <div id="waybill-preview-modal" aria-hidden="true">
-        <div class="preview-modal-topbar">
-            <div class="preview-modal-title"><i class="fas fa-eye"></i> معاينة البوليصة قبل التصدير</div>
-            <div class="preview-modal-actions">
-                <button type="button" onclick="PreviewEngine.zoomIn()"><i class="fas fa-search-plus"></i> تكبير</button>
-                <button type="button" onclick="PreviewEngine.zoomOut()"><i class="fas fa-search-minus"></i> تصغير</button>
-                <button type="button" onclick="PreviewEngine.fit()" class="primary"><i class="fas fa-expand"></i> ملء الشاشة</button>
-                <button type="button" onclick="ExportEngine.generateImage('jpeg')" class="green"><i class="fas fa-file-image"></i> JPG</button>
-                <button type="button" onclick="ExportEngine.generatePDF()" class="primary"><i class="fas fa-file-pdf"></i> PDF</button>
-                <button type="button" onclick="PreviewEngine.close()" class="red"><i class="fas fa-arrow-right"></i> رجوع</button>
-            </div>
-        </div>
-        <div class="preview-modal-body" id="waybill-preview-body">
-            <div id="waybill-preview-stage"></div>
-            <div class="preview-modal-hint">اسحب للتحريك، واستخدم الأزرار للتكبير أو الرجوع</div>
         </div>
     </div>
 
@@ -1147,60 +1300,6 @@
             }
         };
 
-
-        const PreviewEngine = {
-            zoom: 1,
-            open() {
-                const modal = document.getElementById('waybill-preview-modal');
-                const stage = document.getElementById('waybill-preview-stage');
-                const source = document.getElementById('document-wrapper');
-                if (!modal || !stage || !source) return UI.toast('تعذر فتح المعاينة', 'error');
-                stage.innerHTML = '';
-                const clone = source.cloneNode(true);
-                clone.id = 'document-wrapper-preview-clone';
-                clone.classList.remove('mobile-centered-waybill');
-                clone.querySelectorAll('.guide-line,.calib-toolbar,.field-label-tag').forEach(el => el.style.display = 'none');
-                clone.style.transform = 'none';
-                clone.style.margin = '0';
-                stage.appendChild(clone);
-                modal.classList.add('active');
-                modal.setAttribute('aria-hidden','false');
-                document.body.style.overflow = 'hidden';
-                this.zoom = 1;
-                this.fit();
-                try { AuthManager.logEvent('open_waybill_preview','ui',StateMgr.data.awb_no || '',{}); } catch(e) {}
-            },
-            close() {
-                const modal = document.getElementById('waybill-preview-modal');
-                const stage = document.getElementById('waybill-preview-stage');
-                if (modal) { modal.classList.remove('active'); modal.setAttribute('aria-hidden','true'); }
-                if (stage) stage.innerHTML = '';
-                document.body.style.overflow = '';
-            },
-            apply() {
-                const stage = document.getElementById('waybill-preview-stage');
-                if (stage) stage.style.transform = `scale(${this.zoom})`;
-            },
-            zoomIn() { this.zoom = Math.min(2.5, this.zoom + 0.15); this.apply(); },
-            zoomOut() { this.zoom = Math.max(0.25, this.zoom - 0.15); this.apply(); },
-            fit() {
-                const body = document.getElementById('waybill-preview-body');
-                const stage = document.getElementById('waybill-preview-stage');
-                const doc = stage?.querySelector('.document-wrapper');
-                if (!body || !stage || !doc) return;
-                const bw = Math.max(240, body.clientWidth - 34);
-                const bh = Math.max(240, body.clientHeight - 34);
-                const dw = doc.offsetWidth || 1123;
-                const dh = doc.offsetHeight || 794;
-                this.zoom = Math.max(0.25, Math.min(1.35, bw / dw, bh / dh));
-                this.apply();
-                body.scrollLeft = 0;
-                body.scrollTop = 0;
-            }
-        };
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') PreviewEngine.close(); });
-        window.addEventListener('resize', () => { const m = document.getElementById('waybill-preview-modal'); if (m?.classList.contains('active')) PreviewEngine.fit(); });
-
         const ExportEngine = {
             getDynamicFileName() { const awb = StateMgr.data.awb_no || 'بدون_رقم'; let client = StateMgr.data.consignee_name || ''; if (client) client = '_' + client.trim().split(' ').slice(0, 2).join('_'); return `Waybill_${AuthManager.getPrefix()}_${awb}${client}`; },
             getDynamicScale() { return window.innerWidth <= 768 ? 1.5 : 2.5; },
@@ -1325,7 +1424,7 @@
             async generateImage(format='png') { try { await UI.showProcessing(`جاري الحفظ الإجباري ثم التصدير بصيغة ${format.toUpperCase()}...`); await this.ensureArchivedBeforeExport(); const canvas = await this.safeCapture(this.getDynamicScale()); const dataUrl = canvas.toDataURL(`image/${format}`, format === 'jpeg' ? 0.95 : 1.0); try { const link = document.createElement('a'); link.download = `${this.getDynamicFileName()}.${format}`; link.href = dataUrl; document.body.appendChild(link); link.click(); document.body.removeChild(link); } catch(e) {} UI.hideProcessing(); setTimeout(() => this.showFallback(dataUrl), 1000); UI.toast('تم حفظ البوليصة في الأرشيف وتصدير الصورة بنجاح', 'success'); } catch(e) { UI.hideProcessing(); UI.toast('حدث خطأ في التصدير', 'error'); } }
         };
         const AppUpdateEngine = {
-            currentVersion: '20260709-v12-preview-lts',
+            currentVersion: '20260707-export-stable-v1',
             lastUpdate: null,
             async start() {
                 if (!localStorage.getItem('enterprise_session') || !window.supabase) return;
@@ -1563,75 +1662,475 @@
         });
     </script>
 
+<script id="durrat-v76-mobile-ux-js">
+(function(){
+  const mq = () => window.matchMedia('(max-width: 900px)').matches;
+  const ready = (fn) => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn) : fn();
+
+  function ensureButton(id, html, onClick) {
+    let b = document.getElementById(id);
+    if (!b) {
+      b = document.createElement('button');
+      b.id = id;
+      b.className = 'mobile-ux-btn';
+      b.innerHTML = html;
+      b.type = 'button';
+      document.body.appendChild(b);
+    }
+    b.onclick = onClick;
+    return b;
+  }
+
+  function centerWaybill(retry = 3) {
+    if (!mq()) return;
+    const preview = document.getElementById('preview-container');
+    const wrapper = document.getElementById('document-wrapper');
+    if (!preview || !wrapper) return;
+    preview.style.direction = 'ltr';
+    wrapper.style.marginLeft = 'auto';
+    wrapper.style.marginRight = 'auto';
+    wrapper.style.right = 'auto';
+    wrapper.style.left = 'auto';
+    const target = Math.max(0, (preview.scrollWidth - preview.clientWidth) / 2);
+    preview.scrollLeft = target;
+    if (retry > 0) setTimeout(() => centerWaybill(retry - 1), 250);
+  }
+
+  function toggleFields(force) {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+    const open = typeof force === 'boolean' ? force : !sidebar.classList.contains('mobile-open');
+    sidebar.classList.toggle('mobile-open', open);
+    localStorage.setItem('durrat_mobile_fields_open', open ? '1' : '0');
+    setTimeout(centerWaybill, 80);
+  }
+
+  function openFirstGroup() {
+    if (!mq()) return;
+    const form = document.getElementById('form-builder');
+    if (!form) return;
+    const groups = [...form.querySelectorAll('details')].filter(d => d.style.display !== 'none');
+    if (groups.length && !groups.some(g => g.open)) groups[0].open = true;
+  }
+
+  function attachDrawerGestures() {
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar || sidebar.dataset.mobileGestures === '1') return;
+    sidebar.dataset.mobileGestures = '1';
+    let startY = 0;
+    sidebar.addEventListener('touchstart', e => { startY = e.touches[0].clientY; }, {passive:true});
+    sidebar.addEventListener('touchend', e => {
+      if (!mq()) return;
+      const endY = e.changedTouches[0].clientY;
+      if (startY - endY > 70) toggleFields(true);
+      if (endY - startY > 70) toggleFields(false);
+    }, {passive:true});
+  }
+
+  function attachPreviewGestures() {
+    const preview = document.getElementById('preview-container');
+    if (!preview || preview.dataset.mobileGestures === '1') return;
+    preview.dataset.mobileGestures = '1';
+    let lastTap = 0, pinchStart = 0, baseScale = 1;
+    const dist = (a,b) => Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
+    preview.addEventListener('touchstart', e => {
+      if (!mq()) return;
+      if (e.touches.length === 2 && window.ZoomEngine) {
+        pinchStart = dist(e.touches[0], e.touches[1]);
+        baseScale = ZoomEngine.scale || 1;
+      }
+    }, {passive:true});
+    preview.addEventListener('touchmove', e => {
+      if (!mq()) return;
+      if (e.touches.length === 2 && pinchStart && window.ZoomEngine) {
+        e.preventDefault();
+        const ratio = dist(e.touches[0], e.touches[1]) / pinchStart;
+        ZoomEngine.scale = Math.max(0.22, Math.min(2.2, baseScale * ratio));
+        ZoomEngine.apply();
+      }
+    }, {passive:false});
+    preview.addEventListener('touchend', e => {
+      if (!mq()) return;
+      if (e.touches.length < 2) pinchStart = 0;
+      const now = Date.now();
+      if (now - lastTap < 280 && window.ZoomEngine) {
+        ZoomEngine.reset();
+        centerWaybill(4);
+      }
+      lastTap = now;
+    }, {passive:true});
+  }
+
+  function enhanceMobile() {
+    if (!mq()) return;
+    document.body.classList.add('mobile-ux-enabled');
+    ensureButton('mobile-fields-toggle', '<i class="fas fa-list-check"></i> الحقول', () => toggleFields());
+    ensureButton('mobile-center-waybill', '<i class="fas fa-crosshairs"></i>', () => { if(window.ZoomEngine) ZoomEngine.reset(); centerWaybill(5); });
+    ensureButton('mobile-quick-save', '<i class="fas fa-save"></i>', () => { if(window.ArchiveEngine) ArchiveEngine.saveCurrent(); });
+    attachDrawerGestures();
+    attachPreviewGestures();
+    openFirstGroup();
+    if (localStorage.getItem('durrat_mobile_fields_open') === '1') toggleFields(true);
+    centerWaybill(5);
+  }
+
+  ready(() => {
+    enhanceMobile();
+    const oldResetTimer = () => { if (window.ZoomEngine && !ZoomEngine.__v75Patched) {
+      const oldApply = ZoomEngine.apply.bind(ZoomEngine);
+      ZoomEngine.apply = function(){ oldApply(); setTimeout(centerWaybill, 30); };
+      const oldReset = ZoomEngine.reset.bind(ZoomEngine);
+      ZoomEngine.reset = function(){ oldReset(); setTimeout(() => centerWaybill(4), 60); };
+      ZoomEngine.__v75Patched = true;
+    }};
+    oldResetTimer(); setTimeout(oldResetTimer, 500); setTimeout(oldResetTimer, 1500);
+
+    const observer = new MutationObserver(() => { openFirstGroup(); attachDrawerGestures(); });
+    observer.observe(document.body, { childList:true, subtree:true });
+    window.addEventListener('resize', () => { enhanceMobile(); centerWaybill(4); });
+    window.addEventListener('orientationchange', () => setTimeout(() => { enhanceMobile(); centerWaybill(6); }, 500));
+    window.addEventListener('load', () => setTimeout(() => { enhanceMobile(); centerWaybill(6); }, 700));
+  });
+
+  window.DurratMobileUX = { centerWaybill, toggleFields, openFirstGroup };
+})();
+</script>
 
 
-
-
-
-
-
-
-<script id="durrat-v11-enterprise-lts-runtime">
+<script id="durrat-v8-layout-guard">
 (function(){
   const mq = window.matchMedia('(max-width: 900px)');
-  const ready = (fn)=> document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn) : fn();
-  function ensureButton(id, html, onClick){
-    let b=document.getElementById(id);
-    if(!b){ b=document.createElement('button'); b.id=id; b.className='mobile-ux-btn'; b.type='button'; b.innerHTML=html; document.body.appendChild(b); }
-    b.onclick=onClick; return b;
+  function applyLayoutMode(){
+    document.body.classList.toggle('is-mobile-layout', mq.matches);
+    document.body.classList.toggle('is-desktop-layout', !mq.matches);
+    const preview = document.querySelector('.preview-area');
+    const doc = document.querySelector('.document-wrapper');
+    if (preview && doc && mq.matches) {
+      requestAnimationFrame(()=>{
+        const left = Math.max(0, (preview.scrollWidth - preview.clientWidth) / 2);
+        preview.scrollLeft = left;
+      });
+    }
   }
-  function setMode(){
-    const mobile = mq.matches;
+  window.addEventListener('resize', applyLayoutMode, {passive:true});
+  window.addEventListener('orientationchange', ()=>setTimeout(applyLayoutMode,250), {passive:true});
+  document.addEventListener('DOMContentLoaded', applyLayoutMode);
+  setTimeout(applyLayoutMode, 700);
+})();
+</script>
+
+
+<script id="durrat-v81-layout-stabilizer">
+(function(){
+  function stabilizeLayout(){
+    var isMobile = window.matchMedia('(max-width: 900px)').matches;
+    document.body.classList.toggle('is-mobile-layout', isMobile);
+    document.body.classList.toggle('is-desktop-layout', !isMobile);
+    var preview = document.getElementById('preview-container') || document.querySelector('.preview-area');
+    var doc = document.getElementById('document-wrapper') || document.querySelector('.document-wrapper');
+    if(!preview || !doc) return;
+    if(!isMobile){
+      preview.style.direction = 'ltr';
+      preview.style.display = 'flex';
+      preview.style.justifyContent = 'center';
+      preview.style.alignItems = 'flex-start';
+      doc.style.marginLeft = 'auto';
+      doc.style.marginRight = 'auto';
+      doc.style.left = 'auto';
+      doc.style.right = 'auto';
+      requestAnimationFrame(function(){ preview.scrollLeft = 0; });
+    } else {
+      preview.style.direction = 'ltr';
+      doc.style.marginLeft = 'auto';
+      doc.style.marginRight = 'auto';
+      setTimeout(function(){
+        try { preview.scrollLeft = Math.max(0, (preview.scrollWidth - preview.clientWidth) / 2); } catch(e) {}
+      }, 120);
+    }
+  }
+  window.addEventListener('load', stabilizeLayout);
+  window.addEventListener('resize', stabilizeLayout);
+  window.addEventListener('orientationchange', function(){ setTimeout(stabilizeLayout, 250); });
+  document.addEventListener('DOMContentLoaded', stabilizeLayout);
+  setTimeout(stabilizeLayout, 500);
+  setTimeout(stabilizeLayout, 1500);
+})();
+</script>
+
+
+<script id="durrat-v9-lts-layout-stabilizer">
+(function(){
+  function isMobile(){ return window.matchMedia('(max-width: 900px)').matches; }
+  function apply(){
+    const mobile = isMobile();
     document.body.classList.toggle('is-mobile-layout', mobile);
     document.body.classList.toggle('is-desktop-layout', !mobile);
-    if(!mobile){ document.body.classList.remove('mobile-ux-enabled'); const sb=document.querySelector('.sidebar'); if(sb) sb.classList.remove('mobile-open'); }
-    else { document.body.classList.add('mobile-ux-enabled'); }
-  }
-  function centerMobile(retry=3){
-    if(!mq.matches) return;
-    const p=document.getElementById('preview-container') || document.querySelector('.preview-area');
-    const d=document.getElementById('document-wrapper') || document.querySelector('.document-wrapper');
-    if(!p||!d) return;
-    p.style.direction='ltr'; d.style.marginLeft='auto'; d.style.marginRight='auto'; d.style.left='auto'; d.style.right='auto';
-    requestAnimationFrame(()=>{ try{ p.scrollLeft=Math.max(0,(p.scrollWidth-p.clientWidth)/2); }catch(e){} });
-    if(retry>0) setTimeout(()=>centerMobile(retry-1),240);
-  }
-  function stabilizeDesktop(){
-    if(mq.matches) return;
-    const p=document.getElementById('preview-container') || document.querySelector('.preview-area');
-    const d=document.getElementById('document-wrapper') || document.querySelector('.document-wrapper');
-    if(!p||!d) return;
-    p.style.direction='ltr'; p.style.display='flex'; p.style.justifyContent='center'; p.style.alignItems='flex-start'; p.style.overflow='auto';
-    d.classList.remove('mobile-centered-waybill'); d.style.marginLeft='auto'; d.style.marginRight='auto'; d.style.left='auto'; d.style.right='auto';
-  }
-  function toggleFields(force){ const sb=document.querySelector('.sidebar'); if(!sb) return; const open=typeof force==='boolean'?force:!sb.classList.contains('mobile-open'); sb.classList.toggle('mobile-open',open); localStorage.setItem('durrat_mobile_fields_open',open?'1':'0'); setTimeout(()=>centerMobile(2),80); }
-  function openFirstGroup(){ if(!mq.matches) return; const form=document.getElementById('form-builder'); if(!form) return; const groups=[...form.querySelectorAll('details')].filter(d=>d.offsetParent!==null); if(groups.length && !groups.some(g=>g.open)) groups[0].open=true; }
-  function mobileControls(){
-    if(!mq.matches) return;
-    ensureButton('mobile-fields-toggle','<i class="fas fa-list-check"></i> الحقول',()=>toggleFields());
-    ensureButton('mobile-center-waybill','<i class="fas fa-crosshairs"></i>',()=>{ if(window.ZoomEngine) ZoomEngine.reset(); centerMobile(5); });
-    ensureButton('mobile-quick-save','<i class="fas fa-save"></i>',()=>{ if(window.ArchiveEngine) ArchiveEngine.saveCurrent(); });
-    openFirstGroup(); if(localStorage.getItem('durrat_mobile_fields_open')==='1') toggleFields(true); centerMobile(5);
-  }
-  function attachGestures(){
-    const sb=document.querySelector('.sidebar');
-    if(sb && sb.dataset.v11gestures!=='1'){
-      sb.dataset.v11gestures='1'; let sy=0; sb.addEventListener('touchstart',e=>{sy=e.touches[0].clientY},{passive:true}); sb.addEventListener('touchend',e=>{ if(!mq.matches)return; const ey=e.changedTouches[0].clientY; if(sy-ey>70)toggleFields(true); if(ey-sy>70)toggleFields(false);},{passive:true});
-    }
-    const p=document.getElementById('preview-container') || document.querySelector('.preview-area');
-    if(p && p.dataset.v11gestures!=='1'){
-      p.dataset.v11gestures='1'; let last=0, start=0, base=1; const dist=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
-      p.addEventListener('touchstart',e=>{ if(!mq.matches)return; if(e.touches.length===2 && window.ZoomEngine){start=dist(e.touches[0],e.touches[1]); base=ZoomEngine.scale||1;} },{passive:true});
-      p.addEventListener('touchmove',e=>{ if(!mq.matches)return; if(e.touches.length===2 && start && window.ZoomEngine){ e.preventDefault(); const r=dist(e.touches[0],e.touches[1])/start; ZoomEngine.scale=Math.max(.22,Math.min(2.2,base*r)); ZoomEngine.apply(); } },{passive:false});
-      p.addEventListener('touchend',()=>{ if(!mq.matches)return; start=0; const now=Date.now(); if(now-last<280 && window.ZoomEngine){ ZoomEngine.reset(); centerMobile(5); } last=now; },{passive:true});
+    const preview = document.getElementById('preview-container') || document.querySelector('.preview-area');
+    const doc = document.getElementById('document-wrapper') || document.querySelector('.document-wrapper');
+    if(!preview || !doc) return;
+    if(!mobile){
+      preview.style.direction = 'ltr';
+      preview.style.display = 'flex';
+      preview.style.justifyContent = 'center';
+      preview.style.alignItems = 'flex-start';
+      preview.style.overflow = 'auto';
+      doc.style.marginLeft = 'auto';
+      doc.style.marginRight = 'auto';
+      doc.classList.remove('mobile-centered-waybill');
+      setTimeout(()=>{ try { preview.scrollLeft = 0; } catch(e){} }, 60);
+    } else {
+      preview.style.direction = 'ltr';
+      setTimeout(()=>{ try { preview.scrollLeft = Math.max(0, (preview.scrollWidth - preview.clientWidth) / 2); } catch(e){} }, 120);
     }
   }
-  function apply(){ setMode(); stabilizeDesktop(); mobileControls(); attachGestures(); }
-  ready(()=>{ apply(); setTimeout(apply,500); setTimeout(apply,1500); });
-  window.addEventListener('load',()=>setTimeout(apply,300));
-  window.addEventListener('resize',()=>setTimeout(apply,120));
-  window.addEventListener('orientationchange',()=>setTimeout(apply,450));
-  window.DurratV11Layout={apply,centerMobile,toggleFields};
+  window.addEventListener('load', apply);
+  window.addEventListener('resize', apply);
+  window.addEventListener('orientationchange', ()=>setTimeout(apply, 300));
+  document.addEventListener('DOMContentLoaded', apply);
+  setTimeout(apply, 700);
+  setTimeout(apply, 1800);
+})();
+</script>
+
+
+
+<!-- Durrat V13 Mobile Professional UX Patch -->
+<style id="durrat-v13-mobile-pro-css">
+@media (max-width: 900px) {
+  :root { --v13-bottom-nav-h: 72px; }
+  body.v13-focus-mode header,
+  body.v13-focus-mode .preview-area,
+  body.v13-focus-mode .developer-footer,
+  body.v13-focus-mode .zoom-controls,
+  body.v13-focus-mode #branch-permissions-card,
+  body.v13-focus-mode #mobile-center-waybill { display: none !important; }
+  body.v13-focus-mode .sidebar { transform: translateY(0) !important; height: calc(100dvh - var(--v13-bottom-nav-h)) !important; border-radius: 0 !important; top:0 !important; bottom: var(--v13-bottom-nav-h) !important; }
+  body.v13-focus-mode .sidebar::before { content: "وضع التركيز — الحقول فقط" !important; }
+  body.v13-focus-mode .form-scroller { height: calc(100% - 105px) !important; }
+
+  /* تصغير الصلاحيات وتحويلها لبطاقة مختصرة */
+  #branch-permissions-card.branch-permissions-card,
+  .branch-permissions-card {
+    margin: 8px 0 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+    max-height: 96px !important;
+    overflow: hidden !important;
+    transition: max-height .22s ease, padding .22s ease !important;
+  }
+  #branch-permissions-card.v13-expanded { max-height: 360px !important; overflow: auto !important; }
+  #branch-permissions-card .perm-card-head { display:flex !important; align-items:center !important; justify-content:space-between !important; gap:8px !important; cursor:pointer !important; }
+  #branch-permissions-card .perm-card-head b { font-size: .95rem !important; }
+  #branch-permissions-card .perm-card-head small { font-size: .72rem !important; opacity:.8; }
+  #branch-permissions-card:not(.v13-expanded) .perm-chip-grid { display:flex !important; gap:6px !important; overflow-x:auto !important; padding: 6px 0 0 !important; max-height: 42px !important; }
+  #branch-permissions-card:not(.v13-expanded) .perm-chip:nth-child(n+5) { display:none !important; }
+  #branch-permissions-card .perm-chip { padding: 6px 10px !important; font-size: .78rem !important; white-space:nowrap !important; border-radius: 999px !important; }
+  #branch-permissions-card .perm-admin-open { min-height: 38px !important; padding: 8px 12px !important; font-size:.85rem !important; border-radius:14px !important; }
+  #branch-permissions-card::after { content: "اضغط للتفاصيل"; display:block; font-size:.7rem; opacity:.6; text-align:center; margin-top:3px; }
+  #branch-permissions-card.v13-expanded::after { content: "اضغط للإخفاء"; }
+
+  /* إعطاء الأولوية للحقول */
+  .sidebar { height: min(86dvh, 820px) !important; transform: translateY(calc(100% - 64px)) !important; }
+  .sidebar.mobile-open { transform: translateY(0) !important; }
+  .form-scroller { padding-bottom: 190px !important; }
+  .input-group { padding: 12px !important; border-radius: 16px !important; }
+  .input-group label { font-size: .98rem !important; margin-bottom: 4px !important; }
+  .input-group input, .input-group textarea, .input-group select { min-height: 54px !important; font-size: 17px !important; }
+
+  /* شريط أقسام سريع */
+  #v13-section-tabs { display:flex; gap:8px; overflow-x:auto; padding:8px 10px; margin:4px 0 8px; scrollbar-width:none; }
+  #v13-section-tabs::-webkit-scrollbar{ display:none; }
+  #v13-section-tabs button { flex:0 0 auto; border:1px solid rgba(59,130,246,.25); background:rgba(15,23,42,.86); color:#e5e7eb; border-radius:999px; padding:9px 12px; font-weight:900; font-size:.82rem; }
+  #v13-section-tabs button.done { color:#10b981; border-color:rgba(16,185,129,.35); }
+  #v13-section-tabs button.warn { color:#fb923c; border-color:rgba(251,146,60,.35); }
+
+  /* شريط تنقل سفلي */
+  #v13-bottom-nav { position:fixed; left:0; right:0; bottom:0; height:var(--v13-bottom-nav-h); z-index:7600; display:flex; align-items:center; justify-content:space-around; gap:6px; padding:8px 8px calc(8px + env(safe-area-inset-bottom)); background:rgba(2,6,23,.94); border-top:1px solid rgba(148,163,184,.18); backdrop-filter: blur(18px); }
+  #v13-bottom-nav button { border:0; background:transparent; color:#cbd5e1; min-width:54px; font-size:.72rem; font-weight:900; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  #v13-bottom-nav i { font-size:1.05rem; }
+  #v13-bottom-nav button.primary { color:#fff; background:linear-gradient(135deg,#2563eb,#06b6d4); border-radius:18px; padding:8px 12px; }
+  body { padding-bottom: var(--v13-bottom-nav-h) !important; }
+
+  /* زر التالي و أعلى الصفحة */
+  .v13-next-field { width:100%; min-height:46px; margin-top:10px; border:0; border-radius:14px; background:linear-gradient(135deg,#0f766e,#06b6d4); color:white; font-weight:900; }
+  #v13-top-btn { position:fixed; right:14px; bottom:168px; z-index:7601; width:48px; height:48px; border-radius:50%; border:1px solid rgba(255,255,255,.12); background:rgba(15,23,42,.92); color:white; box-shadow:0 10px 30px rgba(0,0,0,.35); display:none; }
+  #v13-top-btn.show { display:block; }
+
+  /* نافذة المعاينة */
+  #v13-preview-modal { position:fixed; inset:0; background:rgba(2,6,23,.98); z-index:9000; display:none; flex-direction:column; }
+  #v13-preview-modal.active { display:flex; }
+  #v13-preview-head { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(148,163,184,.18); }
+  #v13-preview-head button { border:0; border-radius:14px; padding:10px 12px; color:#fff; font-weight:900; background:#1e293b; }
+  #v13-preview-head .danger { background:#dc2626; }
+  #v13-preview-head .accent { background:linear-gradient(135deg,#2563eb,#06b6d4); }
+  #v13-preview-stage { flex:1; overflow:auto; display:flex; justify-content:center; align-items:flex-start; padding:12px; direction:ltr; }
+  #v13-preview-inner { transform-origin:top center; direction:rtl; }
+
+  /* إخفاء بعض أزرار الجوال القديمة عند وجود شريط V13 */
+  #mobile-fields-toggle { bottom: calc(var(--v13-bottom-nav-h) + 20px) !important; }
+  #mobile-quick-save, #mobile-center-waybill { bottom: calc(var(--v13-bottom-nav-h) + 20px) !important; }
+}
+@media (min-width: 901px) {
+  #v13-bottom-nav, #v13-section-tabs, #v13-top-btn, #v13-preview-modal { display:none !important; }
+}
+</style>
+<script id="durrat-v13-mobile-pro-js">
+(function(){
+  const isMobile = () => window.matchMedia('(max-width: 900px)').matches;
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+  function toast(msg){ try { window.UI && UI.toast ? UI.toast(msg) : console.log(msg); } catch(e){} }
+  function openFields(){ const side=$('.sidebar'); if(side){ side.classList.add('mobile-open'); localStorage.setItem('durrat_mobile_fields_open','1'); } }
+  function closeFields(){ const side=$('.sidebar'); if(side){ side.classList.remove('mobile-open'); localStorage.setItem('durrat_mobile_fields_open','0'); } }
+
+  function shrinkPermissions(){
+    const box = $('#branch-permissions-card');
+    if(!box || box.dataset.v13Ready==='1') return;
+    box.dataset.v13Ready='1';
+    box.addEventListener('click', function(e){
+      if(e.target.closest('button') || e.target.closest('.perm-link')) return;
+      box.classList.toggle('v13-expanded');
+    });
+  }
+
+  function buildSectionTabs(){
+    const scroller = $('#form-builder') || $('.form-scroller');
+    if(!scroller || $('#v13-section-tabs')) return;
+    const tabs = document.createElement('div');
+    tabs.id = 'v13-section-tabs';
+    const groups = $$('details', scroller).slice(0, 12);
+    if(!groups.length) return;
+    groups.forEach((d, i) => {
+      const text = (($('summary', d)||{}).textContent || ('قسم ' + (i+1))).trim().replace(/\s+/g,' ').slice(0,18);
+      const btn = document.createElement('button');
+      btn.type='button'; btn.textContent=text;
+      btn.onclick = () => { openFields(); d.open=true; d.scrollIntoView({behavior:'smooth', block:'start'}); };
+      tabs.appendChild(btn);
+    });
+    scroller.parentElement.insertBefore(tabs, scroller);
+    updateSectionTabs();
+  }
+
+  function updateSectionTabs(){
+    const tabs = $('#v13-section-tabs'); if(!tabs) return;
+    const scroller = $('#form-builder') || $('.form-scroller'); if(!scroller) return;
+    const groups = $$('details', scroller).slice(0, tabs.children.length);
+    groups.forEach((d,i)=>{
+      const inputs = $$('input,textarea,select', d).filter(x => x.type !== 'hidden' && !x.disabled);
+      const filled = inputs.filter(x => String(x.value||'').trim()).length;
+      const btn = tabs.children[i]; if(!btn) return;
+      btn.classList.toggle('done', inputs.length && filled >= Math.max(1, Math.ceil(inputs.length*.7)));
+      btn.classList.toggle('warn', inputs.length && filled > 0 && filled < Math.max(1, Math.ceil(inputs.length*.7)));
+    });
+  }
+
+  function addNextButtons(){
+    const inputs = $$('.form-scroller .input-group input, .form-scroller .input-group textarea, .form-scroller .input-group select').filter(x=>x.type!=='hidden');
+    inputs.forEach((inp, idx)=>{
+      const group = inp.closest('.input-group');
+      if(!group || group.querySelector('.v13-next-field')) return;
+      const btn=document.createElement('button');
+      btn.type='button'; btn.className='v13-next-field';
+      btn.innerHTML='التالي <i class="fas fa-arrow-left"></i>';
+      btn.onclick=()=>{
+        const next = inputs[idx+1] || inputs[0];
+        if(next){ next.closest('details') && (next.closest('details').open=true); next.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(()=>next.focus(),250); }
+      };
+      group.appendChild(btn);
+    });
+  }
+
+  function ensureBottomNav(){
+    if(!isMobile() || $('#v13-bottom-nav')) return;
+    const nav=document.createElement('nav'); nav.id='v13-bottom-nav';
+    nav.innerHTML=`
+      <button type="button" data-act="home"><i class="fas fa-house"></i><span>الرئيسية</span></button>
+      <button type="button" data-act="fields" class="primary"><i class="fas fa-list-check"></i><span>الحقول</span></button>
+      <button type="button" data-act="preview"><i class="fas fa-eye"></i><span>معاينة</span></button>
+      <button type="button" data-act="save"><i class="fas fa-save"></i><span>حفظ</span></button>
+      <button type="button" data-act="focus"><i class="fas fa-bullseye"></i><span>تركيز</span></button>`;
+    nav.addEventListener('click', e=>{
+      const b=e.target.closest('button'); if(!b) return;
+      const act=b.dataset.act;
+      if(act==='home') { closeFields(); window.scrollTo({top:0,behavior:'smooth'}); }
+      if(act==='fields') openFields();
+      if(act==='preview') openPreview();
+      if(act==='save') { try{ window.ArchiveEngine && ArchiveEngine.saveCurrent(); toast('تم الحفظ'); }catch(err){ toast('تعذر الحفظ'); } }
+      if(act==='focus') { document.body.classList.toggle('v13-focus-mode'); openFields(); }
+    });
+    document.body.appendChild(nav);
+  }
+
+  function ensureTopButton(){
+    if($('#v13-top-btn')) return;
+    const btn=document.createElement('button'); btn.id='v13-top-btn'; btn.innerHTML='<i class="fas fa-arrow-up"></i>';
+    btn.onclick=()=>{ const fs=$('.form-scroller'); if(fs) fs.scrollTo({top:0, behavior:'smooth'}); window.scrollTo({top:0, behavior:'smooth'}); };
+    document.body.appendChild(btn);
+    const fs=$('.form-scroller');
+    const check=()=>btn.classList.toggle('show', isMobile() && ((fs&&fs.scrollTop>450)||window.scrollY>450));
+    fs && fs.addEventListener('scroll', check, {passive:true}); window.addEventListener('scroll', check, {passive:true});
+  }
+
+  function ensurePreviewModal(){
+    if($('#v13-preview-modal')) return;
+    const modal=document.createElement('div'); modal.id='v13-preview-modal';
+    modal.innerHTML=`<div id="v13-preview-head">
+      <button class="danger" data-act="close"><i class="fas fa-arrow-right"></i> رجوع</button>
+      <div style="color:#fff;font-weight:900">معاينة البوليصة</div>
+      <div><button data-act="out"><i class="fas fa-search-minus"></i></button><button data-act="in"><i class="fas fa-search-plus"></i></button><button class="accent" data-act="jpg">JPG</button></div>
+    </div><div id="v13-preview-stage"><div id="v13-preview-inner"></div></div>`;
+    modal.addEventListener('click', e=>{
+      const b=e.target.closest('button'); if(!b) return;
+      const inner=$('#v13-preview-inner'); let z=parseFloat(inner.dataset.zoom||'1');
+      if(b.dataset.act==='close') closePreview();
+      if(b.dataset.act==='in') { z=Math.min(2.5,z+.15); inner.dataset.zoom=z; inner.style.transform=`scale(${z})`; }
+      if(b.dataset.act==='out') { z=Math.max(.35,z-.15); inner.dataset.zoom=z; inner.style.transform=`scale(${z})`; }
+      if(b.dataset.act==='jpg') { try{ window.ExportEngine && ExportEngine.generateImage ? ExportEngine.generateImage('jpeg') : null; }catch(e){} }
+    });
+    document.body.appendChild(modal);
+  }
+
+  function openPreview(){
+    ensurePreviewModal();
+    const modal=$('#v13-preview-modal'), inner=$('#v13-preview-inner'), doc=$('#document-wrapper');
+    if(!modal||!inner||!doc) return;
+    inner.innerHTML='';
+    const clone=doc.cloneNode(true);
+    clone.style.transform='none'; clone.style.margin='0 auto'; clone.style.position='relative'; clone.style.left='auto'; clone.style.right='auto';
+    inner.appendChild(clone); inner.dataset.zoom='1'; inner.style.transform='scale(1)';
+    modal.classList.add('active');
+  }
+  function closePreview(){ const modal=$('#v13-preview-modal'); if(modal) modal.classList.remove('active'); }
+
+  function addToolbarPreviewButton(){
+    const tb=$('#top-toolbar'); if(!tb || $('#v13-toolbar-preview')) return;
+    const btn=document.createElement('button'); btn.id='v13-toolbar-preview'; btn.type='button'; btn.className='btn-info';
+    btn.innerHTML='<i class="fas fa-eye"></i> معاينة'; btn.onclick=openPreview;
+    const pdfBtn = Array.from(tb.querySelectorAll('button')).find(b => /PDF|JPG|حفظ/.test(b.textContent||''));
+    tb.insertBefore(btn, pdfBtn || tb.firstChild);
+  }
+
+  function bindInputUpdates(){
+    if(document.body.dataset.v13InputBind==='1') return; document.body.dataset.v13InputBind='1';
+    document.addEventListener('input', ()=>{ updateSectionTabs(); scheduleAutosave(); }, true);
+    document.addEventListener('change', ()=>{ updateSectionTabs(); scheduleAutosave(); }, true);
+  }
+  let saveTimer=null;
+  function scheduleAutosave(){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{ try{ if(window.StateMgr && StateMgr.saveLocal) StateMgr.saveLocal(); else localStorage.setItem('durrat_v13_last_activity', Date.now()); }catch(e){} }, 1600);
+  }
+
+  function init(){
+    if(!isMobile()) return;
+    shrinkPermissions(); buildSectionTabs(); addNextButtons(); ensureBottomNav(); ensureTopButton(); ensurePreviewModal(); addToolbarPreviewButton(); bindInputUpdates(); updateSectionTabs();
+  }
+  document.addEventListener('DOMContentLoaded', init);
+  window.addEventListener('load', ()=>setTimeout(init,500));
+  window.addEventListener('resize', ()=>setTimeout(init,250));
+  new MutationObserver(()=>setTimeout(init,80)).observe(document.documentElement, {childList:true, subtree:true});
+  window.DurratV13Mobile = { openPreview, closePreview, openFields, closeFields };
 })();
 </script>
 
