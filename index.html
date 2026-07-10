@@ -810,8 +810,11 @@
         </div>
     </div>
 
-    <footer class="developer-footer" style="background: var(--panel-bg); backdrop-filter: blur(10px); border-top: 1px solid var(--border);">
-        تطوير وبرمجة <a href="https://wa.me/message/5WPPYBBO6JMLF1?src=qr" target="_blank">المهندس أمير الذبحاني <i class="fab fa-whatsapp" style="color: #25D366; font-size: 1.1rem;"></i></a>
+    <footer class="developer-footer" aria-label="بيانات المطور">
+        <span class="developer-label">تطوير وبرمجة</span>
+        <a class="developer-name" href="https://wa.me/message/5WPPYBBO6JMLF1?src=qr" target="_blank" rel="noopener">
+          <i class="fab fa-whatsapp" aria-hidden="true"></i><span>المهندس أمير الذبحاني</span>
+        </a>
     </footer>
 
     <script>
@@ -2647,5 +2650,80 @@
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(pollNotifications, 3000); setInterval(pollNotifications, 30000); });
 })();
 </script>
+
+<!-- Durrat V18.2 Mobile VIP Final Override -->
+<style id="durrat-v182-mobile-vip-final">
+@media (max-width:900px){
+  :root{--v182-brand-h:72px;--v182-tools-h:64px;--v182-nav-h:76px;--v182-dev-h:38px}
+  html,body{width:100%;max-width:100%;overflow-x:hidden!important}
+  body,body.is-mobile-layout,body.mobile-ux-enabled{padding-bottom:calc(var(--v182-nav-h) + var(--v182-dev-h) + env(safe-area-inset-bottom))!important}
+
+  /* رأس واضح: الهوية ثم أدوات العمل، بدون قص أو اختفاء */
+  header,body.is-mobile-layout header,body.mobile-ux-enabled header{
+    position:sticky!important;top:0!important;z-index:9000!important;
+    display:grid!important;grid-template-rows:auto auto!important;
+    width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+    flex:0 0 auto!important;padding:6px 0 0!important;margin:0!important;gap:4px!important;
+    overflow:visible!important;background:var(--panel-bg)!important;backdrop-filter:blur(18px)!important;
+    border-bottom:1px solid var(--border)!important
+  }
+  header .brand{display:flex!important;width:100%!important;min-height:58px!important;justify-content:center!important;align-items:center!important;padding:8px 14px!important;box-sizing:border-box!important;font-size:clamp(1rem,4.6vw,1.35rem)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  header .brand #branch-title{max-width:42vw!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+  #top-toolbar,.toolbar#top-toolbar,body.is-mobile-layout #top-toolbar,body.mobile-ux-enabled #top-toolbar{
+    display:flex!important;visibility:visible!important;opacity:1!important;position:relative!important;inset:auto!important;
+    width:100%!important;max-width:100%!important;min-height:60px!important;height:60px!important;
+    flex:0 0 60px!important;align-items:center!important;flex-wrap:nowrap!important;
+    overflow-x:auto!important;overflow-y:hidden!important;gap:8px!important;padding:5px 12px 7px!important;
+    box-sizing:border-box!important;scroll-snap-type:x proximity!important;scroll-padding-inline:12px!important;
+    scrollbar-width:none!important;-webkit-overflow-scrolling:touch!important;background:rgba(15,23,42,.04)!important
+  }
+  #top-toolbar::-webkit-scrollbar{display:none!important}
+  #top-toolbar>button,#top-toolbar>select{
+    display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important;
+    align-items:center!important;justify-content:center!important;gap:7px!important;
+    min-width:100px!important;height:48px!important;min-height:48px!important;padding:9px 14px!important;margin:0!important;
+    border-radius:15px!important;font-size:.9rem!important;font-weight:900!important;line-height:1!important;
+    scroll-snap-align:start!important;white-space:nowrap!important
+  }
+  #top-toolbar>select{min-width:122px!important}
+  #top-toolbar .admin-tool{display:none!important}
+  body.is-admin-user #top-toolbar .admin-tool{display:inline-flex!important}
+
+  .workspace,body.is-mobile-layout .workspace,body.mobile-ux-enabled .workspace{
+    height:auto!important;min-height:calc(100dvh - 132px)!important;max-height:none!important;overflow:visible!important;margin:0!important
+  }
+  .preview-area,body.is-mobile-layout .preview-area,body.mobile-ux-enabled .preview-area{
+    height:auto!important;min-height:calc(100dvh - 165px)!important;overflow:visible!important;
+    padding-top:14px!important;padding-bottom:190px!important
+  }
+
+  /* توقيع المطور موزون وسطر واحد في الأسفل */
+  .developer-footer{
+    position:fixed!important;left:0!important;right:0!important;bottom:calc(var(--v182-nav-h) + env(safe-area-inset-bottom))!important;
+    z-index:9400!important;width:100%!important;height:var(--v182-dev-h)!important;min-height:var(--v182-dev-h)!important;
+    display:flex!important;direction:rtl!important;align-items:center!important;justify-content:center!important;gap:6px!important;
+    margin:0!important;padding:5px 10px!important;box-sizing:border-box!important;white-space:nowrap!important;
+    font-size:clamp(.72rem,3vw,.86rem)!important;line-height:1!important;background:rgba(255,255,255,.94)!important;
+    color:#334155!important;border-top:1px solid rgba(148,163,184,.25)!important;box-shadow:0 -8px 24px rgba(15,23,42,.08)!important
+  }
+  .developer-footer .developer-label{font-weight:800!important;color:inherit!important}
+  .developer-footer .developer-name{display:inline-flex!important;align-items:center!important;gap:5px!important;color:#0891b2!important;font-weight:950!important;text-decoration:none!important;font-size:inherit!important}
+  .developer-footer .developer-name i{color:#22c55e!important;font-size:1.05em!important}
+  body.dark-mode .developer-footer,body.theme-dark .developer-footer{background:rgba(2,6,23,.95)!important;color:#cbd5e1!important}
+
+  #v13-bottom-nav{height:var(--v182-nav-h)!important;z-index:9500!important}
+  #mobile-fields-toggle,#mobile-center-waybill,#mobile-quick-save{bottom:calc(var(--v182-nav-h) + var(--v182-dev-h) + 14px)!important;z-index:9300!important}
+  .zoom-controls{bottom:calc(var(--v182-nav-h) + var(--v182-dev-h) + 76px)!important;z-index:9200!important}
+  #mobile-fields-toggle{right:12px!important;min-width:126px!important}
+  #mobile-center-waybill{left:14px!important}
+  #mobile-quick-save{left:78px!important}
+}
+@media(max-width:420px){
+  #top-toolbar>button,#top-toolbar>select{min-width:94px!important;padding-inline:12px!important;font-size:.84rem!important}
+  header .brand{font-size:1rem!important}
+  .developer-footer{font-size:.71rem!important;gap:4px!important}
+}
+</style>
+
 </body>
 </html>
