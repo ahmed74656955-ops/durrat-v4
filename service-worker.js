@@ -1,8 +1,10 @@
-const CACHE_NAME = "durrat-v18-2-mobile-vip-maintenance";
+const CACHE_NAME = 'durrat-erp-v18-4-mobile-ease';
 
 const PRECACHE_URLS = [
   "./",
   "./index.html",
+  "./css/mobile-v18-4.css",
+  "./js/enterprise/v18_4-mobile-ux.js",
   "./admin.html",
   "./manifest.json",
   "./style.css",
