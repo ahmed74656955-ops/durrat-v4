@@ -1,0 +1,128 @@
+/* Durrat ERP V18.4 — Mobile Ease & Guidance */
+@media (max-width: 900px) {
+  :root { --v184-clock-h: 32px; }
+
+  /* أدوات التكبير العائمة تشتت أثناء إدخال الحقول؛ المعاينة تكفي */
+  .preview-area > .zoom-controls,
+  #mobile-center-waybill,
+  #v13-top-btn { display: none !important; }
+
+  /* رأس الجوال: الهوية ثم التاريخ/الوقت ثم الأدوات */
+  header { grid-template-rows: auto auto auto !important; }
+  #v184-clockbar {
+    order: 2;
+    width: calc(100% - 20px);
+    min-height: var(--v184-clock-h);
+    margin: 0 10px 3px;
+    padding: 4px 9px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    border: 1px solid rgba(148,163,184,.22);
+    border-radius: 12px;
+    background: rgba(255,255,255,.68);
+    color: #334155;
+    font-size: .73rem;
+    font-weight: 850;
+    backdrop-filter: blur(12px);
+  }
+  body.dark-mode #v184-clockbar,
+  body.theme-dark #v184-clockbar { background: rgba(15,23,42,.82); color:#e2e8f0; }
+  #v184-clockbar[hidden] { display:none !important; }
+  #v184-clockbar .v184-clock-main { display:flex; align-items:center; gap:10px; min-width:0; }
+  #v184-clockbar .v184-clock-item { display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
+  #v184-clockbar .v184-clock-item i { color:var(--primary); }
+  #v184-clock-settings { border:0; background:transparent; color:inherit; width:30px; height:26px; border-radius:8px; cursor:pointer; }
+
+  #top-toolbar { order:3; }
+
+  /* زر رئيسية صغير ودائم بدون حجب الحقول */
+  #v184-home-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 72px);
+    left: 8px;
+    z-index: 9800;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15,23,42,.86);
+    color:#fff;
+    box-shadow:0 8px 22px rgba(15,23,42,.24);
+    backdrop-filter:blur(12px);
+  }
+
+  /* إبقاء الحقول في مركز الاهتمام */
+  #mobile-fields-toggle { right: 12px !important; min-width: 118px !important; }
+  #mobile-quick-save { left: 16px !important; }
+
+  /* محاذاة بيانات المطور */
+  .developer-footer { gap:7px !important; justify-content:center !important; }
+  .developer-footer .developer-label,
+  .developer-footer .developer-name { line-height:1 !important; }
+
+  /* المعاينة: رجوع واضح بدون أدوات تكبير */
+  #v13-preview-head { grid-template-columns: auto 1fr auto !important; }
+  #v13-preview-head [data-act="in"],
+  #v13-preview-head [data-act="out"] { display:none !important; }
+  #v184-preview-home {
+    border:0;
+    border-radius:11px;
+    padding:9px 12px;
+    background:#0f172a;
+    color:#fff;
+    font-weight:900;
+  }
+
+  /* لوحة الخيارات الصغيرة */
+  #v184-display-popover {
+    position:fixed;
+    top:132px;
+    left:10px;
+    z-index:9900;
+    width:min(290px,calc(100vw - 20px));
+    padding:14px;
+    border-radius:17px;
+    background:rgba(255,255,255,.97);
+    color:#0f172a;
+    box-shadow:0 18px 50px rgba(15,23,42,.28);
+    border:1px solid rgba(148,163,184,.28);
+    direction:rtl;
+  }
+  body.dark-mode #v184-display-popover { background:rgba(15,23,42,.98);color:#fff; }
+  #v184-display-popover[hidden] { display:none !important; }
+  .v184-switch-row { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid rgba(148,163,184,.18);font-weight:850; }
+  .v184-switch-row:last-child { border-bottom:0; }
+  .v184-switch-row input { width:20px;height:20px;accent-color:#0ea5e9; }
+
+  /* نافذة الإرشاد لأول تشغيل */
+  #v184-onboarding {
+    position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;
+    padding:18px;background:rgba(2,6,23,.72);backdrop-filter:blur(10px);direction:rtl;
+  }
+  #v184-onboarding[hidden] { display:none !important; }
+  .v184-guide-card { width:min(430px,100%);max-height:88dvh;overflow:auto;background:#fff;color:#0f172a;border-radius:25px;padding:22px;box-shadow:0 30px 80px rgba(0,0,0,.38); }
+  body.dark-mode .v184-guide-card { background:#0f172a;color:#f8fafc; }
+  .v184-guide-head { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px; }
+  .v184-guide-head h2 { margin:0;font-size:1.25rem; }
+  .v184-guide-close { border:0;background:#fee2e2;color:#dc2626;width:36px;height:36px;border-radius:11px;font-size:1.1rem; }
+  .v184-guide-step { display:flex;gap:12px;align-items:flex-start;padding:12px;margin:9px 0;border:1px solid rgba(148,163,184,.22);border-radius:16px;background:rgba(14,165,233,.04); }
+  .v184-guide-step i { min-width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff; }
+  .v184-guide-step b { display:block;margin-bottom:4px; }
+  .v184-guide-step p { margin:0;color:#64748b;line-height:1.65;font-size:.9rem; }
+  body.dark-mode .v184-guide-step p { color:#cbd5e1; }
+  .v184-guide-actions { display:flex;gap:10px;margin-top:16px; }
+  .v184-guide-actions button { flex:1;border:0;border-radius:14px;padding:12px;font-weight:900; }
+  .v184-guide-primary { background:linear-gradient(135deg,#2563eb,#06b6d4);color:#fff; }
+  .v184-guide-secondary { background:#e2e8f0;color:#0f172a; }
+}
+
+@media (min-width: 901px) {
+  #v184-clockbar,#v184-home-btn,#v184-display-popover,#v184-onboarding { display:none !important; }
+}
