@@ -1,0 +1,20 @@
+
+/* Durrat V18.3 - admin scrolling and maintenance controls */
+html, body { min-height:100%; }
+.main-content { min-width:0; }
+.content-area { overflow:auto !important; scrollbar-gutter:stable both-edges; }
+.card.glass-panel { min-width:0; }
+.table-wrapper, .admin-table-wrapper, .fields-table-wrapper, .v18-table-scroll {
+  width:100%; overflow:auto !important; -webkit-overflow-scrolling:touch; scrollbar-width:thin;
+}
+.data-table { min-width:980px; width:100%; }
+.data-table th, .data-table td { white-space:nowrap; }
+.data-table td.wrap-cell { white-space:normal; min-width:260px; max-width:460px; }
+.bulk-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 14px; }
+.bulk-actions .danger-zone { margin-inline-start:auto; display:flex; gap:8px; flex-wrap:wrap; }
+.row-select, #select-all-audit, #select-all-archive { transform:scale(1.2); accent-color:var(--danger); cursor:pointer; }
+.maintenance-note { padding:12px 14px; border:1px solid rgba(245,158,11,.35); background:rgba(245,158,11,.08); border-radius:14px; line-height:1.8; }
+@media (max-width: 900px){
+  .data-table{min-width:820px}
+  .content-area{padding-bottom:100px!important}
+}
